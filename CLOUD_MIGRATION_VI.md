@@ -9,7 +9,8 @@
 - Đã deploy Worker và gắn tên miền chính https://study.anhdungece.id.vn . Link workers.dev cũ chuyển phiên sang địa chỉ chính; xem [DOMAIN_AND_SESSIONS_VI.md](DOMAIN_AND_SESSIONS_VI.md). Frontend và `/api/health` tại tên miền chính trả 200, `database:true`.
 - Đã cấu hình Hyperdrive `kienhoc-supabase`, kết nối trực tiếp Supabase bằng TLS `verify-full` với CA chính thức, tối đa 5 kết nối origin; tắt query caching để giữ đúng dữ liệu xác thực/tiến độ.
 - Đã kiểm tra production: đăng nhập mật khẩu, ghi/đọc tiến độ, cô lập hai tài khoản, revision conflict 409 và thu hồi phiên khi logout. Tài khoản thử đã được xóa.
-- Chưa có Resend key và backup SQLite nguồn. OTP email chưa sử dụng được, dữ liệu học/tài khoản cũ chưa được chuyển.
+- OTP email đã cấu hình bằng Resend, miền gửi `auth.anhdungece.id.vn` đã verified. Khóa production chỉ có Sending access cho đúng miền này, lưu trong Cloudflare secrets; `EMAIL_FROM` là `Kiến Học <dangnhap@auth.anhdungece.id.vn>`. Production `/api/health` trả `emailConfigured:true`; gửi OTP thật trả 200 và Resend báo delivered. Chưa kiểm chứng thao tác nhập mã của người dùng trên trình duyệt.
+- Tạm bỏ qua nhập dữ liệu cũ theo lựa chọn của chủ dự án: bắt đầu tài khoản/tiến độ mới, giữ nguyên hệ thống cũ. Mật khẩu/tài khoản cũ chưa được nhập; người dùng có thể đăng nhập bằng OTP cùng email và đặt mật khẩu mới. Chưa có backup SQLite nguồn; chỉ dùng công cụ import khi thực sự cần và đích còn trống, không xóa dữ liệu mới để ép import.
 - Giữ OTP/JWT/bcrypt hiện có, không chuyển người dùng sang Supabase Auth trong đợt này. Không cần publishable key hay service-role key trong frontend.
 
 ## Chạy ngay trên máy
