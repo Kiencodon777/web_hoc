@@ -40,7 +40,7 @@ export default {
     headers.set('X-Forwarded-For', ip);
     headers.delete('Forwarded');
     const forwarded = new Request(request, { headers });
-    const store = postgresModule.openPostgres(bindings.DATABASE_URL);
+    const store = postgresModule.openHyperdrive(bindings.HYPERDRIVE);
     try { return await requests.run(store, () => handler.fetch(forwarded, bindings, ctx)); }
     finally { ctx.waitUntil(store.close()); }
   }

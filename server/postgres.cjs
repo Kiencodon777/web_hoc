@@ -72,4 +72,13 @@ function openPostgres(url) {
   pool.on('error', () => console.error('PostgreSQL idle connection failed.'));
   return postgresStorage(pool);
 }
-module.exports = { openPostgres, postgresStorage, postgresSQL };
+function openHyperdrive(binding) {
+  if (!binding?.connectionString) throw Error('HYPERDRIVE binding is required.');
+  // This is the internal runtime proxy, not the public database endpoint.
+  // Hyperdrive verifies TLS + hostname against the uploaded CA at the origin.
+  const pool = new Pool({connectionString:binding.connectionString,ssl:false,max:2,
+    connectionTimeoutMillis:10000,idleTimeoutMillis:1000});
+  pool.on('error',()=>console.error('Hyperdrive idle connection failed.'));
+  return postgresStorage(pool);
+}
+module.exports = { openPostgres, openHyperdrive, postgresStorage, postgresSQL };

@@ -11,6 +11,15 @@ const { blank } = require('../dist/progress-merge.js');
 const { importSQLite } = require('../scripts/import-sqlite.cjs');
 const { openDatabase } = require('../server/database.cjs');
 const { postgresConfig } = require('../server/postgres-config.cjs');
+const { safeDatabaseError } = require('../server/safe-db-error.cjs');
+
+test('database diagnostics redact connection strings and both password encodings', () => {
+  const url = 'postgresql://example:example%40password@localhost:5432/postgres';
+  const detail = safeDatabaseError(new Error(url+' example@password example%40password'),url);
+  assert(!detail.includes('example@password'));
+  assert(!detail.includes('example%40password'));
+  assert(!detail.includes('postgresql://'));
+});
 
 test('Supabase TLS verifies its public CA and URL options cannot disable verification', () => {
   const config = postgresConfig('postgresql://example:testing@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=no-verify&uselibpqcompat=true');

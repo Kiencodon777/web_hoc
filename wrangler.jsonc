@@ -1,10 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kienhoc",
+  "account_id": "dea1d41355c5cb6bd9c128f72ec85a0f",
   "main": "worker/index.mjs",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "preview_urls": false,
+  "hyperdrive": [{"binding":"HYPERDRIVE","id":"90035687e0384e4c9f27530c6cf88e0e"}],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -13,7 +16,7 @@
   "vars": {
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
-    "APP_ORIGINS": "http://localhost:8787,http://127.0.0.1:8787"
+    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev"
   },
   "ratelimits": [{
     "name": "AUTH_LIMITER", "namespace_id": "1001",

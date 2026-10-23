@@ -6,7 +6,10 @@
 - Supabase project `kienhoc`, Singapore, ref `tfpxpfjuoliltjhqvjyx` đã tạo trong `concas2025's Org`.
 - Đã áp dụng hai migration trong `supabase/migrations/`. Các bảng hiện chưa có tài khoản/tiến độ cũ.
 - Frontend + API chạy cùng origin trên Cloudflare Workers. PostgreSQL nằm trên Supabase.
-- Chưa deploy Cloudflare: chủ tài khoản cần đăng ký và đăng nhập. Chưa có DATABASE_URL, Resend key hay backup SQLite nguồn.
+- Đã deploy tại https://kienhoc.anhdungcasi.workers.dev . Frontend và `/api/health` trả 200, `database:true`.
+- Đã cấu hình Hyperdrive `kienhoc-supabase`, kết nối trực tiếp Supabase bằng TLS `verify-full` với CA chính thức, tối đa 5 kết nối origin; tắt query caching để giữ đúng dữ liệu xác thực/tiến độ.
+- Đã kiểm tra production: đăng nhập mật khẩu, ghi/đọc tiến độ, cô lập hai tài khoản, revision conflict 409 và thu hồi phiên khi logout. Tài khoản thử đã được xóa.
+- Chưa có Resend key và backup SQLite nguồn. OTP email chưa sử dụng được, dữ liệu học/tài khoản cũ chưa được chuyển.
 - Giữ OTP/JWT/bcrypt hiện có, không chuyển người dùng sang Supabase Auth trong đợt này. Không cần publishable key hay service-role key trong frontend.
 
 ## Chạy ngay trên máy
@@ -21,9 +24,9 @@ Mở http://localhost:3000 . `setup:local` tạo `.env` riêng với JWT secret 
 
 ## Kết nối Supabase
 
-Mở https://supabase.com/dashboard/project/tfpxpfjuoliltjhqvjyx và chọn **Connect → Transaction pooler**. Lưu URI vào `DATABASE_URL` trong `.env` trên máy và Cloudflare secret khi deploy. Nếu chưa biết mật khẩu database, đặt lại trong Dashboard rồi dùng mật khẩu mới. URL-encode phần mật khẩu trong URI; không đưa URI vào chat, commit, log hoặc `dist/`.
+Mở https://supabase.com/dashboard/project/tfpxpfjuoliltjhqvjyx và chọn **Connect → Transaction pooler**. Lưu URI vào `DATABASE_URL` trong `.env` trên máy. Worker production dùng credential được lưu trong Hyperdrive thay vì secret DATABASE_URL. Nếu chưa biết mật khẩu database, đặt lại trong Dashboard rồi dùng mật khẩu mới và cập nhật Hyperdrive. URL-encode phần mật khẩu trong URI; không đưa URI vào chat, commit, log hoặc `dist/`.
 
-Driver dùng TLS và kiểm tra chứng chỉ, không dùng named prepared statements, pool tối đa hai kết nối mỗi request Worker. `server/supabase-ca.cjs` chứa chứng chỉ CA công khai của Supabase, tải qua HTTPS từ kho chính thức và dùng cho kết nối Supabase; luôn giữ kiểm tra chứng chỉ/hostname. Các tùy chọn SSL trong URI không được ghi đè chính sách TLS của ứng dụng. Đợt đầu có thể dùng tài khoản database từ Dashboard; trước khi vận hành lớn nên tách role backend có quyền trên schema `kienhoc` và quản lý credential riêng.
+Trên Node local và các script nhập dữ liệu, driver dùng TLS và kiểm tra chứng chỉ. `server/supabase-ca.cjs` chứa CA công khai chính thức của Supabase; các tùy chọn SSL trong URI không được ghi đè chính sách TLS. Trên Worker production, kết nối đi qua binding Hyperdrive, giữ pool client tối đa hai kết nối mỗi request. Hyperdrive thực hiện TLS tới database với `verify-full` và CA đã upload; chặng proxy nội bộ dùng giao thức của binding, không tự mở kết nối không mã hóa tới database công khai. Đợt đầu dùng tài khoản database từ Dashboard; trước khi vận hành lớn nên tách role backend có quyền trên schema `kienhoc` và quản lý credential riêng.
 
 Schema `kienhoc` không được thêm vào danh sách Exposed schemas của Data API. RLS đã bật, không có policy cho anon/authenticated; frontend chỉ đi qua API đã xác thực. Security Advisor báo INFO “RLS Enabled No Policy” là hệ quả chủ đích của cấu hình backend truy cập riêng, không phải lý do để mở policy public.
 
@@ -58,10 +61,11 @@ npx wrangler login
 npx wrangler whoami
 ```
 
-Tạo secret bằng prompt tương tác, không đặt giá trị bí mật trong dòng lệnh hoặc mã nguồn:
+Hyperdrive đã được tạo và binding HYPERDRIVE đã nằm trong `wrangler.jsonc`. Mật khẩu database được giữ trong cấu hình origin của Hyperdrive; DATABASE_URL chỉ cần trong `.env` local cho các script và `npm start`. Khi thay mật khẩu Supabase, phải cập nhật credential origin của Hyperdrive.
+
+Tạo/cập nhật secret bằng prompt tương tác, không đặt giá trị bí mật trong dòng lệnh hoặc mã nguồn:
 
 ```powershell
-npx wrangler secret put DATABASE_URL
 npx wrangler secret put JWT_SECRET
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put EMAIL_FROM
@@ -77,9 +81,9 @@ npm run cf:check
 npm run cf:deploy
 ```
 
-Static assets chỉ lấy từ `dist/`, API dùng Express qua Node HTTP compatibility. Kết nối PostgreSQL được tạo/đóng theo request để tuân thủ vòng đời socket của Workers. Rate limit IP lưu trên PostgreSQL, bổ sung binding AUTH_LIMITER tại Cloudflare; cooldown/giới hạn OTP theo email và khóa giao dịch cũng nằm trong PostgreSQL. Lưu tiến độ dùng khóa giao dịch theo tài khoản, tránh ghi đè khi nhiều Worker cùng nhận revision cũ.
+Static assets chỉ lấy từ `dist/`, API dùng Express qua Node HTTP compatibility. Kết nối client Hyperdrive được tạo/đóng theo request để tuân thủ vòng đời socket của Workers; Hyperdrive giữ pool tới Supabase. Query caching đã tắt. Rate limit IP lưu trên PostgreSQL, bổ sung binding AUTH_LIMITER tại Cloudflare; cooldown/giới hạn OTP theo email và khóa giao dịch cũng nằm trong PostgreSQL. Lưu tiến độ dùng khóa giao dịch theo tài khoản, tránh ghi đè khi nhiều Worker cùng nhận revision cũ.
 
-Để thử runtime Worker local, sao chép `.dev.vars.example` thành `.dev.vars`, điền giá trị thật rồi `npm run cf:dev`. File này được Git bỏ qua. Kiểm tra giới hạn CPU của gói Cloudflare với bcrypt cost 12 trước khi vận hành; đóng gói thành công không chứng minh thời gian CPU production đủ.
+Để thử runtime Worker local, sao chép `.dev.vars.example` thành `.dev.vars`, điền JWT_SECRET và cấu hình mail khi có. Đặt biến môi trường local `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` bằng URI pooler trên máy trước `npm run cf:dev`; không commit URI. File `.dev.vars` và file credential `.env.cloudflare` được Git bỏ qua. Đăng nhập bcrypt cost 12 đã chạy thành công trên URL production; vẫn cần theo dõi CPU/lưu lượng thực tế khi tăng quy mô.
 
 Chỉ trỏ domain/DNS sau khi URL Worker đã qua nghiệm thu; lưu các bản ghi DNS hiện tại để khôi phục. Không cần chuyển nameserver để thử bằng workers.dev.
 
@@ -92,7 +96,7 @@ Chỉ trỏ domain/DNS sau khi URL Worker đã qua nghiệm thu; lưu các bản
 - Kiểm tra offline/online, đăng xuất thu hồi phiên, đổi mật khẩu thu hồi phiên khác, redeploy không mất dữ liệu.
 - `.env`, source backend và backup truy cập bằng URL phải trả 404.
 
-Test tự động: SQLite API/client/sync, PostgreSQL bằng PGlite (engine PostgreSQL WASM), nhập snapshot giữ mật khẩu/ID/revision, từ chối ghi đè đích đã có dữ liệu. PGlite chỉ có một session nên không thay thế kiểm thử nhiều kết nối thật. Worker đã được chạy thử local với assets 200, API báo 503 khi DB không truy cập được và source/secrets 404. Chưa kiểm chứng TCP/TLS tới Supabase từ Worker production, email thật, CPU production hay DNS.
+Test tự động: SQLite API/client/sync, PostgreSQL bằng PGlite (engine PostgreSQL WASM), nhập snapshot giữ mật khẩu/ID/revision, từ chối ghi đè đích đã có dữ liệu và cấu hình TLS/redaction. PGlite chỉ có một session nên không thay thế kiểm thử nhiều kết nối thật. Worker đã kiểm tra production với frontend/health 200 và source/secrets 404; tài khoản thử xác nhận login, progress, isolation, conflict và logout trước khi xóa. Chưa kiểm chứng email thật, dữ liệu người dùng cũ hay custom domain/DNS.
 
 Giữ bản SQLite và phiên bản ứng dụng cũ để rollback trước khi mở ghi cloud. Khi đã có dữ liệu mới trên cloud, không quay về SQLite cũ mà bỏ qua dữ liệu mới; cần dừng ghi và đối chiếu/xuất dữ liệu trước. Chưa sửa DNS hay ngừng backend trên máy cũ.
 
