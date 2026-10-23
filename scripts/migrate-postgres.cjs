@@ -1,9 +1,10 @@
 const { Pool } = require('pg');
+const { postgresConfig } = require('../server/postgres-config.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 async function main() {
   if (!process.env.DATABASE_URL) throw Error('DATABASE_URL is required.');
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: true }, max: 1 });
+  const pool = new Pool({ ...postgresConfig(process.env.DATABASE_URL), max: 1 });
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

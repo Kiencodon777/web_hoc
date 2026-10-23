@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { postgresConfig } = require('./postgres-config.cjs');
 
 // Only application-owned SQL templates pass through this adapter; values always
 // remain parameters. Never accept SQL templates from an HTTP request.
@@ -66,8 +67,8 @@ function postgresStorage(pool) {
 
 function openPostgres(url) {
   if (!url) throw Error('DATABASE_URL is required.');
-  const pool = new Pool({ connectionString: url, max: 2, connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 1000, ssl: { rejectUnauthorized: true } });
+  const pool = new Pool({ ...postgresConfig(url), max: 2, connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 1000 });
   pool.on('error', () => console.error('PostgreSQL idle connection failed.'));
   return postgresStorage(pool);
 }

@@ -23,7 +23,7 @@ Mở http://localhost:3000 . `setup:local` tạo `.env` riêng với JWT secret 
 
 Mở https://supabase.com/dashboard/project/tfpxpfjuoliltjhqvjyx và chọn **Connect → Transaction pooler**. Lưu URI vào `DATABASE_URL` trong `.env` trên máy và Cloudflare secret khi deploy. Nếu chưa biết mật khẩu database, đặt lại trong Dashboard rồi dùng mật khẩu mới. URL-encode phần mật khẩu trong URI; không đưa URI vào chat, commit, log hoặc `dist/`.
 
-Driver dùng TLS và kiểm tra chứng chỉ, không dùng named prepared statements, pool tối đa hai kết nối mỗi request Worker. Khi cần CA riêng, cấu hình CA hợp lệ; không tắt kiểm tra TLS. Đợt đầu có thể dùng tài khoản database từ Dashboard; trước khi vận hành lớn nên tách role backend có quyền trên schema `kienhoc` và quản lý credential riêng.
+Driver dùng TLS và kiểm tra chứng chỉ, không dùng named prepared statements, pool tối đa hai kết nối mỗi request Worker. `server/supabase-ca.cjs` chứa chứng chỉ CA công khai của Supabase, tải qua HTTPS từ kho chính thức và dùng cho kết nối Supabase; luôn giữ kiểm tra chứng chỉ/hostname. Các tùy chọn SSL trong URI không được ghi đè chính sách TLS của ứng dụng. Đợt đầu có thể dùng tài khoản database từ Dashboard; trước khi vận hành lớn nên tách role backend có quyền trên schema `kienhoc` và quản lý credential riêng.
 
 Schema `kienhoc` không được thêm vào danh sách Exposed schemas của Data API. RLS đã bật, không có policy cho anon/authenticated; frontend chỉ đi qua API đã xác thực. Security Advisor báo INFO “RLS Enabled No Policy” là hệ quả chủ đích của cấu hình backend truy cập riêng, không phải lý do để mở policy public.
 

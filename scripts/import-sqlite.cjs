@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const Database = require('better-sqlite3');
 const { Pool } = require('pg');
+const { postgresConfig } = require('../server/postgres-config.cjs');
 const { validProgress } = require('../server/validation.cjs');
 
 async function importSQLite(source, pool) {
@@ -45,7 +46,7 @@ async function importSQLite(source, pool) {
 }
 if (require.main === module) {
   if (!process.env.DATABASE_URL) throw Error('Set DATABASE_URL in your local .env.');
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: true }, max: 1 });
+  const pool = new Pool({ ...postgresConfig(process.env.DATABASE_URL), max: 1 });
   importSQLite(process.argv[2], pool).then(counts => console.log('Verified import:', counts))
     .catch(() => { console.error('Import failed; transaction rolled back. Check the backup and empty target.'); process.exitCode = 1; })
     .finally(() => pool.end());

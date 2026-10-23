@@ -10,6 +10,18 @@ const { createApp } = require('../server/app.cjs');
 const { blank } = require('../dist/progress-merge.js');
 const { importSQLite } = require('../scripts/import-sqlite.cjs');
 const { openDatabase } = require('../server/database.cjs');
+const { postgresConfig } = require('../server/postgres-config.cjs');
+
+test('Supabase TLS verifies its public CA and URL options cannot disable verification', () => {
+  const config = postgresConfig('postgresql://example:testing@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=no-verify&uselibpqcompat=true');
+  assert.equal(config.ssl.rejectUnauthorized,true);
+  assert.match(config.ssl.ca,/BEGIN CERTIFICATE/);
+  const cert = new (require('node:crypto').X509Certificate)(config.ssl.ca);
+  assert(cert.ca);
+  assert(cert.subject.includes('Supabase Root 2021 CA'));
+  assert.equal(new URL(config.connectionString).search,'');
+  assert.equal(postgresConfig('postgresql://example:testing@localhost:5432/postgres').ssl.ca,undefined);
+});
 
 // PGlite runs real PostgreSQL SQL in WASM. A single-session pool serializes
 // clients; cross-server advisory locking still requires live Supabase testing.
