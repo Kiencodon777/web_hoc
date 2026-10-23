@@ -7,16 +7,20 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "triggers":{"crons":["*/5 * * * *"]},
   "hyperdrive": [{"binding":"HYPERDRIVE","id":"90035687e0384e4c9f27530c6cf88e0e"}],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": true
   },
   "vars": {
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
-    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev"
+    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev",
+    "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
+    "CANONICAL_ENABLED": "true",
+    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev"
   },
   "ratelimits": [{
     "name": "AUTH_LIMITER", "namespace_id": "1001",

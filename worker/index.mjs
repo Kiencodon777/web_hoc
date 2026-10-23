@@ -3,6 +3,8 @@ import { env } from 'cloudflare:workers';
 import { httpServerHandler } from 'cloudflare:node';
 import appModule from '../server/app.cjs';
 import postgresModule from '../server/postgres.cjs';
+import domainRouting from '../server/domain-routing.cjs';
+import domainHandoff from '../server/domain-handoff.cjs';
 
 // TCP connections belong to a request in Workers, not to a global isolate.
 const requests = new AsyncLocalStorage();
@@ -26,7 +28,18 @@ app.listen(3000);
 const handler = httpServerHandler({ port: 3000 });
 
 export default {
+  async scheduled(controller,bindings,ctx){
+    const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
+    try{await store.purgeHandoffs(Date.now());}finally{ctx.waitUntil(store.close());}
+  },
   async fetch(request, bindings, ctx) {
+    if(new URL(request.url).pathname.startsWith('/api/domain-transfer/')){
+      const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
+      try{return await domainHandoff.handleHandoff(request,bindings,store,request.headers.get('CF-Connecting-IP')||'unknown');}
+      finally{ctx.waitUntil(store.close());}
+    }
+    const migration = await domainRouting.handleDomainRouting(request, bindings);
+    if(migration)return migration;
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return bindings.ASSETS.fetch(request);
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';

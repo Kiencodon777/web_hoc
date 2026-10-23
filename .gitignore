@@ -8,6 +8,7 @@ backups/
 *.db*
 *.log
 coverage/
+supabase/.temp/
 
 .dev.vars
 .dev.vars.*

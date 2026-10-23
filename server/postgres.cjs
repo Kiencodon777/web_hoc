@@ -37,6 +37,15 @@ function postgresStorage(pool) {
   return {
     ...connection(pool),
     asyncStorage: true,
+    purgeHandoffs:now=>pool.query('DELETE FROM kienhoc.domain_handoffs WHERE expires_at <= $1',[now]),
+    async saveHandoff(tokenHash,payload,expiresAt,now){
+      await pool.query('DELETE FROM kienhoc.domain_handoffs WHERE expires_at <= $1',[now]);
+      await pool.query('INSERT INTO kienhoc.domain_handoffs(token_hash,payload,expires_at) VALUES($1,$2,$3)',[tokenHash,payload,expiresAt]);
+    },
+    async takeHandoff(tokenHash,now){
+      const result=await pool.query('DELETE FROM kienhoc.domain_handoffs WHERE token_hash=$1 AND expires_at>$2 RETURNING payload',[tokenHash,now]);
+      return result.rows[0]?.payload||null;
+    },
     async consumeRate(key, windowMs) {
       const now = Date.now();
       await pool.query('DELETE FROM kienhoc.rate_limits WHERE reset_at < $1', [now]);

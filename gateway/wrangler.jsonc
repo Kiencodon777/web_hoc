@@ -1,0 +1,7 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "kienhoc-study",
+  "pages_build_output_dir": "../build/gateway",
+  "compatibility_date": "2026-10-01",
+  "services": [{ "binding": "KIENHOC", "service": "kienhoc" }]
+}

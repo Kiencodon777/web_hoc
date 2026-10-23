@@ -4,9 +4,9 @@
 
 - Repo: https://github.com/Kiencodon777/web_hoc ; nhánh triển khai: `codex/supabase-cloudflare`.
 - Supabase project `kienhoc`, Singapore, ref `tfpxpfjuoliltjhqvjyx` đã tạo trong `concas2025's Org`.
-- Đã áp dụng hai migration trong `supabase/migrations/`. Các bảng hiện chưa có tài khoản/tiến độ cũ.
+- Đã áp dụng các migration trong `supabase/migrations/`, gồm schema ứng dụng và hàng đợi chuyển phiên được mã hóa. Các bảng hiện chưa có tài khoản/tiến độ từ máy cũ.
 - Frontend + API chạy cùng origin trên Cloudflare Workers. PostgreSQL nằm trên Supabase.
-- Đã deploy tại https://kienhoc.anhdungcasi.workers.dev . Frontend và `/api/health` trả 200, `database:true`.
+- Đã deploy Worker và gắn tên miền chính https://study.anhdungece.id.vn . Link workers.dev cũ chuyển phiên sang địa chỉ chính; xem [DOMAIN_AND_SESSIONS_VI.md](DOMAIN_AND_SESSIONS_VI.md). Frontend và `/api/health` tại tên miền chính trả 200, `database:true`.
 - Đã cấu hình Hyperdrive `kienhoc-supabase`, kết nối trực tiếp Supabase bằng TLS `verify-full` với CA chính thức, tối đa 5 kết nối origin; tắt query caching để giữ đúng dữ liệu xác thực/tiến độ.
 - Đã kiểm tra production: đăng nhập mật khẩu, ghi/đọc tiến độ, cô lập hai tài khoản, revision conflict 409 và thu hồi phiên khi logout. Tài khoản thử đã được xóa.
 - Chưa có Resend key và backup SQLite nguồn. OTP email chưa sử dụng được, dữ liệu học/tài khoản cũ chưa được chuyển.
@@ -96,8 +96,8 @@ Chỉ trỏ domain/DNS sau khi URL Worker đã qua nghiệm thu; lưu các bản
 - Kiểm tra offline/online, đăng xuất thu hồi phiên, đổi mật khẩu thu hồi phiên khác, redeploy không mất dữ liệu.
 - `.env`, source backend và backup truy cập bằng URL phải trả 404.
 
-Test tự động: SQLite API/client/sync, PostgreSQL bằng PGlite (engine PostgreSQL WASM), nhập snapshot giữ mật khẩu/ID/revision, từ chối ghi đè đích đã có dữ liệu và cấu hình TLS/redaction. PGlite chỉ có một session nên không thay thế kiểm thử nhiều kết nối thật. Worker đã kiểm tra production với frontend/health 200 và source/secrets 404; tài khoản thử xác nhận login, progress, isolation, conflict và logout trước khi xóa. Chưa kiểm chứng email thật, dữ liệu người dùng cũ hay custom domain/DNS.
+Test tự động: SQLite API/client/sync, PostgreSQL bằng PGlite (engine PostgreSQL WASM), nhập snapshot giữ mật khẩu/ID/revision, từ chối ghi đè đích đã có dữ liệu và cấu hình TLS/redaction. PGlite chỉ có một session nên không thay thế kiểm thử nhiều kết nối thật. Worker đã kiểm tra production với frontend/health 200 và source/secrets 404; tài khoản thử xác nhận login, progress, isolation, conflict và logout trước khi xóa. Custom domain/DNS và chuyển phiên giữa origin cũng đã được kiểm chứng; chưa kiểm chứng email thật hay nhập dữ liệu người dùng cũ.
 
-Giữ bản SQLite và phiên bản ứng dụng cũ để rollback trước khi mở ghi cloud. Khi đã có dữ liệu mới trên cloud, không quay về SQLite cũ mà bỏ qua dữ liệu mới; cần dừng ghi và đối chiếu/xuất dữ liệu trước. Chưa sửa DNS hay ngừng backend trên máy cũ.
+Giữ bản SQLite và phiên bản ứng dụng cũ để rollback trước khi mở ghi cloud. Khi đã có dữ liệu mới trên cloud, không quay về SQLite cũ mà bỏ qua dữ liệu mới; cần dừng ghi và đối chiếu/xuất dữ liệu trước. Đã thêm CNAME cho study.anhdungece.id.vn; chưa sửa DNS vietkienetet.id.vn hay ngừng backend trên máy cũ.
 
 Tài liệu nền: [Cloudflare Express](https://developers.cloudflare.com/workers/tutorials/deploy-an-express-app/), [Supabase kết nối Postgres](https://supabase.com/docs/guides/database/connecting-to-postgres), [RLS không có policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).

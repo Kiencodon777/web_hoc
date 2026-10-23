@@ -76,6 +76,12 @@ test('PostgreSQL API: OTP, password, isolation, simultaneous first writes and lo
     const a = await s.login('pg-a@example.com'), b = await s.login('pg-b@example.com');
     const auth = 'Bearer '+a.token, password = 'Postgres-test-only-123';
     assert.equal((await s.db.consumeRate('test-ip',60000)).totalHits,1);
+    await s.db.saveHandoff('test-hash','encrypted-test-value',2000,1000);
+    assert.equal(await s.db.takeHandoff('test-hash',1001),'encrypted-test-value');
+    assert.equal(await s.db.takeHandoff('test-hash',1002),null);
+    await s.db.saveHandoff('expired-hash','expired-value',2000,1000);
+    assert.equal(await s.db.takeHandoff('expired-hash',2000),null);
+    await s.db.purgeHandoffs(2000);
     assert.equal((await s.db.consumeRate('test-ip',60000)).totalHits,2);
     await s.db.resetRate('test-ip');
     assert.equal((await s.db.consumeRate('test-ip',60000)).totalHits,1);
