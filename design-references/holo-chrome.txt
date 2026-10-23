@@ -1,0 +1,843 @@
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+holo-chrome-flow.tsx
+"use client"
+
+import * as React from "react"
+
+/**
+ * Holo Chrome Flow — a full-bleed shader of liquid chrome folding over itself,
+ * with a holographic oil-slick film riding the highlights, dark veins opening
+ * between the folds and a few sparkles caught in them.
+ *
+ * The surface is fbm warped twice over, read as a height map. Fine ridges
+ * are added along its own contour lines, which is where the layered,
+ * poured-metal lines come from. Its gradient gives a normal, the normal
+ * reflects a soft studio, and the same normal drives a three-colour thin-film
+ * that shifts with the viewing angle — so tilting the "foil" with the pointer
+ * moves the rainbow the way a hologram does.
+ *
+ * The pointer is the tilt, the key light and a finger in the metal: the flow
+ * smears along the way the pointer moves, and a click drops a bead of mercury
+ * that rings outward. Left alone the light drifts on its own.
+ *
+ * Self-contained: raw WebGL2, React is the only import, no CSS file. Nothing
+ * here touches the host page — the canvas sizes itself from its own box and the
+ * pointer is read off the component, not the window.
+ */
+
+export type HoloChromeColors = {
+  /** The body of the metal — the colour the chrome reflects in soft light. */
+  base: string
+  /** Highlight colour of the key light. */
+  shine: string
+  /** The crevices between folds. */
+  vein: string
+  /** Three stops of the holographic film, cycled in order. */
+  filmA: string
+  filmB: string
+  filmC: string
+}
+
+export const HOLO_CHROME_PRESETS = {
+  opal: {
+    base: "#b7b9cf",
+    shine: "#fff4e4",
+    vein: "#07070e",
+    filmA: "#ff6fd8",
+    filmB: "#59e8ff",
+    filmC: "#ffc896",
+  },
+  noir: {
+    base: "#34353f",
+    shine: "#f2f0ff",
+    vein: "#000000",
+    filmA: "#c04dff",
+    filmB: "#2de2c4",
+    filmC: "#ff9a3c",
+  },
+  "rose-gold": {
+    base: "#d8b6aa",
+    shine: "#fff1df",
+    vein: "#1c0a0d",
+    filmA: "#ff8fb1",
+    filmB: "#ffd68a",
+    filmC: "#b58dff",
+  },
+  glacier: {
+    base: "#a8c4d6",
+    shine: "#f4fbff",
+    vein: "#020a12",
+    filmA: "#6ff4ff",
+    filmB: "#9b86ff",
+    filmC: "#e9fffa",
+  },
+  aurora: {
+    base: "#9aa3b6",
+    shine: "#effff8",
+    vein: "#030611",
+    filmA: "#3dffb0",
+    filmB: "#7a5cff",
+    filmC: "#ff5ec4",
+  },
+} satisfies Record<string, HoloChromeColors>
+
+export type HoloChromePreset = keyof typeof HOLO_CHROME_PRESETS
+
+export type HoloChromeFlowProps = {
+  /**
+   * Explicit height. The canvas fills this box, so it must be a definite
+   * length — "100%" only works if every ancestor also has one, which an
+   * installed page usually does not.
+   */
+  height?: string
+  /** Named palette. `colors` overrides individual fields on top of it. */
+  preset?: HoloChromePreset
+  /** Any of the palette fields as hex (#rgb or #rrggbb). */
+  colors?: Partial<HoloChromeColors>
+  /** Flow speed multiplier. 0 freezes the metal; the pointer stays live. */
+  speed?: number
+  /** How hard the field folds over itself. 0.5 is lazy swells, 1.6 is marbled. */
+  flow?: number
+  /** Zoom of the pattern. Above 1 is finer, more folds on screen. */
+  scale?: number
+  /** How much the folds are combed into one direction. 1 is isotropic. */
+  stretch?: number
+  /** Direction the folds are combed along, in degrees. */
+  angle?: number
+  /** Strength of the holographic film. 0 is plain chrome. */
+  iridescence?: number
+  /** Density of the fine poured lines along each fold. 0 is smooth. */
+  ridges?: number
+  /** How much of the surface opens into dark veins, 0–1. */
+  veins?: number
+  /** Sparkles in the veins and on the crests. */
+  sparkle?: number
+  /** How far the pointer tilts the film and swings the light. */
+  tilt?: number
+  /** How strongly the pointer smears the metal as it moves. */
+  smear?: number
+  /** Film grain. 0 is perfectly clean. */
+  grain?: number
+  /** Edge darkening, 0–1. */
+  vignette?: number
+  /** Changes the pattern without changing its character. */
+  seed?: number
+  /** Pointer tilt, smear and click drops. Off, the light wanders by itself. */
+  interactive?: boolean
+  /** Click / tap drops a bead of mercury that rings outward. */
+  ripples?: boolean
+  /** Device-pixel-ratio cap. It is a full-screen shader; 1.25 is sharp and cheap. */
+  maxDpr?: number
+  /** Rendered above the metal. Pointer events still reach the shader. */
+  children?: React.ReactNode
+  className?: string
+}
+
+// #region color
+export function hexToRgb(hex: string) {
+  let h = String(hex).trim().replace(/^#/, "")
+  if (h.length === 3 || h.length === 4) {
+    h = h
+      .slice(0, 3)
+      .split("")
+      .map((c) => c + c)
+      .join("")
+  } else if (h.length === 8) {
+    h = h.slice(0, 6)
+  }
+  if (!/^[0-9a-f]{6}$/i.test(h)) return [0, 0, 0]
+  const n = parseInt(h, 16)
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]
+}
+
+// Hex that goes into a CSS string must be well-formed, or the fallback
+// gradient silently drops the whole declaration.
+export function cssHex(hex: string, fallback: string) {
+  const h = String(hex).trim()
+  return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(h) ? h : fallback
+}
+// #endregion
+
+const MAX_RIPPLES = 6
+const RIPPLE_LIFE = 4
+
+// One triangle that covers the viewport, built from gl_VertexID — no buffers.
+const VERT = `#version 300 es
+void main() {
+  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+}
+`
+
+const FRAG = `#version 300 es
+precision highp float;
+
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec2 uMouse;        // centred, y up, in units of the canvas height
+uniform float uHover;       // 0 idle drift, 1 pointer inside
+uniform vec2 uDrag;         // smoothed pointer velocity
+uniform vec3 uBase;
+uniform vec3 uShine;
+uniform vec3 uVein;
+uniform vec3 uFilmA;
+uniform vec3 uFilmB;
+uniform vec3 uFilmC;
+uniform float uFlow;
+uniform float uScale;
+uniform float uStretch;
+uniform float uAngle;
+uniform float uIrid;
+uniform float uRidges;
+uniform float uVeins;
+uniform float uSparkle;
+uniform float uTilt;
+uniform float uSmear;
+uniform float uGrain;
+uniform float uVignette;
+uniform float uSeed;
+uniform vec4 uRipples[6];   // xy centre, z start time, w strength
+
+out vec4 outColor;
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  return mix(
+    mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+    mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  mat2 rot = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 4; i++) {
+    v += a * noise(p);
+    p = rot * p;
+    a *= 0.5;
+  }
+  return v;
+}
+
+// The metal. Warp the plane by fbm, warp it again by the result, and read fbm
+// once more through both — the classic way to get folds that look poured.
+// Returns height in x and the second warp's magnitude in y, which is where the
+// folds pinch and the veins open.
+vec2 surface(vec2 p, float t) {
+  vec2 q = vec2(
+    fbm(p + vec2(0.0, 0.0) + vec2(0.11, 0.04) * t),
+    fbm(p + vec2(5.2, 1.3) - vec2(0.03, 0.09) * t)
+  );
+  vec2 r = vec2(
+    fbm(p + 3.2 * uFlow * q + vec2(1.7, 9.2) + 0.13 * t),
+    fbm(p + 3.2 * uFlow * q + vec2(8.3, 2.8) - 0.10 * t)
+  );
+  float f = fbm(p + 3.0 * uFlow * r);
+  return vec2(f, length(r - q));
+}
+
+float height(vec2 p, float t, out float pinch) {
+  vec2 s = surface(p, t);
+  pinch = s.y;
+  // Fine ridges along the contour lines: the layered, poured look.
+  return s.x + 0.016 * uRidges * sin(s.x * 70.0);
+}
+
+// Three stops, cycled smoothly: A -> B -> C -> A.
+vec3 film(float x) {
+  x = fract(x) * 3.0;
+  vec3 a = mix(uFilmA, uFilmB, smoothstep(0.0, 1.0, x));
+  vec3 b = mix(uFilmB, uFilmC, smoothstep(1.0, 2.0, x));
+  vec3 c = mix(uFilmC, uFilmA, smoothstep(2.0, 3.0, x));
+  return x < 1.0 ? a : (x < 2.0 ? b : c);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  float t = uTime;
+  vec2 m = uMouse;
+
+  // Comb the plane in one direction so the folds stream like the pour.
+  float ca = cos(uAngle);
+  float sa = sin(uAngle);
+  mat2 comb = mat2(ca, sa, -sa, ca);
+
+  vec2 p = uv;
+
+  // Smear: drag the metal along with the pointer, and twist it a little.
+  vec2 d = p - m;
+  float fall = exp(-dot(d, d) * 7.0);
+  p -= uDrag * fall * 0.22 * uSmear;
+  float tw = uSmear * (0.25 * uHover + length(uDrag) * 0.6) * fall;
+  float cs = cos(tw);
+  float sn = sin(tw);
+  p = m + mat2(cs, -sn, sn, cs) * (p - m);
+
+  // Beads of mercury: a damped ring that pushes the metal radially as it passes.
+  float ring = 0.0;
+  for (int i = 0; i < 6; i++) {
+    vec4 rp = uRipples[i];
+    float age = t - rp.z;
+    if (rp.w <= 0.0 || age < 0.0 || age > 4.0) continue;
+    vec2 dd = uv - rp.xy;
+    float rr = length(dd);
+    float x = rr - age * 0.38;
+    float env = exp(-x * x * 50.0) * exp(-age * 1.1) * rp.w;
+    p += (dd / max(rr, 1e-3)) * sin(x * 36.0) * env * 0.05;
+    ring += env * (0.5 + 0.5 * sin(x * 36.0));
+  }
+
+  vec2 q = comb * p;
+  q.x /= max(uStretch, 0.2);
+  float freq = 1.85 * uScale;
+  q = q * freq + vec2(uSeed * 7.31, uSeed * 3.17);
+
+  // Height and its gradient, by finite differences a pixel and a half apart.
+  float e = 1.5 / uRes.y * freq;
+  float pinch;
+  float pinchDummy;
+  float h = height(q, t, pinch);
+  float hx = height(q + vec2(e, 0.0), t, pinchDummy);
+  float hy = height(q + vec2(0.0, e), t, pinchDummy);
+  vec2 g = vec2(hx - h, hy - h) / e;
+  float slope = length(g);
+  // Back into screen space so the light is not combed along with the folds.
+  g.x /= max(uStretch, 0.2);
+  g = transpose(comb) * g;
+  vec3 n = normalize(vec3(-g * 0.08, 1.0));
+
+  // The pointer tilts the foil: the light swings and the film slides.
+  // Clamped, so a pointer in a far corner of a wide canvas tilts the foil
+  // rather than turning the key light straight into the camera.
+  vec2 tiltv = m * uTilt;
+  tiltv *= min(1.0, 0.45 / max(length(tiltv), 1e-4));
+  vec3 V = vec3(0.0, 0.0, 1.0);
+  vec3 R = reflect(-V, n);
+  float fres = pow(1.0 - n.z, 1.2);
+
+  // A soft studio: dim below, bright above, a long softbox and a warm key.
+  // The tilt swings the lights around the axis rather than raising them, so
+  // the highlights travel across the folds while the exposure stays put.
+  float az = 2.16 + tiltv.x * 2.2 - tiltv.y * 1.2;
+  vec3 L = normalize(vec3(cos(az) * 0.56, sin(az) * 0.56, 0.8));
+  vec3 L2 = normalize(vec3(-cos(az + 0.4) * 0.72, -sin(az + 0.4) * 0.72, 0.7));
+  float sky = smoothstep(-0.6, 0.8, R.y + tiltv.y * 0.25 + 0.2 * R.x);
+  // Squared, so slopes turned away from the light fall into cool shadow.
+  vec3 chrome = uBase * (0.34 + 1.08 * pow(sky, 1.5));
+  float strip = exp(-pow((dot(R.xy, vec2(0.7, 0.7)) - 0.3 - 0.25 * (tiltv.x + tiltv.y)) * 4.0, 2.0));
+  chrome += uBase * strip * 0.3;
+  float kd = max(dot(R, L), 0.0);
+  float key = pow(kd, 22.0);
+  float keyWide = pow(kd, 5.0);
+  float rim = pow(max(dot(R, L2), 0.0), 8.0);
+
+  // Thin film: hue walks with the viewing angle, the height, and the tilt.
+  float phase = fres * 2.2 + h * 3.0 + dot(n.xy, tiltv) * 2.5 + t * 0.03 + uSeed * 0.37;
+  vec3 holo = film(phase);
+  float lum = dot(chrome, vec3(0.299, 0.587, 0.114));
+  // The film rides the slopes and the bright side; flat, dim metal stays silver.
+  float iridMask = clamp(smoothstep(0.12, 0.6, fres) * (0.25 + 0.75 * sky) + keyWide * 0.9, 0.0, 1.0) * uIrid;
+  // Pushed past the palette a touch, so the film reads as colour, not tint.
+  vec3 vivid = clamp(mix(vec3(dot(holo, vec3(0.333))), holo, 1.35), 0.0, 1.0);
+  vec3 col = mix(chrome, chrome * 0.35 + vivid * (0.28 + lum), clamp(iridMask * 0.9, 0.0, 1.0));
+
+  // Highlights: warm key, film-tinted rim, and a soft warm pool of light that
+  // drifts with the tilt — the glow at the heart of the pour.
+  col += uShine * key * 1.1;
+  col += mix(uShine, holo, 0.5) * keyWide * 0.25;
+  col += holo * rim * 0.5 * uIrid;
+  // Spectral fringe: a fast rainbow around the rim of each hot highlight, the
+  // way a hologram splits white light at the edge of a reflection.
+  float kf = pow(kd, 12.0);
+  float fringe = smoothstep(0.2, 0.45, kf) * smoothstep(0.85, 0.5, kf);
+  vec3 split = clamp(mix(vec3(0.5), film(kf * 2.4 + h * 1.5 + dot(n.xy, tiltv) * 3.0), 1.5), 0.0, 1.0);
+  col += (split - 0.35) * fringe * 0.45 * uIrid;
+  vec2 hot = uv - tiltv * 0.55;
+  col += mix(uShine, uFilmC, 0.35) * exp(-dot(hot, hot) * 2.2) * 0.22 * (0.5 + sky);
+
+  // Veins: where the folds dip lowest the metal opens into dark channels; where
+  // the second warp pinches, a thin seam runs along the fold.
+  // Veins: a narrow band along the low contour, so the dark reads as gaps
+  // between folds rather than holes; plus a thin seam where the second warp
+  // pinches. Below the band the metal carries on as a deeper fold.
+  float lo = 0.3;
+  // Distance to the contour in pattern space, so a vein keeps its width
+  // whether the fold is steep or shallow.
+  float vd = abs(h - lo) / (slope + 0.25);
+  // Tapered by a slow noise so veins swell and pinch out like real seams.
+  float vw = (0.003 + 0.04 * uVeins) * (0.25 + 1.1 * noise(q * 0.45 + 11.0));
+  float veinLow = smoothstep(vw, vw * 0.3, vd);
+  float seam = smoothstep(0.004 + 0.02 * uVeins, 0.0, abs(pinch - 0.3)) * smoothstep(0.55, 0.32, h);
+  float vein = clamp(max(veinLow, seam * 0.9) * step(0.001, uVeins), 0.0, 1.0);
+  // The lip of each vein catches a hairline of light.
+  float lip = smoothstep(0.0, 0.5, vein) * smoothstep(1.0, 0.5, vein);
+  col = mix(col, uVein + holo * 0.035, vein);
+  col += mix(uShine, holo, 0.6) * lip * 0.25 * (0.35 + keyWide);
+
+  // Sparkles: a scatter of points, brighter and denser in the dark.
+  vec2 sg = gl_FragCoord.xy / uRes.y * 140.0;
+  vec2 cell = floor(sg);
+  float rnd = hash21(cell + uSeed * 13.1);
+  vec2 off = vec2(hash21(cell + 7.7), hash21(cell + 3.3)) * 0.6 + 0.2;
+  vec2 dp = fract(sg) - off;
+  float tw2 = 0.5 + 0.5 * sin(t * (2.0 + rnd * 5.0) + rnd * 40.0);
+  float star = smoothstep(0.11, 0.0, length(dp)) + 0.35 * smoothstep(0.03, 0.0, abs(dp.x) * abs(dp.y) * 30.0) * smoothstep(0.45, 0.0, length(dp));
+  float density = mix(0.985, 0.93, vein);
+  col += mix(uShine, holo, 0.4) * star * step(density, rnd) * tw2 * uSparkle * mix(0.6, 1.6, vein);
+
+  // Mercury rings catch the light on their crests.
+  col += (uShine * 0.25 + holo * 0.15) * ring;
+
+  // The light that sits under the pointer, as if the foil were catching it.
+  float dist = length(uv - m);
+  col += mix(uShine, holo, 0.35) * (0.06 / (dist + 0.18)) * 0.25 * uHover * (1.0 - vein * 0.7);
+
+  float vig = smoothstep(1.35, 0.2, length(uv * vec2(0.8, 1.0)));
+  col *= mix(1.0, vig, uVignette);
+
+  // Gentle shoulder so the highlights bloom instead of clipping flat.
+  col = col / (1.0 + max(col - 1.0, 0.0) * 0.6);
+
+  float gr = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
+  col += (gr - 0.5) * 0.05 * uGrain;
+  col += (hash21(gl_FragCoord.yx + 13.7) - 0.5) / 255.0;
+
+  outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}
+`
+
+function compile(gl: WebGL2RenderingContext, vert: string, frag: string) {
+  const program = gl.createProgram()
+  if (!program) return null
+  for (const [type, source] of [
+    [gl.VERTEX_SHADER, vert],
+    [gl.FRAGMENT_SHADER, frag],
+  ] as const) {
+    const shader = gl.createShader(type)
+    if (!shader) return null
+    gl.shaderSource(shader, source)
+    gl.compileShader(shader)
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.error("holo-chrome-flow:", gl.getShaderInfoLog(shader))
+      return null
+    }
+    gl.attachShader(program, shader)
+    gl.deleteShader(shader)
+  }
+  gl.linkProgram(program)
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error("holo-chrome-flow:", gl.getProgramInfoLog(program))
+    return null
+  }
+  return program
+}
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = React.useState(false)
+
+  React.useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const sync = () => setReduced(mq.matches)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
+
+  return reduced
+}
+
+export default function HoloChromeFlow({
+  height = "100svh",
+  preset = "opal",
+  colors,
+  speed = 1,
+  flow = 1,
+  scale = 1,
+  stretch = 2.2,
+  angle = 35,
+  iridescence = 1,
+  ridges = 1,
+  veins = 0.5,
+  sparkle = 1,
+  tilt = 1,
+  smear = 1,
+  grain = 0.6,
+  vignette = 0.45,
+  seed = 0,
+  interactive = true,
+  ripples = true,
+  maxDpr = 1.25,
+  children,
+  className = "",
+}: HoloChromeFlowProps) {
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const kickRef = React.useRef<() => void>(() => {})
+  const reduced = usePrefersReducedMotion()
+  const [generation, setGeneration] = React.useState(0)
+  const [failed, setFailed] = React.useState(false)
+
+  const palette = { ...(HOLO_CHROME_PRESETS[preset] ?? HOLO_CHROME_PRESETS.opal), ...colors }
+
+  // The render loop reads props through a ref, so tweaking one never rebuilds
+  // the GL context.
+  const params = {
+    base: hexToRgb(palette.base),
+    shine: hexToRgb(palette.shine),
+    vein: hexToRgb(palette.vein),
+    filmA: hexToRgb(palette.filmA),
+    filmB: hexToRgb(palette.filmB),
+    filmC: hexToRgb(palette.filmC),
+    speed,
+    flow,
+    scale,
+    stretch,
+    angle: (angle * Math.PI) / 180,
+    iridescence,
+    ridges,
+    veins: Math.min(1, Math.max(0, veins)),
+    sparkle,
+    tilt,
+    smear,
+    grain,
+    vignette,
+    seed,
+    ripples,
+  }
+  const paramsRef = React.useRef(params)
+  paramsRef.current = params
+
+  // Under reduced motion nothing loops, so a prop change has to ask for a frame.
+  const paramKey = JSON.stringify(params)
+  React.useEffect(() => {
+    kickRef.current()
+  }, [paramKey])
+
+  React.useEffect(() => {
+    const root = rootRef.current
+    const canvas = canvasRef.current
+    if (!root || !canvas) return
+
+    const gl = canvas.getContext("webgl2", {
+      antialias: false,
+      alpha: false,
+      depth: false,
+      powerPreference: "high-performance",
+      preserveDrawingBuffer: false,
+    })
+    if (!gl) {
+      setFailed(true)
+      return
+    }
+
+    const program = compile(gl, VERT, FRAG)
+    if (!program) {
+      setFailed(true)
+      return
+    }
+    // The vertex shader needs no attributes, but a bound VAO keeps every
+    // driver happy about the draw.
+    const vao = gl.createVertexArray()
+
+    const u = (name: string) => gl.getUniformLocation(program, name)
+    const loc = {
+      res: u("uRes"),
+      time: u("uTime"),
+      mouse: u("uMouse"),
+      hover: u("uHover"),
+      drag: u("uDrag"),
+      base: u("uBase"),
+      shine: u("uShine"),
+      vein: u("uVein"),
+      filmA: u("uFilmA"),
+      filmB: u("uFilmB"),
+      filmC: u("uFilmC"),
+      flow: u("uFlow"),
+      scale: u("uScale"),
+      stretch: u("uStretch"),
+      angle: u("uAngle"),
+      irid: u("uIrid"),
+      ridges: u("uRidges"),
+      veins: u("uVeins"),
+      sparkle: u("uSparkle"),
+      tilt: u("uTilt"),
+      smear: u("uSmear"),
+      grain: u("uGrain"),
+      vignette: u("uVignette"),
+      seed: u("uSeed"),
+      ripples: u("uRipples"),
+    }
+
+    const drops = new Float32Array(MAX_RIPPLES * 4)
+    let nextDrop = 0
+
+    // Pointer state, all in shader space: centred, y up, units of height.
+    const target = { x: 0.12, y: 0.1 }
+    const mouse = { x: 0.12, y: 0.1 }
+    const drag = { x: 0, y: 0 }
+    let hoverTarget = 0
+    let hover = 0
+    // A still frame lands on a good moment of the pour, not t = 0.
+    let simTime = 9
+    let clock = 0
+    let last = 0
+    let raf = 0
+    let visible = true
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, Math.max(0.5, maxDpr))
+      const w = Math.max(1, Math.round(canvas.clientWidth * dpr))
+      const h = Math.max(1, Math.round(canvas.clientHeight * dpr))
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w
+        canvas.height = h
+      }
+    }
+
+    const draw = (now: number) => {
+      raf = 0
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016
+      last = now
+      resize()
+      const P = paramsRef.current
+
+      if (reduced) {
+        mouse.x = target.x
+        mouse.y = target.y
+        hover = hoverTarget
+        drag.x = 0
+        drag.y = 0
+      } else {
+        clock += dt
+        simTime += dt * P.speed * 0.6
+        // Nobody is steering: the light wanders on a slow Lissajous path, so
+        // the film keeps shifting the way a foil does in a moving hand.
+        if (hoverTarget === 0) {
+          const aspect = canvas.width / canvas.height
+          target.x = Math.sin(clock * 0.19) * 0.3 * aspect
+          target.y = Math.sin(clock * 0.13 + 1.1) * 0.24
+        }
+        const px = mouse.x
+        const py = mouse.y
+        const k = 1 - Math.exp(-dt * (hoverTarget ? 6 : 1.2))
+        mouse.x += (target.x - mouse.x) * k
+        mouse.y += (target.y - mouse.y) * k
+        hover += (hoverTarget - hover) * (1 - Math.exp(-dt * 3))
+        // Velocity, smoothed and capped, so a flick smears instead of tearing.
+        const inv = 1 / Math.max(dt, 1e-3)
+        const vx = hoverTarget ? (mouse.x - px) * inv : 0
+        const vy = hoverTarget ? (mouse.y - py) * inv : 0
+        const sp = Math.hypot(vx, vy)
+        const cap = sp > 1.6 ? 1.6 / sp : 1
+        const kd = 1 - Math.exp(-dt * 3.5)
+        drag.x += (vx * cap - drag.x) * kd
+        drag.y += (vy * cap - drag.y) * kd
+      }
+
+      gl.viewport(0, 0, canvas.width, canvas.height)
+      gl.useProgram(program)
+      gl.bindVertexArray(vao)
+      gl.uniform2f(loc.res, canvas.width, canvas.height)
+      gl.uniform1f(loc.time, simTime)
+      gl.uniform2f(loc.mouse, mouse.x, mouse.y)
+      gl.uniform1f(loc.hover, hover)
+      gl.uniform2f(loc.drag, drag.x, drag.y)
+      gl.uniform3fv(loc.base, P.base)
+      gl.uniform3fv(loc.shine, P.shine)
+      gl.uniform3fv(loc.vein, P.vein)
+      gl.uniform3fv(loc.filmA, P.filmA)
+      gl.uniform3fv(loc.filmB, P.filmB)
+      gl.uniform3fv(loc.filmC, P.filmC)
+      gl.uniform1f(loc.flow, P.flow)
+      gl.uniform1f(loc.scale, P.scale)
+      gl.uniform1f(loc.stretch, P.stretch)
+      gl.uniform1f(loc.angle, P.angle)
+      gl.uniform1f(loc.irid, P.iridescence)
+      gl.uniform1f(loc.ridges, P.ridges)
+      gl.uniform1f(loc.veins, P.veins)
+      gl.uniform1f(loc.sparkle, P.sparkle)
+      gl.uniform1f(loc.tilt, P.tilt)
+      gl.uniform1f(loc.smear, P.smear)
+      gl.uniform1f(loc.grain, P.grain)
+      gl.uniform1f(loc.vignette, P.vignette)
+      gl.uniform1f(loc.seed, P.seed)
+      gl.uniform4fv(loc.ripples, drops)
+      gl.drawArrays(gl.TRIANGLES, 0, 3)
+      gl.bindVertexArray(null)
+
+      if (!reduced && visible) raf = requestAnimationFrame(draw)
+    }
+
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(draw)
+    }
+    kickRef.current = kick
+    kick()
+
+    const resizeObserver = new ResizeObserver(kick)
+    resizeObserver.observe(canvas)
+
+    // Off-screen, a full-screen shader is pure waste: stop until it is back.
+    const visibility = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      if (visible) {
+        last = 0
+        kick()
+      }
+    })
+    visibility.observe(root)
+
+    const toShader = (e: PointerEvent) => {
+      const rect = root.getBoundingClientRect()
+      const h = rect.height || 1
+      return {
+        x: (e.clientX - rect.left - rect.width / 2) / h,
+        y: -(e.clientY - rect.top - rect.height / 2) / h,
+      }
+    }
+    const onMove = (e: PointerEvent) => {
+      if (!interactive) return
+      const p = toShader(e)
+      target.x = p.x
+      target.y = p.y
+      hoverTarget = 1
+      if (reduced) kick()
+    }
+    const onLeave = () => {
+      hoverTarget = 0
+      if (reduced) kick()
+    }
+    const onDown = (e: PointerEvent) => {
+      if (!interactive) return
+      onMove(e)
+      // A drop is motion; reduced motion keeps the tilt but skips the rings.
+      if (reduced || !paramsRef.current.ripples) return
+      const p = toShader(e)
+      const i = (nextDrop++ % MAX_RIPPLES) * 4
+      drops[i] = p.x
+      drops[i + 1] = p.y
+      drops[i + 2] = simTime
+      drops[i + 3] = 1
+    }
+    // Drops store sim time; if speed is 0 they would hang forever, so they are
+    // also retired on the wall clock.
+    const retire = window.setInterval(() => {
+      for (let i = 0; i < MAX_RIPPLES; i++) {
+        if (drops[i * 4 + 3] > 0 && Math.abs(simTime - drops[i * 4 + 2]) > RIPPLE_LIFE) drops[i * 4 + 3] = 0
+      }
+    }, 1000)
+
+    // A lost context leaves a permanently black canvas unless the whole setup
+    // runs again, so ask for the restore and rebuild on the next generation.
+    const onLost = (e: Event) => {
+      e.preventDefault()
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+    const onRestored = () => setGeneration((g) => g + 1)
+
+    root.addEventListener("pointermove", onMove)
+    root.addEventListener("pointerdown", onDown)
+    root.addEventListener("pointerleave", onLeave)
+    root.addEventListener("pointercancel", onLeave)
+    canvas.addEventListener("webglcontextlost", onLost)
+    canvas.addEventListener("webglcontextrestored", onRestored)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      kickRef.current = () => {}
+      window.clearInterval(retire)
+      resizeObserver.disconnect()
+      visibility.disconnect()
+      root.removeEventListener("pointermove", onMove)
+      root.removeEventListener("pointerdown", onDown)
+      root.removeEventListener("pointerleave", onLeave)
+      root.removeEventListener("pointercancel", onLeave)
+      canvas.removeEventListener("webglcontextlost", onLost)
+      canvas.removeEventListener("webglcontextrestored", onRestored)
+      gl.deleteProgram(program)
+      gl.deleteVertexArray(vao)
+    }
+  }, [interactive, reduced, generation, maxDpr])
+
+  const base = cssHex(palette.base, "#b7b9cf")
+  const vein = cssHex(palette.vein, "#07070e")
+
+  return (
+    <div
+      ref={rootRef}
+      className={"relative w-full overflow-hidden " + className}
+      style={{ height, background: vein }}
+    >
+      {failed ? (
+        // No WebGL2: a still of the same metal beats an empty black box.
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 45% 30% at 35% 40%, " + cssHex(palette.shine, "#fff4e4") + "cc, transparent 70%), " +
+              "linear-gradient(125deg, transparent 20%, " + cssHex(palette.filmA, "#ff6fd8") + "55 35%, transparent 45%, " +
+              cssHex(palette.filmB, "#59e8ff") + "55 60%, transparent 70%, " + cssHex(palette.filmC, "#ffc896") + "44 85%, transparent 95%), " +
+              "repeating-linear-gradient(35deg, " + base + " 0 38px, " + vein + " 46px, " + base + " 60px), " +
+              base,
+          }}
+        />
+      ) : (
+        <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+      )}
+      {children != null && <div className="relative z-10 h-full w-full">{children}</div>}
+    </div>
+  )
+}
+
+
+demo.tsx
+"use client"
+
+import HoloChromeFlow from "@/components/ui/holo-chrome-flow"
+
+export default function Demo() {
+  return <HoloChromeFlow />
+}
+
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them

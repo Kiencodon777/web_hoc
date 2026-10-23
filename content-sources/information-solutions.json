@@ -1,0 +1,1533 @@
+{
+  "1": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nguồn phát tin → kênh truyền → nơi nhận tin.",
+    "sources": [
+      "comm",
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "2": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Theo nghĩa giảm bất định: bên nhận thu được điều chưa biết.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "3": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Tín hiệu là đại lượng vật lý mang thông tin.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "4": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Đề đang xét nguồn vật lý tương tự trước số hóa.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "5": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Âm thanh và hình ảnh nguyên thủy được mô hình bằng hàm liên tục.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "6": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Nguồn liên tục phát tin liên tục.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "7": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Chữ cái thuộc tập ký hiệu rời rạc.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "8": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Kênh vận chuyển tín hiệu từ phát đến thu.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "9": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Trong sơ đồ rút gọn, nhiễu được đưa vào kênh.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Nhiễu thực tế còn phát sinh trong máy thu và linh kiện. B là đáp án theo mô hình kênh đơn giản, không phải vị trí duy nhất ngoài thực tế."
+  },
+  "10": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "B gần với chức năng giải mã, phát hiện và sửa lỗi.",
+    "sources": [
+      "block"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Máy thu còn có thể lọc và khuếch đại. Đề không liệt kê đầy đủ chuỗi chức năng; B phù hợp với ngữ cảnh giải mã chống lỗi."
+  },
+  "11": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lượng tin chia thời gian là tốc độ thông tin.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Thuật ngữ chính xác cho B là tốc độ thông tin (bit/s), không phải hiệu suất không thứ nguyên."
+  },
+  "12": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Chống nhiễu giúp khôi phục bản tin chính xác.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "13": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Rời rạc theo thời gian: lấy mẫu; theo biên độ: lượng tử.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "14": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lấy các giá trị x(nT) tại thời điểm lấy mẫu.",
+    "sources": [
+      "sampling"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "15": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Với giới hạn phổ f_max, ngưỡng Nyquist là 2f_max.",
+    "sources": [
+      "sampling",
+      "ti"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Ngưỡng ≥2f_max là cách phát biểu lý tưởng thường dùng trong đề. Thực tế chọn f_s>2f_max và lọc chống chồng phổ; đúng tại biên còn cần điều kiện phổ/pha."
+  },
+  "16": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Chu kỳ T giây cho tần số f=1/T Hz.",
+    "sources": [
+      "sampling"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "17": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lượng tử hóa ánh xạ biên độ vào tập mức hữu hạn.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "18": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "∆ᵢ biểu diễn bước lượng tử giữa các mức lân cận.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Đề gọi “mức” nhưng ∆ᵢ chính xác hơn là bước lượng tử, khác với giá trị của một mức biên độ."
+  },
+  "19": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lượng tử đều có các bước ∆ᵢ bằng nhau.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "20": {
+    "answers": [],
+    "explanation": "Đề ghi “tần số tối thiểu” 4000 Hz nên chưa biết giới hạn phổ trên. Nếu sửa thành “tần số tối đa”, ngưỡng lấy mẫu mới là 8000 Hz (C).",
+    "sources": [
+      "sampling",
+      "ti"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "21": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Độ đo lượng hóa lượng thông tin.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "22": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "I(x)=−log p(x)=log(1/p(x)).",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "23": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "−log(1)=0.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "24": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "log₂ cho đơn vị bit.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "25": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "log₁₀ cho đơn vị hartley.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "26": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Trong ngữ cảnh này, mã hóa đổi biểu diễn tin.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "27": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Phép đổi biểu diễn khả nghịch bảo toàn lượng tin.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Hệ thống & số hóa",
+    "note": "Giả thiết phép mã hóa bảo toàn tin/khả nghịch. Nén mất dữ liệu không thỏa phát biểu này."
+  },
+  "28": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Mã nhị phân dùng hai ký hiệu 0 và 1.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "29": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Hai trạng thái logic thuận tiện cho mạch điện tử.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Hệ thống & số hóa"
+  },
+  "30": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Điều chế ánh xạ thông tin lên tín hiệu truyền phù hợp.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế"
+  },
+  "31": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "AM: amplitude modulation, điều chế biên độ.",
+    "sources": [
+      "cisco"
+    ],
+    "topic": "Điều chế"
+  },
+  "32": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "SSB: single-sideband, điều chế đơn biên.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế"
+  },
+  "33": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "FM: frequency modulation, điều chế tần số.",
+    "sources": [
+      "cisco"
+    ],
+    "topic": "Điều chế"
+  },
+  "34": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "FSK thay đổi tần số theo ký hiệu rời rạc.",
+    "sources": [
+      "ni",
+      "cisco"
+    ],
+    "topic": "Điều chế"
+  },
+  "35": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "ASK thay đổi biên độ theo ký hiệu.",
+    "sources": [
+      "cisco"
+    ],
+    "topic": "Điều chế"
+  },
+  "36": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "PSK thay đổi pha theo ký hiệu.",
+    "sources": [
+      "cisco"
+    ],
+    "topic": "Điều chế"
+  },
+  "37": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Giải điều chế khôi phục thông tin từ tín hiệu mang.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế"
+  },
+  "38": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Tách sóng biên độ phục hồi tín hiệu điều chế AM.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế"
+  },
+  "39": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Máy thu lọc nhiễu và ước lượng thông tin gốc.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế"
+  },
+  "40": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "B gần nhất: điều chế giúp thích nghi với kênh truyền.",
+    "sources": [
+      "modulation"
+    ],
+    "topic": "Điều chế",
+    "note": "Điều chế không tự động bảo đảm giảm mọi nhiễu hay tổn hao; hiệu quả phụ thuộc sơ đồ điều chế và kênh."
+  },
+  "41": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nguồn rời rạc phát các ký hiệu thuộc tập rời rạc.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "42": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Mô hình nguồn ngẫu nhiên rời rạc là dãy biến ngẫu nhiên.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "43": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nguồn không nhớ có các ký hiệu độc lập.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "44": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nguồn dừng có phân bố hữu hạn chiều bất biến khi dịch thời gian.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "45": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Tốc độ điều khiển được có thể thay đổi từ bên ngoài.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "46": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "B phù hợp nhất với cách phân loại giản lược trong đề.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "Không điều khiển được không nhất thiết có nghĩa tốc độ luôn cố định. B là cách diễn đạt gần nhất trong các lựa chọn."
+  },
+  "47": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "I(x)=−log p(x).",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "48": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "p nhỏ hơn làm −log p lớn hơn.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "49": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Logarit tự nhiên cho đơn vị nat.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "50": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nếu các ký hiệu độc lập, p(bản tin)=m⁻ⁿ; I=n log m.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "Cần các ký hiệu độc lập (hoặc toàn bộ mⁿ bản tin đồng xác suất). Chỉ các phân bố biên đều chưa đủ."
+  },
+  "51": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lượng tin tương hỗ đo thông tin về x thu được từ y.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "52": {
+    "answers": [
+      "D"
+    ],
+    "explanation": "p(y|x)=1 chưa suy ra I(x)=I(y). Ví dụ Y luôn cố định: I(y)=0 dù I(x)>0. Không đủ dữ kiện cho các quan hệ A–C.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "D được hiểu là “chưa xác định được quan hệ từ giả thiết”, không phải lượng tin không tồn tại. Muốn I(x)=I(y) cần thêm điều kiện ánh xạ một-một phù hợp."
+  },
+  "53": {
+    "answers": [],
+    "explanation": "p(y|x)<1 chưa đủ suy ra mất tin về x. Phản ví dụ: X có hai giá trị đồng xác suất; mỗi X cho hai Y riêng biệt với xác suất 1/2. Y vẫn xác định X, nên i(x;y)=I(x)=1 bit.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "B chỉ có thể suy ra với điều kiện thích hợp về p(x|y)<1; không được thay bằng p(y|x)<1."
+  },
+  "54": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "I(x|y)=−log p(x|y): phần bất định về x còn lại.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "Lượng tin điều kiện cho từng cặp khác với entropy có điều kiện là giá trị trung bình."
+  },
+  "55": {
+    "answers": [
+      "C",
+      "D"
+    ],
+    "explanation": "C và D đều đúng theo quy tắc nhân xác suất: p(x,y)=p(x)p(y|x)=p(y)p(x|y). A cần thêm điều kiện độc lập.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "56": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Độc lập: p(x,y)=p(x)p(y), nên i(x;y)=log 1=0.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "57": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "0<p≤1 suy ra −log p≥0.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "58": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "i(x;y)=I(x)−I(x|y)≤I(x), vì I(x|y)≥0.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "59": {
+    "answers": [],
+    "explanation": "Đề dùng cùng I(xᵢ,yⱼ) cho hai đại lượng nên công thức tự tham chiếu. Phải phân biệt J(x,y)=−log p(x,y) và i(x;y)=I(x)+I(y)−J(x,y). C chỉ đúng nếu đổi ký hiệu vế trái thành J và hạng cuối thành i.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "60": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Entropy là kỳ vọng của lượng tin riêng.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "61": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "H(X)=Σ p(xᵢ)log(1/p(xᵢ)).",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "62": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Nguồn chắc chắn: H=−1 log 1=0.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "63": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Với m ký hiệu: H≤log m, bằng nhau khi pᵢ=1/m. Chọn B cho H=0, không phải cực đại.",
+    "sources": [
+      "entropy",
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "PDF in sẵn “Đáp án B” tại câu 63, nhưng đó là lỗi. Đã sửa thành A theo bất đẳng thức entropy và trường hợp phân bố đều."
+  },
+  "64": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Entropy lớn biểu thị độ bất định trung bình lớn.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "65": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Entropy đo độ bất định trung bình.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "66": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "H(X|Y) đo phần bất định về X còn lại sau khi biết Y.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "67": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Độc lập khiến biết Y không giảm bất định về X.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "68": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Quy tắc dây chuyền: H(X,Y)=H(X)+H(Y|X).",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "69": {
+    "answers": [],
+    "explanation": "H(X|Y) là entropy có điều kiện, hay độ nhập nhằng (equivocation). “Sai số trung bình” không phải tên chính xác; entropy khác xác suất lỗi. Không có phương án phù hợp.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "70": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "H(Y|X): bất định đầu ra khi đã biết đầu vào.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "71": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "I(X;Y)=H(X)−H(X|Y).",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "72": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Độc lập: I(X;Y)=0.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "73": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Với nguồn cố định, I lớn nghĩa là giảm nhiều bất định hơn.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "74": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "I(X;Y)=H(X)+H(Y)−H(X,Y).",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "75": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Thay H(X|Y)=0 vào I=H(X)−H(X|Y).",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "76": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Với biến rời rạc, I(X;Y)=0 khi và chỉ khi độc lập.",
+    "sources": [
+      "mutual"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "77": {
+    "answers": [
+      "A",
+      "B",
+      "C"
+    ],
+    "explanation": "A sai vì tin có thể tương tự; B sai vì ảnh, nhạc, thư đều mang tin; C không phải định nghĩa tổng quát của tin. Đề không có một phương án sai duy nhất.",
+    "sources": [
+      "comm",
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "78": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Lấy mẫu theo thời gian và lượng tử theo biên độ.",
+    "sources": [
+      "comm"
+    ],
+    "topic": "Thông tin & entropy",
+    "note": "Để lưu/truyền thành chuỗi bit còn cần mã hóa nhị phân các mức lượng tử; A mô tả hai bước rời rạc hóa."
+  },
+  "79": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Lượng tin dựa trên bất định, không dựa năng lượng hay ý nghĩa.",
+    "sources": [
+      "shannon"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "80": {
+    "answers": [],
+    "explanation": "C sai rõ ràng: lượng tin là phần giảm bất định, không phải tổng. B cũng diễn đạt nhập nhằng giữa bất định trước nhận tin và thông tin thu được. Nếu buộc chọn một theo ý đề, thường là C; cần giảng viên xác nhận.",
+    "sources": [
+      "shannon",
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "81": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "k bit vào sinh n bit ra: tỷ lệ mã R=k/n.",
+    "sources": [
+      "conv"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "82": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Thanh ghi dịch mô tả bộ nhớ của bộ mã chập.",
+    "sources": [
+      "conv"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "83": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Đầu ra mã chập phụ thuộc cả dữ liệu và trạng thái nhớ.",
+    "sources": [
+      "conv",
+      "block"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "84": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "K là độ dài ràng buộc.",
+    "sources": [
+      "conv"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "85": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Mã chập tuyến tính, trạng thái đầu bằng 0: đầu vào 0 cho đầu ra 0.",
+    "sources": [
+      "conv"
+    ],
+    "topic": "Mã chống lỗi",
+    "note": "Giả định bộ mã chập tuyến tính khởi tạo toàn 0. Nếu bộ nhớ đầu khác 0, có thể xuất hiện đầu ra khác 0 lúc đầu."
+  },
+  "86": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Khóa đủ mạnh và bí mật là yêu cầu cần thiết.",
+    "sources": [
+      "key"
+    ],
+    "topic": "Mật mã & an toàn",
+    "note": "Khóa dài không đủ nếu thuật toán yếu, khóa dễ đoán hoặc bị lộ. Không dùng Caesar để bảo vệ dữ liệu thật."
+  },
+  "87": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Caesar dùng chung khóa dịch để mã hóa và giải mã.",
+    "sources": [
+      "symmetric"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "88": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Mỗi chữ được dịch k vị trí, có quay vòng.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "89": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "A=0, D=3; k=3−0=3.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "90": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "H→K, E→H, L→O, L→O, O→R: KHOOR.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "91": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Dịch KHOOR lùi 3 vị trí được HELLO.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "92": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Quy ước A=0,…,Z=25: C=(P+k) mod 26.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "93": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "k là số vị trí dịch, tức khóa.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "94": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Chỉ 26 khóa kể cả k=0; có thể vét cạn.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "95": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Phép ngược của cộng k là trừ k modulo 26.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "96": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Z=25; (25+2) mod 26=1=B.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "97": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "C=2; (2+10) mod 26=12=M.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "98": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Q=16; (16−5) mod 26=11=L.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "99": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "A→D, B→E, C→F đều dịch 3.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "100": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "F=5; (5−3) mod 26=2=C.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "101": {
+    "answers": [
+      "A",
+      "D"
+    ],
+    "explanation": "T=19; (19+7) mod 26=0=A. Hai lựa chọn A và D trùng nội dung “A”; chấp nhận cả hai.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "102": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Bảng a–z có 26 ký tự nên dùng modulo 26.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "103": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "C=(P+0) mod 26=P.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "104": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Caesar khả nghịch, dễ làm nhưng dễ phá khóa.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "105": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "N=13; (13+13) mod 26=0=A.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "106": {
+    "answers": [
+      "A",
+      "B"
+    ],
+    "explanation": "Cả [Iₖ|P] và [P|Iₖ] đều là dạng hệ thống, tùy thứ tự tọa độ. Theo quy ước các câu sau, thường dùng B.",
+    "sources": [
+      "gen"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "107": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "G có k hàng; mã (7,4) cho 4 hàng.",
+    "sources": [
+      "gen"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "108": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Mã hóa vector thông tin u thành c=uG.",
+    "sources": [
+      "linear"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "109": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "P có n−k=7−3=4 cột.",
+    "sources": [
+      "gen"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "110": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "P có 7−4=3 cột.",
+    "sources": [
+      "gen"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "111": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "G có k×n, Iₖ có k×k; P có k×(n−k).",
+    "sources": [
+      "gen"
+    ],
+    "topic": "Mã chống lỗi"
+  },
+  "112": {
+    "answers": [],
+    "explanation": "Chưa nêu hệ đối xứng hay khóa công khai. Đối xứng có thể dùng cùng khóa (A); khóa công khai đòi hỏi khó suy khóa bí mật từ khóa công khai (gần C). Không có kết luận duy nhất.",
+    "sources": [
+      "symmetric",
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "113": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "P: plaintext, bản rõ.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "114": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "E_K áp dụng lên P tạo bản mã C.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "115": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "D_K áp dụng lên C khôi phục P.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "116": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Hệ đối xứng dùng cùng khóa bí mật theo mô hình thông dụng.",
+    "sources": [
+      "symmetric"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "117": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "E là phép mã hóa (encryption).",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "118": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Khóa chọn phép biến đổi trong họ thuật toán.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "119": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Đầu ra mã hóa là ciphertext, bản mã.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "120": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "A=0; (0+3) mod 26=3=D.",
+    "sources": [
+      "caesar"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "121": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "B là ý mô tả bảo mật trong các lựa chọn.",
+    "sources": [
+      "confidentiality"
+    ],
+    "topic": "Mật mã & an toàn",
+    "note": "Mô tả B là mục tiêu bảo mật. Bảo mật tính toán phụ thuộc năng lực đối thủ, thuật toán và giả thiết; không đồng nghĩa bí mật hoàn hảo."
+  },
+  "122": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Bí mật hoàn hảo: quan sát bản mã không cung cấp tin về bản rõ.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "123": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Bí mật hoàn hảo tương ứng bản rõ và bản mã độc lập.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "124": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "One-time pad đạt bí mật hoàn hảo với khóa ngẫu nhiên đều, độc lập, dài bằng bản tin và chỉ dùng một lần.",
+    "sources": [
+      "hac"
+    ],
+    "topic": "Mật mã & an toàn",
+    "note": "OTP ở câu này là one-time pad, khác mã đăng nhập one-time password của website."
+  },
+  "125": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "An toàn phải dựa vào giữ bí mật khóa.",
+    "sources": [
+      "key"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "126": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Khóa dài và khó đoán chống tìm kiếm khóa hiệu quả hơn.",
+    "sources": [
+      "key"
+    ],
+    "topic": "Mật mã & an toàn",
+    "note": "Còn phụ thuộc thuật toán, nguồn ngẫu nhiên, quản lý khóa và triển khai; độ dài đơn thuần không bảo đảm an toàn."
+  },
+  "127": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Khóa khó dự đoán làm giảm khả năng đoán trúng.",
+    "sources": [
+      "key"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "128": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Lộ khóa có thể làm mất bí mật các dữ liệu liên quan.",
+    "sources": [
+      "key"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "129": {
+    "answers": [],
+    "explanation": "Phụ thuộc thuật toán và cách dùng. Tái dùng khóa one-time pad làm lộ quan hệ hai bản rõ; AES-GCM cho phép nhiều bản tin trong giới hạn với IV không trùng. C chỉ phù hợp ngữ cảnh mã cổ điển/OTP, không đúng cho mọi hệ.",
+    "sources": [
+      "hac",
+      "gcm"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "130": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Không chắc chắn thể hiện mức khó dự đoán ký hiệu.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "131": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "H là độ đo entropy của nguồn.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "132": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "H=−1 log₂1=0 bit.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "133": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Với bảng chữ cố định, phân bố đều cho H lớn nhất.",
+    "sources": [
+      "entropy"
+    ],
+    "topic": "Thông tin & entropy"
+  },
+  "134": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Tính phân tách là giải mã duy nhất cả dãy từ mã.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "135": {
+    "answers": [
+      "A",
+      "B"
+    ],
+    "explanation": "A đủ vì mã tiền tố giải mã tức thời. B cũng đủ nếu các từ mã phân biệt và biết ranh giới đầu. Hai điều kiện đều đủ, không phải đều cần.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố",
+    "note": "Mã giải mã duy nhất không nhất thiết là mã tiền tố. Ví dụ {0,01} giải mã duy nhất nhưng không phải mã tiền tố."
+  },
+  "136": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Giải mã duy nhất tránh nhập nhằng khi ghép từ mã.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "137": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Không từ mã nào là tiền tố của từ mã khác.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "138": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Mã tiền tố luôn giải mã duy nhất.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "139": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "{0,10,110}: không phần tử nào mở đầu phần tử khác.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "140": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Các từ mã nằm ở lá; không từ mã nào là tổ tiên của từ mã khác.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "141": {
+    "answers": [
+      "C"
+    ],
+    "explanation": "Trong C, 01 là tiền tố của 0101.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "142": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "{0,10,11} không có cặp tiền tố.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "143": {
+    "answers": [],
+    "explanation": "Không có đáp án đúng: A có 10→101; B có 0→01; C có 00→000; D có 1→11. Cả bốn đều vi phạm tính tiền tố.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "144": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Trong A, 1 là tiền tố của 10, 101 và 1011.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "145": {
+    "answers": [
+      "D"
+    ],
+    "explanation": "{1,01,001} không có cặp tiền tố.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "146": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "{0,11,101} không có cặp tiền tố.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "147": {
+    "answers": [
+      "A"
+    ],
+    "explanation": "Trong A, 1 là tiền tố của 11 và 111.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "148": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Tiền tố là phần đầu; cấm quan hệ đó giữa hai từ mã khác nhau.",
+    "sources": [
+      "prefix"
+    ],
+    "topic": "Mã tiền tố"
+  },
+  "149": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Trong ngữ cảnh mã mật ở đây, mục tiêu là tính bí mật.",
+    "sources": [
+      "confidentiality"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "150": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Toàn vẹn bảo vệ dữ liệu trước thay đổi trái phép.",
+    "sources": [
+      "integrity"
+    ],
+    "topic": "Mật mã & an toàn"
+  },
+  "151": {
+    "answers": [
+      "B"
+    ],
+    "explanation": "Xác thực nguồn giúp kiểm tra danh tính người gửi được tuyên bố.",
+    "sources": [
+      "authentication"
+    ],
+    "topic": "Mật mã & an toàn",
+    "note": "Hiểu là kiểm tra nguồn gốc theo cơ chế xác thực và giả thiết an toàn; mã hóa đơn thuần không tự cung cấp xác thực."
+  }
+}

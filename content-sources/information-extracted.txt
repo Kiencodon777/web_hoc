@@ -1,0 +1,780 @@
+1   Hệ thống truyền tin bao gồm các khối chính:
+    A. Nguồn tin – Bộ nhớ – Bộ xử lý
+    B. Nguồn tin – Kênh tin – Nhận tin
+    C. Phát tin – Điều khiển – Nhận tin
+    D. Nguồn tin – Thiết bị khuếch đại – Nhận tin
+2   Thông tin chỉ có ý nghĩa khi:
+    A. Bên phát chưa biết
+    B. Bên nhận chưa biết
+    C. Bên phát và nhận đều biết
+    D. Thông tin lặp lại
+3   Tín hiệu là:
+    A. Một dạng năng lượng mất mát
+    B. Một đại lượng không xác định
+    C. Dạng vật chất dùng để mang thông tin
+    D. Dạng năng lượng dự phòng
+4   Nguồn tin nguyên thủy thường là:
+    A. Các dãy số rời rạc
+    B. Các hàm liên tục theo thời gian
+    C. Các bit nhị phân
+    D. Tín hiệu số
+5   Tín hiệu âm thanh, hình ảnh từ nguồn tin nguyên thủy thường:
+    A. Là các hàm rời rạc
+    B. Là các hàm liên tục
+    C. Là tín hiệu nhị phân
+    D. Là sóng vuông
+6   Tin từ nguồn liên tục gọi là:
+    A. Tin số
+    B. Tin rời rạc
+    C. Tin liên tục
+    D. Tin tương hỗ
+7   Ví dụ nguồn rời rạc là:
+    A. Sóng âm
+    B. Nhiệt độ môi trường
+    C. Bảng chữ cái
+    D. Ánh sáng mặt trời
+8   Kênh tin là:
+    A. Thiết bị xử lý thông tin
+    B. Môi trường lan truyền tín hiệu
+     C. Bộ khuếch đại tín hiệu
+     D. Nguồn tạo nhiễu
+9    Nhiễu trong hệ thống truyền tin phát sinh ở:
+     A. Nguồn tin
+     B. Kênh tin
+     C. Thiết bị nhận
+     D. Bộ lọc
+10   Nơi nhận tin có nhiệm vụ:
+     A. Tạo tín hiệu
+     B. Phát hiện sai và sửa sai
+     C. Khuếch đại tín hiệu
+     D. Nén tín hiệu
+11   Hiệu suất của hệ thống truyền tin là:
+     A. Tốc độ xử lý tín hiệu
+     B. Lượng tin truyền trong một đơn vị thời gian
+     C. Số lượng máy thu
+     D. Mức nhiễu của kênh
+12   Độ chính xác trong hệ thống truyền tin thể hiện:
+     A. Tốc độ lấy mẫu
+     B. Khả năng chống nhiễu
+     C. Kích thước kênh
+     D. Tín hiệu đầu ra
+13   Rời rạc hóa một nguồn tin liên tục gồm 2 bước:
+     A. Lọc và biến đổi
+     B. Mã hóa và giải mã
+     C. Lấy mẫu và lượng tử hóa
+     D. Tách sóng và khuếch đại
+14   Lấy mẫu là:
+     A. Biến đổi tín hiệu rời rạc thành liên tục
+     B. Trích giá trị tín hiệu tại các thời điểm xác định
+     C. Mã hóa tín hiệu
+     D. Nén tín hiệu
+15   Định lý lấy mẫu Shannon yêu cầu tần số lấy mẫu:
+     A.
+     B.
+     C.
+     D.
+16    Tần số lấy mẫu f được tính bằng:
+      A.
+      B.
+      C.
+      D.
+17    Lượng tử hóa là:
+      A. Biến đổi tín hiệu liên tục theo thời gian
+      B. Biến đổi tín hiệu liên tục theo biên độ thành mức rời rạc
+      C. Lấy mẫu tín hiệu
+      D. Khuếch đại tín hiệu
+18    Mức lượng tử hóa ∆i là:
+      A. Khoảng giữa các mức biên độ được chia
+      B. Khoảng giữa các điểm thời gian
+      C. Khoảng giữa hai tín hiệu
+      D. Khoảng cách tín hiệu
+19    Lượng tử hóa đều là khi:
+      A. ∆i khác nhau
+      B. ∆i bằng nhau
+      C. ∆i thay đổi ngẫu nhiên
+      D. Không có mức lượng tử
+20    Khi tần số tối thiểu của tiếng nói là 4000 Hz, tần số lấy mẫu tối thiểu theo Shannon
+là:
+      A. 2000 Hz
+      B. 4000 Hz
+      C. 8000 Hz
+      D. 16000 Hz
+21    Độ đo thông tin là:
+      A. Cách tính độ lớn tín hiệu
+      B. Cách xác định độ lớn thông tin
+      C. Độ lệch chuẩn
+      D. Sai số tín hiệu
+22    Hàm độ đo thông tin có dạng:
+      A.
+      B.
+      C.
+      D.
+23    Khi p(xi) = 1 thì lượng tin I(xi) bằng:
+     A. 0
+     B. 1
+     C. 
+     D. 2
+24   Đơn vị đo thông tin khi cơ số là 2:
+     A. Nat
+     B. Bit
+     C. Hartley
+     D. Joule
+25   Khi cơ số là 10, đơn vị đo thông tin là:
+     A. Nat
+     B. Bit
+     C. Hartley
+     D. Joule
+26   Mã hóa là quá trình:
+     A. Nén và giải nén tín hiệu
+     B. Biến đổi tương đương về mặt tin tức
+     C. Lấy mẫu tín hiệu
+     D. Điều chế tín hiệu
+27   Mã hóa không làm thay đổi:
+     A. Số phần tử mạch
+     B. Lượng tin
+     C. Độ chính xác
+     D. Mức nhiễu
+26   Mã hóa là quá trình:
+     A. Nén và giải nén tín hiệu
+     B. Biến đổi tương đương về mặt tin tức
+     C. Lấy mẫu tín hiệu
+     D. Điều chế tín hiệu
+27   Mã hóa không làm thay đổi:
+     A. Số phần tử mạch
+     B. Lượng tin
+     C. Độ chính xác
+     D. Mức nhiễu
+28   Thông thường cơ số mã được chọn là:
+     A. 1
+     B. 2
+     C. 10
+     D. e
+29   Lý do chọn cơ số m = 2 khi mã hóa:
+     A. Giảm băng thông
+     B. Dễ thực hiện với mạch điện tử
+     C. Giảm tần số
+     D. Tăng độ nhiễu
+30   Điều chế là:
+     A. Tăng biên độ tín hiệu
+     B. Chuyển thông tin thành dạng năng lượng phù hợp với môi trường truyền
+     C. Nén tín hiệu
+     D. Mã hóa tín hiệu
+31   Phương pháp điều chế biên độ viết tắt là:
+     A. FM
+     B. PM
+     C. AM
+     D. ASK
+32   Phương pháp điều chế đơn biên viết tắt là:
+     A. AM
+     B. SSB
+     C. PM
+     D. FM
+33   Phương pháp điều chế tần số viết tắt là:
+     A. AM
+     B. PM
+     C. FM
+     D. ASK
+34   Khi tín hiệu rời rạc điều chế theo tần số gọi là:
+     A. AM
+     B. SSB
+     C. FSK
+     D. PSK
+35   Khi tín hiệu rời rạc điều chế theo biên độ gọi là:
+     A. ASK
+     B. FSK
+     C. PSK
+     D. SSB
+36   Khi tín hiệu rời rạc điều chế theo pha gọi là:
+     A. ASK
+     B. PSK
+     C. FM
+     D. AM
+37   Giải điều chế là:
+     A. Tăng tần số tín hiệu
+     B. Thu nhận và tách thông tin từ tín hiệu nhận
+     C. Khuếch đại tín hiệu
+     D. Mã hóa tín hiệu
+38   Phương pháp giải điều chế biên độ là:
+     A. Tách sóng biên độ
+     B. Tách sóng pha
+     C. Tách sóng tần số
+     D. Mã hóa lại tín hiệu
+39   Khi tín hiệu đầu vào bị nhiễu, quá trình giải điều chế phải:
+     A. Bỏ qua tín hiệu nhiễu
+     B. Tách và lọc thông tin gốc
+     C. Khuếch đại toàn bộ tín hiệu
+     D. Lấy mẫu lại
+40   Mục đích của điều chế trong hệ thống truyền tin:
+     A. Tăng cường độ tín hiệu
+     B. Giảm tổn hao và nhiễu khi truyền
+     C. Tăng xác suất lỗi
+     D. Giảm tần số lấy mẫu
+41   Nguồn rời rạc là:
+     A. Nguồn tạo ra tín hiệu liên tục
+     B. Nguồn tạo ra các tin dưới dạng rời rạc
+     C. Nguồn tạo ra tín hiệu hỗn hợp
+     D. Nguồn tạo ra tín hiệu ngẫu nhiên
+42   Nguồn thông tin rời rạc tạo ra:
+     A. Một tín hiệu cố định
+     B. Một chuỗi các biến ngẫu nhiên rời rạc
+     C. Một chuỗi hàm liên tục
+     D. Một tín hiệu tần số cao
+43   Nguồn rời rạc không nhớ là:
+     A. Nguồn có tín hiệu phụ thuộc vào tín hiệu trước đó
+     B. Nguồn mà xác suất xuất hiện của một ký hiệu độc lập với ký hiệu trước
+     C. Nguồn có xác suất thay đổi
+     D. Nguồn có nhớ
+44   Nguồn dừng là:
+     A. Nguồn mà xác suất xuất hiện thay đổi theo thời gian
+     B. Nguồn mà xác suất xuất hiện các ký hiệu không phụ thuộc gốc thời gian
+     C. Nguồn có nhớ
+     D. Nguồn liên tục
+45   Nguồn có tốc độ thông tin điều khiển được là:
+     A. Tốc độ phát cố định
+     B. Có thể điều khiển tốc độ phát tin từ bên ngoài
+     C. Không thể thay đổi tốc độ
+     D. Phát ngẫu nhiên
+46   Nguồn có tốc độ thông tin không điều khiển được là:
+     A. Tốc độ phát tin ngẫu nhiên
+     B. Tốc độ cố định, không điều khiển được
+     C. Không phát tin
+     D. Phát tin rời rạc không giới hạn
+47   Lượng tin riêng của một ký hiệu được xác định bởi:
+     A.
+
+     B.
+     C.
+
+     D.
+48   Khi xác suất xuất hiện của ký hiệu càng nhỏ, lượng tin riêng:
+     A. Giảm
+     B. Tăng
+     C. Không đổi
+     D. Bằng 0
+49   Khi cơ số là e, đơn vị đo lượng tin là:
+     A. Bit
+     B. Nat
+     C. Hartley
+     D. Byte
+50   Tổng lượng tin của một bản tin n ký hiệu với m ký hiệu đẳng xác suất:
+     A. I(x)=m.logn
+     B. I(x)=n.logm
+     C. I(x)=n+m
+     D. I(x)=n/m
+51   Lượng tin tương hỗ giữa hai tin xi và yj biểu thị:
+     A. Phần tin bị nhiễu
+     B. Phần tin của xi truyền được sang yj
+     C. Phần tin không truyền được
+     D. Phần tin bị mất
+52   Khi xác suất chuyển p(yj|xi) = 1 thì:
+     A. I(xi,yj) = 0
+     B. I(xi) = I(yj)
+     C. I(xi,yj) = I(xi) - I(yj)
+     D. Không xác định
+53   Khi xác suất chuyển p(yj|xi) < 1 thì:
+     A. Không có lượng tin tương hỗ
+     B. Lượng tin tương hỗ < I(xi)
+     C. Lượng tin tương hỗ tăng
+     D. Bằng I(yj)
+54   Lượng tin điều kiện I(xi|yj) thể hiện:
+     A. Lượng tin mất mát khi truyền
+     B. Tổng lượng tin
+     C. Xác suất ngẫu nhiên
+     D. Mức tín hiệu
+55   Xác suất liên kết P(xi,yj) được xác định bằng:
+     A. p(xi) × p(yj)
+     B. p(xi) + p(yj)
+     C. p(xi) × p(yj|xi)
+     D. p(yj) × p(xi|yj)
+56   Khi xi và yj độc lập thống kê thì lượng tin tương hỗ:
+     A. I(xi,yj) = I(xi)
+     B. I(xi,yj) = 0
+     C. I(xi,yj) = I(yj)
+     D. Không xác định
+57   Tính chất 1: I(xi) luôn:
+     A. Âm
+     B. Không âm
+     C. Bằng 0
+     D. Dương vô hạn
+58   Tính chất 2: I(xi) ≥ I(xi,yj) nghĩa là:
+1    Lượng tin ban đầu lớn hơn hoặc bằng phần truyền đi
+2    Lượng tin sau truyền lớn hơn
+3    Hai lượng tin bằng nhau
+4    Lượng tin điều kiện bằng 0
+59       Tính chất 3: I(xi,yj) = ?
+         A. I(xi) + I(yj) + I(xi,yj)
+         B. I(xi) - I(yj)
+         C. I(xi) + I(yj) - I(xi,yj)
+         D. I(xi,yj) - I(xi)
+60       Lượng tin trung bình của một nguồn là:
+         A. Lượng tin lớn nhất của một ký hiệu
+         B. Lượng tin riêng trung bình của tất cả các ký hiệu
+         C. Lượng tin nhỏ nhất
+         D. Độ nhiễu trung bình
+61       Công thức tính lượng tin trung bình:
+         A.
+         B.
+         C.
+         D.
+62       Khi xác suất của một ký hiệu bằng 1, entropi H(X) bằng:
+         A. 1
+         B. 0
+         C. ∞
+         D. Không xác định
+63       Entropi đạt cực đại khi:
+         A. Các xác suất bằng nhau
+         B. Một ký hiệu có xác suất 1
+         C. Xác suất ngẫu nhiên
+         D. Tín hiệu bị nhiễu
+Đáp án   B
+64       Khi entropi lớn thì:
+         A. Thông tin ít bất định
+         B. Thông tin nhiều bất định
+         C. Không có tin tức
+         D. Tốc độ truyền thấp
+Đáp án   B
+65       Entropi của nguồn là:
+         A. Độ bất định trung bình
+         B. Lượng tin tối tHIEU
+         C. Lượng tin bị nhiễu
+         D. Tổng lượng tin
+66   Entropi có điều kiện H(X|Y) thể hiện:
+     A. Độ bất định còn lại khi biết Y
+     B. Tổng entropi
+     C. Sai số ngẫu nhiên
+     D. Xác suất trung bình
+67   Khi X và Y độc lập, H(X|Y) =
+     A. 0
+     B. H(X)
+     C. H(Y)
+     D. Không xác định
+68   Mối quan hệ cơ bản:
+     A. H(X,Y)=H(X)−H(Y)
+     B. H(X,Y) = H(X) + H(Y|X)
+     C. H(X,Y) = H(Y) - H(X|Y)
+     D. H(X,Y)=H(X∣Y)+H(Y∣X)
+69   H(X|Y) còn được gọi là:
+     A. Sai số trung bình
+     B. Lượng tin tương hỗ
+     C. Tín hiệu
+     D. Entropi cực đại
+70   H(Y|X) được gọi là:
+     A. Độ bất định đầu vào
+     B. Độ bất định đầu ra khi đã biết đầu vào
+     C. Tổng lượng tin
+     D. Sai số hệ thống
+71   Lượng tin tương hỗ trung bình được tính:
+     A. I(X,Y)=H(X)+H(Y)
+     B. I(X,Y) = H(X) - H(X|Y)
+     C. I(X,Y) = H(Y) + H(X|Y)
+     D. I(X,Y) = H(X|Y) - H(Y)
+72   Khi X và Y độc lập, lượng tin tương hỗ trung bình:
+     A. Bằng 0
+     B. Bằng H(X)
+     C. Bằng H(Y)
+     D. Bằng tổng hai entropi
+73   I(X,Y) càng lớn thì:
+     A. Thông tin truyền càng ít
+     B. Thông tin truyền càng nhiều
+               C. H(X|Y) càng lớn
+               D. Nhiễu càng lớn
+74             Quan hệ cơ bản:
+               A. I(X,Y)=H(X,Y)−H(X)
+               B. I(X,Y)=H(X)+H(Y)−H(X,Y)
+               C. I(X,Y) = H(Y|X) - H(X)
+               D. I(X,Y)=H(X,Y)+H(Y)
+75             Khi H(X|Y) = 0 thì:
+               A. I(X,Y) = H(X)
+               B. I(X,Y) = 0
+               C. I(X,Y) = H(Y)
+               D. Không xác định
+76             Khi lượng tin tương hỗ bằng 0:
+               A. X và Y phụ thuộc thống kê
+               B. X và Y độc lập thống kê
+               C. Xác suất chuyển bằng 1
+               D. Entropi bằng 0
+77             Chọn câu sai:
+               A. Tin luôn được biểu diễn dưới dạng số
+               B. Tấm ảnh, bản nhạc, bức thư...không phải là các tin
+               C. Tin là một ánh xạ liên tục đến người nhận
+               D. Tin là dạng vật chất để biểu diễn hoặc thể hiện thông tin
+78             Để biến đổi một tín hiệu liên tục theo biên độ và theo thời gian thành tín hiệu số,
+chúng ta cần thực hiện quá trình nào sau đây:
+               A. Rời rạc hóa theo trục thời gian và lượng tử hóa theo trục biên độ
+               B. Mã hóa dữ liệu.
+               C. Lượng tử hóa theo trục thời gian và rời rạc hóa theo trục biên độ
+               D. Giải mã dữ liệu
+79             Khái niệm lượng tin được định nghĩa dựa trên:
+               A. Năng lượng của tín hiệu mang tin
+               B. Độ bất định của tin
+               C. Ý nghĩa của tin
+               D. Năng lượng của tín hiệu mang tin và ý nghĩa của tin
+80             Chọn câu sai trong các câu sau:
+               A. Độ bất định sẽ trở thành thông tin khi nó bị thủ tiêu
+               B. Độ bất định chính là thông tin
+               C. Lượng thông tin = độ bất định tiên nghiệm + độ bất định hậu nghiệm
+               D. Lượng thông tin = độ bất định tiên nghiệm - độ bất định hậu nghiệm
+81   Tốc độ lập mã của mã chập được xác định bằng
+     A. n/k
+     B. k/n
+     C. K/n
+     D. m/k
+82   Trong mã chập, bộ mã hóa thường được mô tả bằng
+     A. Ma trận kiểm tra
+     B. Sơ đồ khối
+     C. Sơ đồ thanh ghi dịch (shift register)
+     D. Cây mã
+83   Mã chập khác với mã khối ở chỗ
+     A. Có thể sửa lỗi tốt hơn
+     B. Có bộ nhớ
+     C. Không cần thức sinh
+     D. Không có ma trận sinh
+84   Mã chập được ký hiệu bởi bộ ba (n, k, K). Trong đó K là
+     A. Số bit đầu ra
+     B. Số bit đầu vào
+     C. Độ dài ràng buộc
+     D. Tỷ lệ mã
+85   Khi đầu vào là “000…0”, đầu ra của mã chập là
+     A. Ngẫu nhiên
+     B. 000…0
+     C. 111…1
+     D. Phụ thuộc vào thức
+86   "Một yêu cầu quan trọng để đảm bảo an toàn thông tin lâu dài trong hệ mã là:"
+     A. Thuật toán mã hóa phải thay đổi thường xuyên
+     B. Khóa phải đủ dài và được giữ bí mật tuyệt đối
+     C. Tốc độ mã hóa nhanh hơn tốc độ giải mã
+     D. Thông điệp phải được gửi đi nhiều lần
+87   Mã Caesar là loại mã hóa thuộc loại nào?
+     A. Mã hóa khóa đối xứng
+     B. Mã hóa khóa công khai
+     C. Mã khối hiện đại
+     D. Mã dòng
+88   Mã Caesar thực hiện phép dịch chuyển như thế nào?
+     A. Dịch vị trí ký tự theo bảng chữ cái
+     B. Đổi chỗ ngẫu nhiên ký tự
+     C. Hoán vị nhị phân
+     D. Dùng hàm băm
+89   "Nếu ký tự ‘A’ được mã hóa thành ‘D’ trong mã Caesar, khóa mã là bao nhiêu"
+     A. 2
+     B. 3
+     C. 4
+     D. 5
+90   Trong mã Caesar Với khóa k=3, mã hóa “HELLO” → ?
+     A. IFMMP
+     B. KHOOR
+     C. JGNNQ
+     D. MIPPS
+91   Giải mã chuỗi “KHOOR” với khóa k=3 Sử dụng mã Caesar
+     A. HELLO
+     B. JGNNQ
+     C. IFMMP
+     D. GDKKN
+92   Công thức tổng quát của mã Caesar là
+     A. C=(P+k)mod 26
+     B. C=(P−k)mod 26
+     C. P=(C+k)mod 26
+     D. P=(P+C)mod k
+93   Ký hiệu k trong mã Caesar thường biểu thị
+     A. Số ký tự trong bản tin
+     B. Số lần lặp lại
+     C. Khóa dịch chuyển
+     D. Giá trị ASCII
+94   Nhược điểm chính của mã Caesar là gì?
+     A. Quá phức tạp
+     B. Không có khóa
+     C. Dễ bị phá bằng thử toàn bộ khóa
+     D. Không thể giải mã
+95   Trong giải mã của mã caesar, công thức là
+     A. P=(C−k)mod 26
+     B. P=(C+k)mod 26
+     C. C=(P+k)mod 26
+     D. P=(P+k)mod 26
+96   "Nếu “Z” được mã hóa với khóa k=2 sử dụng mã caesar kết quả mã hóa là "
+      A. B
+      B. A
+      C. C
+      D. D
+97    "Khi mã hóa chữ “C” với khóa k=10 sử dụng mã caesar kết quả mã hóa là "
+      A. M
+      B. L
+      C. N
+      D. O
+98    "Giải mã ký tự “Q” khi k=5 sử dụng mã caesar"
+      A. L
+      B. M
+      C. R
+      D. K
+99    "Nếu bản rõ là “ABC” sử dụng mã caesar và bản mã là “DEF”, thì khóa là"
+      A. 2
+      B. 3
+      C. 4
+      D. 5
+100   Giải mã ký tự “F” khi k=3 sử dụng mã Caesar.
+      A. I
+      B. C
+      C. D
+      D. G
+101   Với khóa k=7 sử dụng mã caesar ký tự 'T 'được mã hóa thành
+      A. A
+      B. B
+      C. U
+      D. A
+102   "Nếu dùng mã Caesar cho chữ thường (a–z), thì phép toán mod dùng là"
+      A. mod 25
+      B. mod 26
+      C. mod 27
+      D. mod 52
+103   Nếu mã Caesar sử dụng k=0
+      A. Giống bản rõ
+      B. Là chuỗi rỗng
+      C. Mất thông tin
+      D. Xáo trộn ngẫu nhiên
+104   Mã Caesar không đảm bảo tính chất nào sau đây?
+      A. Bảo mật
+      B. Tính nghịch đảo
+      C. Dễ thực hiện
+      D. Dễ giải mã
+105   "Nếu chữ “A” mã hóa thành “N” (k=13), thì “N” mã hóa thành gì?"
+      A. A
+      B. M
+      C. Z
+      D. O
+106   "Trong ma trận sinh chính tắc (systematic generator matrix) có dạng:"
+      A.
+      B.
+      C.
+      D.
+107   Với mã khối tuyến tính (7,4), số hàng của ma trận sinh bằng
+      A. 3
+      B. 4
+      C. 7
+      D. 11
+108   Ma trận sinh của mã (n,k) có vai trò:
+      A. Dùng để giải mã tín hiệu
+      B. Dùng để mã hóa từ thông tin thành từ mã
+      C. Dùng để phát hiện lỗi
+      D. Không có chức năng trong thực tế
+109   "Cho mã (7,3) có ma trận sinh chính tắc dạng, số cột của ma trận P là"
+      A. 3
+      B. 4
+      C. 7
+      D. 11
+110   "Cho mã (7,4) có ma trận sinh chính tắc dạng G=[I4 |P] số cột của ma trận P là"
+      A. 3
+      B. 4
+      C. 7
+      D. 11
+111   Trong ma trận sinh chính tắc G=[Ik |P] kích thước của P là:
+      A. k×k
+             B. k×(n−k)
+             C. (n−k)×k
+             D. (n−k)×(n−k)
+112          "Trong một hệ mật mã an toàn, điều kiện giữa khóa mã hóa (E) và khóa giải mã
+(D) phải:"
+             A. Giống hệt nhau
+             B. Có thể suy ra trực tiếp từ nhau
+             C. Có quan hệ toán học xác định nhưng khó suy ngược
+             D. Không có liên hệ nào
+113          Trong hệ mật mã, ký hiệu P biểu thị cho đại lượng nào?
+             A. Bản mã
+             B. Khóa
+             C. Bản rõ
+             D. Hàm mã hóa
+114          Trong hệ mật mã, C=EK(P) có nghĩa là
+             A. Bản mã được giải mã bằng khóa K
+             B. Bản rõ được mã hóa bằng khóa K
+             C. Khóa được tạo ra từ bản rõ
+             D. Bản rõ và bản mã giống nhau
+115          Phép giải mã trong hệ mật mã được biểu diễn bằng công thức:
+             A. C=EK(P)
+             B. P=DK(C)
+             C. P=EK(C)
+             D. C=DK(P)
+116          Trong hệ mật mã đối xứng, điều nào sau đây là đúng?
+             A. Khóa mã hóa và giải mã khác nhau
+             B. Khóa mã hóa và giải mã giống nhau
+             C. Không cần dùng khóa
+             D. Khóa được công khai
+117          Ký hiệu E trong hệ mật mã có nghĩa là gì?
+             A. Hàm mã hóa
+             B. Hàm giải mã
+             C. Bản rõ
+             D. Bản mã
+118          Trong hệ mật mã, khóa K có vai trò gì?
+             A. Xác định phép mã hóa và giải mã
+             B. Là bản rõ cần truyền
+             C. Là kết quả mã hóa
+          D. Là thuật toán mã hóa
+119       Trong mô hình mã hóa tổng quát, đầu ra của hàm mã hóa là
+          A. Khóa
+          B. Bản rõ
+          C. Bản mã
+          D. Hàm giải mã
+120       "Trong mã hóa Caesar, nếu P=A và khóa K=3, thì C là gì (theo bảng chữ cái Anh)?"
+          A. C
+          B. D
+          C. F
+          D. G
+121       Tính bí mật của hệ thống mã mật được HIEU là gì?
+          A. Người nhận có thể đọc được bản rõ.
+          "B. Kẻ tấn công không thể tìm ra bản rõ từ bản mã nếu không có khóa."
+          C. Tất cả mọi người đều biết khóa mã hóa.
+          D. Hệ thống hoạt động nhanh và hiệu quả.
+122       "Một hệ thống mã mật được coi là hoàn toàn bí mật (perfect secrecy) khi nào?"
+          A. Khi độ dài khóa bằng độ dài bản mã.
+          B. Khi bản mã không chứa thông tin nào về bản rõ.
+          C. Khi không ai có thể giải mã bằng khóa đúng.
+          D. Khi bản rõ và bản mã giống nhau.
+123       "Trong hệ mật mã có tính bí mật tuyệt đối, mối quan hệ giữa bản rõ PPP và bản mã
+CCC là"
+          A. P xác định hoàn toàn C
+          B. C hoàn toàn độc lập với P
+          C. P=C
+          D. C chứa toàn bộ thông tin về P
+124       "Hệ mã nào sau đây đạt tính bí mật tuyệt đối theo lý thuyết Shannon?"
+          A. Mã dịch Caesar
+          B. Mã XOR với khóa ngắn lặp lại
+          C. Mã one-time pad (OTP)
+          D. Mã Affine
+125       "Để đảm bảo tính bí mật trong thực tế, điều nào sau đây là quan trọng nhất?"
+          A. Giữ bí mật thuật toán mã hóa.
+          B. Giữ bí mật khóa mã hóa.
+          C. Tăng kích thước bản rõ.
+          D. Sử dụng cùng một khóa cho mọi thông điệp.
+126           "Yếu tố nào dưới đây ảnh hưởng trực tiếp nhất đến tính bí mật của hệ thống mã
+mật?"
+              A. Độ dài và độ phức tạp của khóa mã hóa
+              B. Tốc độ mã hóa của hệ thống
+              C. Số lượng người dùng trong mạng
+              D. Dung lượng bộ nhớ máy tính
+127           Tính ngẫu nhiên của khóa ảnh hưởng đến tính bí mật như thế nào?
+              A. Không ảnh hưởng
+              B. Càng ngẫu nhiên thì càng khó đoán → bí mật cao hơn
+              C. Ngẫu nhiên làm hệ khó giải mã hợp pháp
+              D. Chỉ ảnh hưởng đến tốc độ, không ảnh hưởng bảo mật
+128           Trong hệ thống mã hóa, yếu tố quản lý và phân phối khóa ảnh hưởng đến tính bí
+mật vì:
+              "A. Khóa bị lộ trong quá trình truyền có thể khiến toàn bộ hệ thống bị tấn công"
+              B. Quản lý khóa chỉ cần thiết trong giải mã
+              C. Phân phối khóa không liên quan đến an toàn
+              D. Mỗi người dùng có thể tự tạo khóa riêng
+129             Khi cùng một khóa được dùng để mã hóa nhiều thông điệp khác nhau, điều gì xảy
+ra với tính bí mật?
+              A. Tăng vì tiết kiệm tài nguyên
+              B. Không đổi
+              C. Giảm vì dễ bị phân tích thống kê và suy ra khóa
+              D. Không ảnh hưởng nếu thông điệp khác nhau
+130           Độ không chắc chắn của một nguồn tin thể hiện điều gì?
+              A. Mức độ sai lệch của thông tin truyền đi
+              B. Mức độ ngẫu nhiên, khó dự đoán của các ký hiệu phát ra từ nguồn
+              C. Mức độ lặp lại của tín hiệu
+              D. Tốc độ truyền tin
+131           "Trong lý thuyết thông tin, đại lượng nào dùng để đo độ không chắc chắn của nguồn
+tin?"
+              A. Entropy (H)
+              B. Nhiễu (Noise)
+              C. Công suất tín hiệu (S)
+              D. Xác suất lỗi (Pe)
+132           "Nếu một nguồn tin chỉ phát ra một ký hiệu duy nhất với xác suất 1, thì độ không
+chắc chắn của nó là:"
+              A. Cực đại
+              B. Bằng 1 bit
+              C. Bằng 0
+      D. Không xác định
+133   Độ không chắc chắn đạt giá trị cực đại khi nào?
+      A. Khi các xác suất không đều nhau
+      B. Khi một ký hiệu có xác suất gần 1
+      C. Khi tất cả các ký hiệu có xác suất bằng nhau
+      D. Khi chỉ có một ký hiệu duy nhất
+134   Tính phân tách của một mã nhị phân được hiểu là:
+      A. Mỗi ký hiệu nguồn ứng với một từ mã duy nhất
+      B. Mỗi dãy mã nhận được chỉ có một cách giải mã duy nhất
+      C. Mỗi mã có cùng độ dài
+      D. Các từ mã đều có trọng số bằng nhau
+135   Điều kiện để mã có thể giải mã duy nhất là:
+      A. Không có từ mã nào là tiền tố của từ mã khác
+      B. Các từ mã có cùng độ dài
+      C. Các mã có cùng trọng số
+      D. Có số lượng mã tối thiểu
+136   Tính phân tách giúp đảm bảo điều gì trong quá trình truyền tin?
+      A. Giảm xác suất lỗi do nhiễu
+      B. Dễ giải mã chính xác, không nhầm lẫn
+      C. Tăng tốc độ truyền
+      D. Tiết kiệm băng thông
+137   Một mã được gọi là mã tiền tố (prefix code) khi:
+      A. Mọi từ mã có cùng độ dài
+      B. Không có từ mã nào là tiền tố của một từ mã khác
+      C. Các từ mã bắt đầu bằng cùng một bit
+      D. Các từ mã có cùng trọng số
+138   Tính tiền tố đảm bảo điều gì cho mã?
+      A. Mã được giải mã duy nhất
+      B. Mã có độ dài cố định
+      C. Mã có thể phát hiện lỗi
+      D. Mã có khoảng cách Hamming lớn
+139   Trong các mã sau, mã nào là mã tiền tố?
+      A. {0, 01, 011}
+      B. {0, 10, 110}
+      C. {1, 10, 100}
+      D. {00, 0, 11}
+140   Trong cây biểu diễn mã (prefix tree), điều kiện nào đảm bảo mã là tiền tố?
+      A. Mỗi nút trong cây có nhiều hơn 2 nhánh
+      B. Không có từ mã nào là nút cha của từ mã khác
+      C. Mỗi từ mã là một nút trung gian
+      D. Cây có chiều cao bằng nhau
+141   Mã nào không phải là mã tiền tố?
+      A. {00, 010, 11}
+      B. {0, 10, 110}
+      C. {1, 01, 0101}
+      D. {10, 11, 001}
+142   Tập mã nào sau đây là mã tiền tố?
+      A. {0, 01, 001}
+      B. {0, 10, 11}
+      C. {1, 11, 111}
+      D. {00, 01, 001}
+143   Trong các tập mã sau, mã nào là mã tiền tố?
+      A. {0, 10, 101}
+      B. {0, 01, 011}
+      C. {00, 000, 1}
+      D. {1, 11, 1111}
+144   Tập mã nào vi phạm tính tiền tố?
+      A. {1, 10, 101, 1011}
+      B. {0, 10, 11}
+      C. {01, 10, 111}
+      D. {10, 11, 000}
+145   Mã nào là mã tiền tố?
+      A. {0, 01, 0011}
+      B. {10, 11, 1110}
+      C. {0, 1, 10}
+      D. {1, 01, 001}
+146   Tập mã nào sau đây là mã tiền tố hợp lệ?
+      A. {0, 11, 101}
+      B. {01, 010, 011}
+      C. {1, 10, 100, 101}
+      D. {00, 01, 001}
+147   Tập mã nào không phải mã tiền tố?
+      A. {1, 11, 111}
+      B. {10, 11, 001}
+      C. {0, 10, 110}
+      D. {00, 01, 11}
+148            Mã có tính prefix (mã tiền tố) là gì?
+               A. Là mã trong đó tất cả các từ mã có cùng độ dài
+               "B. Là mã trong đó không có từ mã nào là phần đầu
+(tiền tố) của từ mã khác"
+               C. Là mã trong đó các từ mã có thể trùng lặp một phần
+               D. Là mã mà tất cả các từ mã đều bắt đầu bằng cùng một bit
+149            Yêu cầu cơ bản quan trọng nhất của một hệ mã mật là gì?
+               A. Tốc độ mã hóa cao
+               B. Đảm bảo tính bí mật của thông tin
+               C. Sử dụng khóa ngắn gọn
+               D. Dễ cài đặt trên phần cứng
+150            "Trong một hệ mã mật, tính toàn vẹn (integrity) của thông tin được hiểu là:"
+               A. Chỉ người được phép mới đọc được thông tin
+               "B. Thông tin không bị thay đổi trong quá trình truyền hoặc lưu trữ"
+               C. Người gửi có thể chối bỏ việc đã gửi tin
+               D. Hệ mã không thể bị giải mã
+151            Tính xác thực (authentication) trong mã mật đảm bảo rằng:
+               A. Thông điệp được truyền đúng đích
+               B. Người nhận chắc chắn biết được ai là người gửi
+               C. Dữ liệu được mã hóa bằng khóa công khai
+               D. Thông tin được truyền an toàn
+

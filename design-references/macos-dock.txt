@@ -1,0 +1,443 @@
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+mac-os-dock.tsx
+'use client';
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+
+// Types for the component
+interface DockApp {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+interface MacOSDockProps {
+  apps: DockApp[];
+  onAppClick: (appId: string) => void;
+  openApps?: string[];
+  className?: string;
+}
+
+const MacOSDock: React.FC<MacOSDockProps> = ({ 
+  apps, 
+  onAppClick, 
+  openApps = [],
+  className = ''
+}) => {
+  const [mouseX, setMouseX] = useState<number | null>(null);
+  const [currentScales, setCurrentScales] = useState<number[]>(apps.map(() => 1));
+  const [currentPositions, setCurrentPositions] = useState<number[]>([]);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const lastMouseMoveTime = useRef<number>(0);
+
+  // Responsive size calculations based on viewport
+  const getResponsiveConfig = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return { baseIconSize: 64, maxScale: 1.6, effectWidth: 240 };
+    }
+
+    // Base calculations on smaller dimension for better mobile experience
+    const smallerDimension = Math.min(window.innerWidth, window.innerHeight);
+    
+    // Scale icon size based on screen size
+    if (smallerDimension < 480) {
+      // Mobile phones
+      return {
+        baseIconSize: Math.max(40, smallerDimension * 0.08),
+        maxScale: 1.4,
+        effectWidth: smallerDimension * 0.4
+      };
+    } else if (smallerDimension < 768) {
+      // Tablets
+      return {
+        baseIconSize: Math.max(48, smallerDimension * 0.07),
+        maxScale: 1.5,
+        effectWidth: smallerDimension * 0.35
+      };
+    } else if (smallerDimension < 1024) {
+      // Small laptops
+      return {
+        baseIconSize: Math.max(56, smallerDimension * 0.06),
+        maxScale: 1.6,
+        effectWidth: smallerDimension * 0.3
+      };
+    } else {
+      // Desktop and large screens
+      return {
+        baseIconSize: Math.max(64, Math.min(80, smallerDimension * 0.05)),
+        maxScale: 1.8,
+        effectWidth: 300
+      };
+    }
+  }, []);
+
+  const [config, setConfig] = useState(getResponsiveConfig);
+  const { baseIconSize, maxScale, effectWidth } = config;
+  const minScale = 1.0;
+  const baseSpacing = Math.max(4, baseIconSize * 0.08);
+
+  // Update config on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setConfig(getResponsiveConfig());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [getResponsiveConfig]);
+
+  // Authentic macOS cosine-based magnification algorithm
+  const calculateTargetMagnification = useCallback((mousePosition: number | null) => {
+    if (mousePosition === null) {
+      return apps.map(() => minScale);
+    }
+
+    return apps.map((_, index) => {
+      const normalIconCenter = (index * (baseIconSize + baseSpacing)) + (baseIconSize / 2);
+      const minX = mousePosition - (effectWidth / 2);
+      const maxX = mousePosition + (effectWidth / 2);
+      
+      if (normalIconCenter < minX || normalIconCenter > maxX) {
+        return minScale;
+      }
+      
+      const theta = ((normalIconCenter - minX) / effectWidth) * 2 * Math.PI;
+      const cappedTheta = Math.min(Math.max(theta, 0), 2 * Math.PI);
+      const scaleFactor = (1 - Math.cos(cappedTheta)) / 2;
+      
+      return minScale + (scaleFactor * (maxScale - minScale));
+    });
+  }, [apps, baseIconSize, baseSpacing, effectWidth, maxScale, minScale]);
+
+  // Calculate positions based on current scales
+  const calculatePositions = useCallback((scales: number[]) => {
+    let currentX = 0;
+    
+    return scales.map((scale) => {
+      const scaledWidth = baseIconSize * scale;
+      const centerX = currentX + (scaledWidth / 2);
+      currentX += scaledWidth + baseSpacing;
+      return centerX;
+    });
+  }, [baseIconSize, baseSpacing]);
+
+  // Initialize positions
+  useEffect(() => {
+    const initialScales = apps.map(() => minScale);
+    const initialPositions = calculatePositions(initialScales);
+    setCurrentScales(initialScales);
+    setCurrentPositions(initialPositions);
+  }, [apps, calculatePositions, minScale, config]);
+
+  // Animation loop
+  const animateToTarget = useCallback(() => {
+    const targetScales = calculateTargetMagnification(mouseX);
+    const targetPositions = calculatePositions(targetScales);
+    const lerpFactor = mouseX !== null ? 0.2 : 0.12;
+
+    setCurrentScales(prevScales => {
+      return prevScales.map((currentScale, index) => {
+        const diff = targetScales[index] - currentScale;
+        return currentScale + (diff * lerpFactor);
+      });
+    });
+
+    setCurrentPositions(prevPositions => {
+      return prevPositions.map((currentPos, index) => {
+        const diff = targetPositions[index] - currentPos;
+        return currentPos + (diff * lerpFactor);
+      });
+    });
+
+    const scalesNeedUpdate = currentScales.some((scale, index) => 
+      Math.abs(scale - targetScales[index]) > 0.002
+    );
+    const positionsNeedUpdate = currentPositions.some((pos, index) => 
+      Math.abs(pos - targetPositions[index]) > 0.1
+    );
+    
+    if (scalesNeedUpdate || positionsNeedUpdate || mouseX !== null) {
+      animationFrameRef.current = requestAnimationFrame(animateToTarget);
+    }
+  }, [mouseX, calculateTargetMagnification, calculatePositions, currentScales, currentPositions]);
+
+  // Start/stop animation loop
+  useEffect(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    animationFrameRef.current = requestAnimationFrame(animateToTarget);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [animateToTarget]);
+
+  // Throttled mouse movement handler
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const now = performance.now();
+    
+    if (now - lastMouseMoveTime.current < 16) {
+      return;
+    }
+    
+    lastMouseMoveTime.current = now;
+    
+    if (dockRef.current) {
+      const rect = dockRef.current.getBoundingClientRect();
+      const padding = Math.max(8, baseIconSize * 0.12);
+      setMouseX(e.clientX - rect.left - padding);
+    }
+  }, [baseIconSize]);
+
+  const handleMouseLeave = useCallback(() => {
+    setMouseX(null);
+  }, []);
+
+  const createBounceAnimation = (element: HTMLElement) => {
+    const bounceHeight = Math.max(-8, -baseIconSize * 0.15);
+    element.style.transition = 'transform 0.2s ease-out';
+    element.style.transform = `translateY(${bounceHeight}px)`;
+    
+    setTimeout(() => {
+      element.style.transform = 'translateY(0px)';
+    }, 200);
+  };
+
+  const handleAppClick = (appId: string, index: number) => {
+    if (iconRefs.current[index]) {
+      if (typeof window !== 'undefined' && (window as any).gsap) {
+        const gsap = (window as any).gsap;
+        const bounceHeight = currentScales[index] > 1.3 ? -baseIconSize * 0.2 : -baseIconSize * 0.15;
+        
+        gsap.to(iconRefs.current[index], {
+          y: bounceHeight,
+          duration: 0.2,
+          ease: 'power2.out',
+          yoyo: true,
+          repeat: 1,
+          transformOrigin: 'bottom center'
+        });
+      } else {
+        createBounceAnimation(iconRefs.current[index]!);
+      }
+    }
+    
+    onAppClick(appId);
+  };
+
+  // Calculate content width
+  const contentWidth = currentPositions.length > 0 
+    ? Math.max(...currentPositions.map((pos, index) => 
+        pos + (baseIconSize * currentScales[index]) / 2
+      ))
+    : (apps.length * (baseIconSize + baseSpacing)) - baseSpacing;
+
+  const padding = Math.max(8, baseIconSize * 0.12);
+
+    return (
+    <div 
+      ref={dockRef}
+      className={`backdrop-blur-md ${className}`}
+      style={{
+        width: `${contentWidth + padding * 2}px`,
+        background: 'rgba(45, 45, 45, 0.75)',
+        borderRadius: `${Math.max(12, baseIconSize * 0.4)}px`,
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: `
+          0 ${Math.max(4, baseIconSize * 0.1)}px ${Math.max(16, baseIconSize * 0.4)}px rgba(0, 0, 0, 0.4),
+          0 ${Math.max(2, baseIconSize * 0.05)}px ${Math.max(8, baseIconSize * 0.2)}px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+        `,
+        padding: `${padding}px`
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div 
+        className="relative"
+        style={{
+          height: `${baseIconSize}px`,
+          width: '100%'
+        }}
+      >
+        {apps.map((app, index) => {
+          const scale = currentScales[index];
+          const position = currentPositions[index] || 0;
+          const scaledSize = baseIconSize * scale;
+          
+          return (
+            <div
+              key={app.id}
+              ref={(el) => { iconRefs.current[index] = el; }}
+              className="absolute cursor-pointer flex flex-col items-center justify-end"
+              title={app.name}
+              onClick={() => handleAppClick(app.id, index)}
+              style={{
+                left: `${position - scaledSize / 2}px`,
+                bottom: '0px',
+                width: `${scaledSize}px`,
+                height: `${scaledSize}px`,
+                transformOrigin: 'bottom center',
+                zIndex: Math.round(scale * 10)
+              }}
+            >
+              <img
+                src={app.icon}
+                alt={app.name}
+                width={scaledSize}
+                height={scaledSize}
+                className="object-contain"
+                style={{
+                  filter: `drop-shadow(0 ${scale > 1.2 ? Math.max(2, baseIconSize * 0.05) : Math.max(1, baseIconSize * 0.03)}px ${scale > 1.2 ? Math.max(4, baseIconSize * 0.1) : Math.max(2, baseIconSize * 0.06)}px rgba(0,0,0,${0.2 + (scale - 1) * 0.15}))`
+                }}
+              />
+              
+              {/* App Indicator Dot */}
+              {openApps.includes(app.id) && (
+                <div 
+                  className="absolute"
+                  style={{
+                    bottom: `${Math.max(-2, -baseIconSize * 0.05)}px`,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: `${Math.max(3, baseIconSize * 0.06)}px`,
+                    height: `${Math.max(3, baseIconSize * 0.06)}px`,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    boxShadow: '0 0 4px rgba(0, 0, 0, 0.3)',
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default MacOSDock;
+
+demo.tsx
+import React, { useState } from 'react';
+import MacOSDock from './components/ui/mac-os-dock.tsx';
+
+// Sample app data with actual macOS-style icons
+const sampleApps = [
+  { 
+    id: 'finder', 
+    name: 'Finder', 
+    icon: 'https://cdn.21st.dev/assets/mirror/99/9963f31f43cd77b0c28981ba7bac04db749a5749019f554d1afb75225a3e9151.png' 
+  },
+  { 
+    id: 'calculator', 
+    name: 'Calculator', 
+    icon: 'https://cdn.21st.dev/assets/mirror/96/9639bd0ec3bae0b56bd8812f61c39d72123c6de272922e5bc7f3a24264112953.png' 
+  },
+  { 
+    id: 'terminal', 
+    name: 'Terminal', 
+    icon: 'https://cdn.21st.dev/assets/mirror/11/11d8587bae8852b8232d1f37e318c4b0fbbd2b0f2b61c71a79dbae327b4fa0c1.webp' 
+  },
+  { 
+    id: 'mail', 
+    name: 'Mail', 
+    icon: 'https://cdn.21st.dev/assets/mirror/7b/7bb8671183d2a2bbb8a3858b1971cc5699ba0103673b011590d22f0fa309bb87.png' 
+  },
+  { 
+    id: 'notes', 
+    name: 'Notes', 
+    icon: 'https://cdn.21st.dev/assets/mirror/cb/cbfa4e5db383bbb86683edc2f7d309e9fd7000d07833f6449837be51b77558fa.png' 
+  },
+  { 
+    id: 'safari', 
+    name: 'Safari', 
+    icon: 'https://cdn.21st.dev/assets/mirror/d5/d558230225bb0dd1897db6c7cf0d03b29506eef8078fe25313c48cd8f72d05ad.png' 
+  },
+  { 
+    id: 'photos', 
+    name: 'Photos', 
+    icon: 'https://cdn.21st.dev/assets/mirror/45/45c61147b702b2765802969df55878aa5f69e27abe656174339dc661d0f9a31d.png' 
+  },
+  { 
+    id: 'music', 
+    name: 'Music', 
+    icon: 'https://cdn.21st.dev/assets/mirror/03/035600d3c05ccbfc974888a3319fa721dac7321dd18734a5d0405af1fd259c41.png' 
+  },
+  { 
+    id: 'calendar', 
+    name: 'Calendar', 
+    icon: 'https://cdn.21st.dev/assets/mirror/e1/e1e93987488d4a904f4b7273213d36319c73d81ca9680b440c144f69af5a7f9a.png' 
+  },
+];
+
+const DockDemo: React.FC = () => {
+  const [openApps, setOpenApps] = useState<string[]>(['finder', 'safari']);
+
+  const handleAppClick = (appId: string) => {
+    console.log('App clicked:', appId);
+    
+    // Toggle app in openApps array
+    setOpenApps(prev => 
+      prev.includes(appId) 
+        ? prev.filter(id => id !== appId)
+        : [...prev, appId]
+    );
+  };
+
+  return (
+    <div style={{ 
+      height: '100vh', 
+      width: '100vw',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden'
+    }}>
+      {/* The Dock Component */}
+      <MacOSDock
+        apps={sampleApps}
+        onAppClick={handleAppClick}
+        openApps={openApps}
+      />
+    </div>
+  );
+};
+
+export default DockDemo;
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them

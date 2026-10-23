@@ -1,0 +1,25 @@
+'use strict';
+const INFO_SOURCES={
+ comm:['MIT · Digital communication, lecture 2','https://ocw.mit.edu/courses/6-450-principles-of-digital-communication-i-fall-2009/1811fc78b310cb16f387254cb2efca5e_MIT6_450F09_slide02.pdf'],
+ shannon:['Shannon · A Mathematical Theory of Communication','https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf'],
+ entropy:['MIT · Entropy','https://ocw.mit.edu/courses/6-441-information-theory-spring-2016/2243edffb30f57181ed97dcb77691580_MIT6_441S16_chapter_1.pdf'],
+ mutual:['MIT · Mutual information','https://ocw.mit.edu/courses/6-441-information-theory-spring-2016/184197ca5d5418da2415d37e929860b9_MIT6_441S16_chapter_2.pdf'],
+ prefix:['MIT · Lossless compression & prefix codes','https://ocw.mit.edu/courses/6-441-information-theory-spring-2016/67d8e68cd8fda55366e3f9f0a9465c17_MIT6_441S16_chapter_6.pdf'],
+ sampling:['MathWorks · Nyquist theorem','https://www.mathworks.com/discovery/nyquist-theorem.html'],
+ ti:['Texas Instruments · Sampling theorem','https://www.ti.com/lit/pdf/snaa079'],
+ modulation:['MIT · Modulation and demodulation','https://ocw.mit.edu/courses/6-450-principles-of-digital-communications-i-fall-2006/1e8d60eb6c0a68cc48e81af039fd4af6_book_6.pdf'],
+ cisco:['Cisco · Digital modulation','https://www.cisco.com/E-Learning/bulk/guest/celc/fwl/ch3/3_5_2/content.html'],
+ ni:['NI · Frequency shift keying','https://www.ni.com/docs/en-US/bundle/pxi-pxie-5650-5651-5652-features/page/fsk.html'],
+ block:['MathWorks · Block codes','https://www.mathworks.com/help/comm/ug/block-codes.html'],
+ conv:['MathWorks · Convolutional codes','https://www.mathworks.com/help/comm/ug/convolutional-codes.html'],
+ linear:['MIT · Linear codes','https://ocw.mit.edu/courses/6-441-information-theory-spring-2016/f417578e714d472cb08d463825e45f03_MIT6_441S16_chapter_16.pdf'],
+ gen:['MathWorks · Generator matrices','https://www.mathworks.com/help/comm/ref/gen2par.html'],
+ caesar:['Cornell · A Course in Cryptography, §1.1','https://www.cs.cornell.edu/courses/cs6830/2009fa/lecnotes.pdf'],
+ hac:['Handbook of Applied Cryptography · Ch. 1','https://cacr.uwaterloo.ca/hac/about/chap1.pdf'],
+ symmetric:['NIST · Symmetric cryptography','https://csrc.nist.gov/glossary/term/symmetric_cryptography'],
+ key:['NIST · Key management','https://csrc.nist.gov/projects/key-management/faqs'],
+ gcm:['NIST SP 800-38D · GCM, §8','https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf'],
+ confidentiality:['NIST · Confidentiality','https://csrc.nist.gov/glossary/term/confidentiality'],
+ integrity:['NIST · Integrity','https://csrc.nist.gov/glossary/term/integrity'],
+ authentication:['NIST · Authentication','https://csrc.nist.gov/glossary/term/authentication']
+};

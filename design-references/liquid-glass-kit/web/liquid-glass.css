@@ -1,0 +1,232 @@
+/**
+ * Apple & BitChord-style Liquid Glass Design System
+ * Optical properties: 220% saturation, multi-stage blur, specular rim highlight, ambient drop shadow.
+ */
+
+:root {
+  /* Dark Glass Palette (Default) */
+  --liquid-glass-bg: rgba(20, 20, 25, 0.65);
+  --liquid-glass-border: rgba(255, 255, 255, 0.12);
+  --liquid-glass-highlight: rgba(255, 255, 255, 0.32);
+  --liquid-glass-shadow-inner: rgba(0, 0, 0, 0.45);
+  --liquid-glass-shadow-drop: rgba(0, 0, 0, 0.65);
+  --liquid-glass-indicator: rgba(255, 255, 255, 0.14);
+  --liquid-text-primary: #ffffff;
+  --liquid-text-secondary: rgba(255, 255, 255, 0.65);
+  
+  /* Fluid Spring Physics Tokens */
+  --spring-ease: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --spring-duration: 0.35s;
+}
+
+/* Light Theme Variables */
+@media (prefers-color-scheme: light) {
+  :root {
+    --liquid-glass-bg: rgba(245, 245, 250, 0.72);
+    --liquid-glass-border: rgba(255, 255, 255, 0.65);
+    --liquid-glass-highlight: rgba(255, 255, 255, 0.85);
+    --liquid-glass-shadow-inner: rgba(0, 0, 0, 0.08);
+    --liquid-glass-shadow-drop: rgba(0, 0, 0, 0.15);
+    --liquid-glass-indicator: rgba(0, 0, 0, 0.08);
+    --liquid-text-primary: #121214;
+    --liquid-text-secondary: rgba(18, 18, 20, 0.60);
+  }
+}
+
+/* Base Liquid Glass Material Modifier */
+.liquid-glass-surface {
+  position: relative;
+  background: var(--liquid-glass-bg);
+  /* Optical Saturation & Gaussian Blur */
+  backdrop-filter: saturate(220%) blur(24px);
+  -webkit-backdrop-filter: saturate(220%) blur(24px);
+  border-radius: 9999px;
+  border: 0.5px solid var(--liquid-glass-border);
+  
+  /* Specular Rim Highlight (Top Lip) + Inner Refraction + Ambient Elevation */
+  box-shadow: 
+    inset 0 1px 1.5px 0 var(--liquid-glass-highlight),
+    inset 0 -1.5px 3px 0 var(--liquid-glass-shadow-inner),
+    0 16px 36px -8px var(--liquid-glass-shadow-drop);
+    
+  transition: transform 0.25s var(--spring-ease), box-shadow 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.liquid-glass-surface:active {
+  transform: scale(0.98);
+}
+
+/* Floating Navigation Wrapper */
+.liquid-dock-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  width: 92%;
+  max-width: 430px;
+}
+
+/* 1. Mini Player Bar */
+.liquid-mini-player {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px 8px 8px;
+  box-sizing: border-box;
+  color: var(--liquid-text-primary);
+  cursor: pointer;
+}
+
+.liquid-album-art {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+.liquid-album-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.liquid-track-details {
+  margin-left: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.liquid-track-title {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--liquid-text-primary);
+}
+
+.liquid-track-artist {
+  font-size: 13px;
+  color: var(--liquid-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.liquid-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.liquid-ctrl-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  color: var(--liquid-text-primary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.liquid-ctrl-btn:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+/* 2. Dual Bottom Navigation Bar */
+.liquid-nav-row {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.liquid-nav-tabs {
+  display: flex;
+  position: relative;
+  flex: 1;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+/* Liquid Momentum Sliding Indicator */
+.liquid-selection-indicator {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  background: var(--liquid-glass-indicator);
+  border-radius: 9999px;
+  transition: left var(--spring-duration) var(--spring-ease),
+              width var(--spring-duration) var(--spring-ease),
+              transform var(--spring-duration) var(--spring-ease);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.liquid-tab-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  color: var(--liquid-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  transition: color 0.25s ease;
+}
+
+.liquid-tab-button.active {
+  color: var(--liquid-text-primary);
+  font-weight: 600;
+}
+
+.liquid-tab-icon {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 3px;
+}
+
+/* Independent Circular Search Button */
+.liquid-search-button {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--liquid-text-primary);
+  cursor: pointer;
+}
+
+.liquid-search-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Accessibility: Reduce Transparency Override */
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass-surface {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #18181c !important;
+  }
+}

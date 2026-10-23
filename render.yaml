@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: kienhoc
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: kienhoc-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/kienhoc.sqlite
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: APP_ORIGINS
+        sync: false
+      - key: TRUST_PROXY_HOPS
+        value: 1
