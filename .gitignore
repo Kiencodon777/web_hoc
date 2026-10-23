@@ -8,3 +8,9 @@ backups/
 *.db*
 *.log
 coverage/
+
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+build/
