@@ -95,3 +95,8 @@ Replaced the continuously simulated Work Wheel hero with a dependency-free adapt
 ## Legacy domain migration / October 24
 
 The existing vietkienetet.id.vn domain and www variant route to the kienhoc Worker in Cloudflare zone 9a90e8c7e8ac785f782db407569f3be8. The canonical study.anhdungece.id.vn host remains unchanged. Both HTTPS aliases are allowed export origins for the existing encrypted single-use browser-progress handoff, avoiding isolated study sessions. The registrar delegation was updated from the four ZoneDNS nameservers to alexa.ns.cloudflare.com and garret.ns.cloudflare.com; prior DNS details are retained locally under ignored build/domain-backups. DNS records preserve the previous public verification TXT values. The old Sites deployment is not modified or deleted. Public delegation and certificate activation must be verified separately from saving the registrar form.
+
+
+## Initial page paint / October 24
+
+Removed the obsolete static Su Ky navigation/header/footer from index.html. A small dark Kiến Học loading status now appears before dependencies are ready; the app shells remain hidden until the first complete synchronous render. Existing element hooks required by academyShell are retained. All ordered classic scripts use defer so downloads overlap without changing execution order. Startup never waits for fonts, backgrounds, timers or scene animations. Script errors/slow loads expose a retry link, JavaScript-disabled browsers receive a readable explanation, and app.js can reveal the rendered shell even if boot.js fails to load. Boot tests cover initial HTML, dependency ordering, failure recovery and immediate reveal; study/progress APIs are unchanged.
