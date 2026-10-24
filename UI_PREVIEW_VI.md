@@ -12,7 +12,7 @@
 
    Ví dụ PR #1: https://kienhoc-ui-preview.anhdungcasi.workers.dev/pr/1/
 
-6. Gửi Dũng link PR và preview. Nếu cần sửa, đẩy commit tiếp lên cùng nhánh; không cần tạo PR mới. Mở lại link `/pr/SO_PR/` hoặc bấm “Nạp commit mới nhất”; GitHub metadata được cache 30 giây.
+6. Gửi Dũng link PR và preview. Nếu cần sửa, đẩy commit tiếp lên cùng nhánh; không cần tạo PR mới. Mở lại link `/pr/SO_PR/` hoặc bấm “Nạp commit mới nhất”; Danh sách Git refs được cache 30 giây.
 
 ## Dành cho Dũng
 
@@ -27,7 +27,7 @@ Worker `kienhoc-ui-preview` đọc các file `dist/` của PR công khai từ Gi
 
 Preview không liên kết production Worker, Supabase, Resend hoặc secret nào. API bị chặn và CSP chặn kết nối API ra ngoài origin preview. Không nhập thông tin đăng nhập thật ở preview. Có thể thử bài học và ghi chú với dữ liệu lưu cục bộ ở origin preview; dữ liệu này không đồng bộ lên tài khoản thật. Preview không dùng để nghiệm thu OTP/backend.
 
-Chỉ hỗ trợ nhánh trong cùng repo `Kiencodon777/web_hoc`, không hỗ trợ fork/private repo. Source repo hiện công khai nên preview cũng công khai, có noindex. Khi GitHub giới hạn đọc công khai, preview có thể báo chờ; bản production không phụ thuộc dịch vụ này.
+Chỉ hỗ trợ PR công khai đã được mở vào repo `Kiencodon777/web_hoc`, không hỗ trợ private repo. Source repo hiện công khai nên preview cũng công khai, có noindex. Preview đọc Git refs qua giao thức Git HTTP thay vì REST API để tránh hạn mức API dùng chung. Khi GitHub gặp lỗi hoặc giới hạn lưu lượng, preview có thể báo chờ; bản production không phụ thuộc dịch vụ này.
 
 Workflow chỉ đưa link vào Checks/Deployments và không checkout hoặc chạy source PR. Khi workflow chưa nằm trong nhánh dùng làm nền, vẫn có thể dùng link trực tiếp theo số PR. Workflow không chứa bước triển khai production.
 

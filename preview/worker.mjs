@@ -1,6 +1,6 @@
 // Public UI previews only. No production service, database, email or secret bindings.
 const REPO='Kiencodon777/web_hoc';
-const API=`https://api.github.com/repos/${REPO}/pulls/`;
+const REFS=`https://github.com/${REPO}.git/info/refs?service=git-upload-pack`;
 const RAW=`https://raw.githubusercontent.com/${REPO}/`;
 const TYPES={html:'text/html; charset=utf-8',css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',json:'application/json',svg:'image/svg+xml',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif',ico:'image/x-icon',woff:'font/woff',woff2:'font/woff2',mp3:'audio/mpeg',mp4:'video/mp4'};
 const CSP="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
@@ -16,14 +16,14 @@ export async function handlePreview(request,{fetcher=fetch,cache=null}={}){
  if(url.pathname==='/open'){const n=url.searchParams.get('pr');return /^[1-9]\d{0,5}$/.test(n||'')?redirect(`/pr/${n}/`):page('Số PR không hợp lệ','<p>Hãy nhập số PR trên GitHub.</p>',400);}
  const entry=url.pathname.match(/^\/pr\/([1-9]\d{0,5})\/?$/);
  if(entry){
-  const number=entry[1],api=new Request(API+number,{headers:{Accept:'application/vnd.github+json','User-Agent':'KienHoc-UI-Preview','X-GitHub-Api-Version':'2022-11-28'}});
+  const number=entry[1],api=new Request(REFS,{headers:{'Git-Protocol':'version=1','User-Agent':'KienHoc-UI-Preview'}});
   let response=cache?await cache.match(api):null;
-  if(!response){try{response=await fetcher(api,{redirect:'error',signal:AbortSignal.timeout(15000)});}catch{return page('Chưa đọc được PR','<p>GitHub chưa phản hồi. Hãy thử lại sau.</p>',502);}
-   if(response.ok&&cache){const stored=new Response(await response.clone().text(),{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=30'}});await cache.put(api,stored);}}
-  if(!response.ok)return page('Chưa mở được PR',`<p>${response.status===404?'Không tìm thấy PR này.':response.status===403||response.status===429?'GitHub đang giới hạn lượt đọc. Hãy thử lại sau vài phút.':'GitHub chưa phản hồi thành công.'}</p>`,response.status===404?404:503);
-  let pr;try{pr=await response.json();}catch{return page('Phản hồi không hợp lệ','<p>Hãy thử mở lại link preview.</p>',502);}
-  const sha=pr.head?.sha;
-  if(pr.base?.repo?.full_name?.toLowerCase()!==REPO.toLowerCase()||pr.head?.repo?.full_name?.toLowerCase()!==REPO.toLowerCase()||!/^[a-f0-9]{40}$/.test(sha||''))return page('Nhánh chưa được hỗ trợ','<p>Hãy tạo nhánh ngay trong repo web_hoc rồi mở PR từ nhánh đó.</p>',422);
+  if(!response){try{response=await fetcher(api,{redirect:'manual',signal:AbortSignal.timeout(15000)});}catch{return page('Chưa đọc được PR','<p>GitHub chưa phản hồi. Hãy thử lại sau.</p>',502);}
+   if(response.ok&&cache){const stored=new Response(await response.clone().text(),{headers:{'Content-Type':'text/plain','Cache-Control':'public, max-age=30'}});await cache.put(api,stored);}}
+  if(!response.ok)return page('Chưa mở được PR','<p>GitHub chưa phản hồi thành công. Hãy thử lại sau.</p>',503);
+  const refs=await response.text();
+  const sha=refs.match(new RegExp('([a-f0-9]{40}) refs/pull/'+number+'/head(?:\\n|\\x00|$)'))?.[1];
+  if(!sha)return page('Không tìm thấy PR','<p>Kiểm tra lại số PR và bảo đảm PR đã được mở trên repo web_hoc.</p>',404);
   return redirect(`/pr/${number}/revision/${sha}/`);
  }
  const match=url.pathname.match(/^\/pr\/([1-9]\d{0,5})\/revision\/([a-f0-9]{40})\/(.*)$/);
@@ -33,7 +33,7 @@ export async function handlePreview(request,{fetcher=fetch,cache=null}={}){
  const ext=file.split('.').pop().toLowerCase(),type=TYPES[ext];if(!type)return new Response('Unsupported asset',{status:404,headers:headers('text/plain')});
  // Force the local API config regardless of proposed code. CSP also denies external APIs.
  if(file==='api-config.js')return new Response("window.KIEN_CONFIG={apiBase:''};",{headers:headers(TYPES.js)});
- let upstream;try{upstream=await fetcher(RAW+sha+'/dist/'+file.split('/').map(encodeURIComponent).join('/'),{redirect:'error',signal:AbortSignal.timeout(15000),cf:{cacheEverything:true,cacheTtl:3600}});}catch{return page('Chưa tải được source','<p>Không đọc được file từ GitHub. Hãy thử lại sau.</p>',502);}
+ let upstream;try{upstream=await fetcher(RAW+sha+'/dist/'+file.split('/').map(encodeURIComponent).join('/'),{redirect:'manual',signal:AbortSignal.timeout(15000),cf:{cacheEverything:true,cacheTtl:3600}});}catch{return page('Chưa tải được source','<p>Không đọc được file từ GitHub. Hãy thử lại sau.</p>',502);}
  if(!upstream.ok)return new Response('File not found in this PR',{status:upstream.status===404?404:502,headers:headers('text/plain')});
  if(ext==='html'){
   let html=await upstream.text();
@@ -45,3 +45,4 @@ export async function handlePreview(request,{fetcher=fetch,cache=null}={}){
  return new Response(request.method==='HEAD'?null:upstream.body,{headers:headers(type,'public, max-age=86400, immutable')});
 }
 export default {fetch(request){return handlePreview(request,{cache:caches.default});}};
+

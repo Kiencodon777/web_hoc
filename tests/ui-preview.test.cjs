@@ -3,8 +3,8 @@ const load=()=>import('../preview/worker.mjs');
 const SHA='a'.repeat(40),origin='https://preview.example';
 test('PR entry pins a single commit and never follows an arbitrary upstream',async()=>{
  const {handlePreview}=await load();const seen=[];
- const r=await handlePreview(new Request(origin+'/pr/12/'),{fetcher:async req=>{seen.push(req.url);return Response.json({base:{repo:{full_name:'Kiencodon777/web_hoc'}},head:{sha:SHA,repo:{full_name:'Kiencodon777/web_hoc'}}})}});
- assert.equal(r.status,302);assert.equal(r.headers.get('Location'),`/pr/12/revision/${SHA}/`);assert.equal(seen[0],'https://api.github.com/repos/Kiencodon777/web_hoc/pulls/12');
+ const r=await handlePreview(new Request(origin+'/pr/12/'),{fetcher:async (req,opts)=>{assert.equal(opts.redirect,'manual');seen.push(req.url);return new Response('003f'+SHA+' refs/pull/12/head\n')}});
+ assert.equal(r.status,302);assert.equal(r.headers.get('Location'),`/pr/12/revision/${SHA}/`);assert.equal(seen[0],'https://github.com/Kiencodon777/web_hoc.git/info/refs?service=git-upload-pack');
 });
 test('preview HTML pins relative assets, marks the commit, and blocks external APIs',async()=>{
  const {handlePreview}=await load();let upstream;
@@ -17,7 +17,7 @@ test('all API requests and unsafe asset paths are rejected without any network c
  for(const path of [`/pr/1/revision/${SHA}/%2eenv`,`/pr/1/revision/${SHA}/assets/%2e%2e%2f.env`])assert.equal((await handlePreview(new Request(origin+path),opts)).status,400);
  const r=await handlePreview(new Request(origin+`/pr/1/revision/${SHA}/api-config.js`),opts);assert.equal(await r.text(),"window.KIEN_CONFIG={apiBase:''};");assert.equal(calls,0);
 });
-test('unknown PR, rate limits and foreign forks fail clearly',async()=>{
- const {handlePreview}=await load();for(const [up,status]of [[404,404],[403,503],[429,503]])assert.equal((await handlePreview(new Request(origin+'/pr/9/'),{fetcher:async()=>new Response('',{status:up})})).status,status);
- const r=await handlePreview(new Request(origin+'/pr/9/'),{fetcher:async()=>Response.json({base:{repo:{full_name:'Kiencodon777/web_hoc'}},head:{sha:SHA,repo:{full_name:'someone/other'}}})});assert.equal(r.status,422);
+test('unknown PR, upstream errors and unrelated refs fail clearly',async()=>{
+ const {handlePreview}=await load();for(const [up,status]of [[404,503],[403,503],[429,503]])assert.equal((await handlePreview(new Request(origin+'/pr/9/'),{fetcher:async()=>new Response('',{status:up})})).status,status);
+ const r=await handlePreview(new Request(origin+'/pr/9/'),{fetcher:async()=>new Response('003f'+SHA+' refs/pull/90/head\n')});assert.equal(r.status,404);
 });
