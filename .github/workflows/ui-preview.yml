@@ -1,0 +1,32 @@
+name: UI Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    name: Xem trước giao diện
+    runs-on: ubuntu-latest
+    environment:
+      name: ui-preview-pr-${{ github.event.number }}
+      url: https://kienhoc-ui-preview.anhdungcasi.workers.dev/pr/${{ github.event.number }}/
+    steps:
+      - name: Ghi link preview
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          {
+            echo '## Kiến Học — Xem trước giao diện'
+            echo
+            echo "[Mở preview PR #${PR_NUMBER}](https://kienhoc-ui-preview.anhdungcasi.workers.dev/pr/${PR_NUMBER}/)"
+            echo
+            echo "Commit đề xuất: ${HEAD_SHA}"
+            echo
+            echo 'Link preview tự đọc commit mới nhất của PR (có thể chậm tối đa khoảng 30 giây). OTP và đồng bộ thật đã tắt.'
+            echo 'Đây chỉ là preview. Merge PR không tự triển khai lên study.anhdungece.id.vn.'
+          } >> "$GITHUB_STEP_SUMMARY"

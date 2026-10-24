@@ -70,3 +70,42 @@ kienhoc-progress-v2 contains independent history/ai/information progress, bookma
 Optional backend envelopes now include a validated, namespaced subjects map. Merge tests cover independent devices/subjects, deleted bookmarks, resets, old-client history bridges, pending states and account isolation. The backend source changed, but production Sites remains static and no external email/API configuration is implied. Native TTS depends on browser/installed voices and reports playback errors. Existing scene/dock/answer motion hooks are reused.
 
 Validation: schema and unique IDs for all 677 records (676 knowledge + one history source appendix), migration/reload, 115-item exams, two-option keyboard safety, exact-number/topic/source/review filters, accepted alternatives, excluded pending questions, expiry and retries, backup validation, independently recomputed practice formulas, Express/SQLite two-device sync and account switching. Browser QA exercises AI exam setup, delayed answer feedback, hints, bookmarks, jumps, submission/review, information practice answers and reading-rate controls. All existing backend/security and UI physics checks continue to pass.
+
+
+## Liquid Glass, SpaceLogin and calendar / October 24
+
+The supplied four prompt/component references are preserved in design-references/2026-glass. Detailed source analysis, scope decisions, browser limitations and verification are in GLASS_UI_REVIEW_VI.md. SpaceLogin supplies the actual astronaut asset and cosmic composition; MagicLinkOtpLogin supplies the three-step interaction, connected to the existing real API. The dock and custom keyboard-accessible subject listbox use a size-aware SVG refraction layer adapted from archisvaze/liquid-glass (MIT retained), with frosted CSS fallback outside Chromium. Foreground text is never displaced. Footer credits Dũng Phạm and Viết Kiên with working internal links and no fabricated contact accounts. A secondary calendar dialog supports week/month selection, per-date local notes, explicit/transition saves, storage failure feedback and JSON export. Notes do not sync with accounts or devices; planning and events remain out of scope. No framework, runtime dependency or database schema change.
+
+
+## Character brand mark / October 24
+
+At the owner's request, the K monograms in the dock, footer and sign-in wordmark are replaced with a transparent cutout derived from their supplied illustration. The white face remains filled; only the exterior background is transparent. Shared asset: dist/assets/kienhoc-mascot.png. Decorative images have empty alt text beside the existing accessible Kiến Học name, with explicit dimensions and no glass tile surrounding the character.
+
+
+## Footer author signatures / October 24
+
+The owner's Apple Hello reference contains fixed SVG strokes for hello/xin chào, not a font. The footer now has purpose-drawn monoline signatures for Dũng Phạm and Viết Kiên, including Vietnamese diacritics, plus real accessible text. SVG paths draw sequentially on first footer intersection; animations pause offscreen/when hidden and become static when system reduced motion or the site motion-off preference is active. Both signatures stack on narrow screens. This is isolated to the author credit and does not change the hero wordmark. Source prompt preserved in design-references/2026-glass/apple-hello-effect.txt.
+
+
+## Hero Viewfinder Flip / October 24
+
+Replaced the continuously simulated Work Wheel hero with a dependency-free adaptation of the supplied 3dflip.txt, preserved in design-references/2026-glass. Cards fold with CSS transforms only when explicitly selected; fixed-size translated slots avoid layout-width animation. Native buttons, arrow/Home/End keyboard selection, live announcements, reduced-motion and the site motion toggle remain supported. Passive pointer handlers distinguish horizontal swipes from vertical/diagonal scrolling; touch-action pan-y pinch-zoom preserves native page scrolling and zoom, and a completed swipe suppresses accidental card activation. No wheel interception, pointer capture or animation frame loop is used for the hero. Existing lower course reel and background are outside this change. The method heading now uses a real space instead of a hidden line break between là and một. Behavioral tests cover navigation boundaries, selected-course routing, gesture direction, swipe/click suppression and remount cleanup. Phone viewport checks cannot establish FPS on a physical low-end phone.
+
+
+## Legacy domain migration / October 24
+
+The existing vietkienetet.id.vn domain and www variant route to the kienhoc Worker in Cloudflare zone 9a90e8c7e8ac785f782db407569f3be8. The canonical study.anhdungece.id.vn host remains unchanged. Both HTTPS aliases are allowed export origins for the existing encrypted single-use browser-progress handoff, avoiding isolated study sessions. The registrar delegation was updated from the four ZoneDNS nameservers to alexa.ns.cloudflare.com and garret.ns.cloudflare.com; prior DNS details are retained locally under ignored build/domain-backups. DNS records preserve the previous public verification TXT values. The old Sites deployment is not modified or deleted. Public delegation and certificate activation must be verified separately from saving the registrar form.
+
+
+## Initial page paint / October 24
+
+Removed the obsolete static Su Ky navigation/header/footer from index.html. A small dark Kiến Học loading status now appears before dependencies are ready; the app shells remain hidden until the first complete synchronous render. Existing element hooks required by academyShell are retained. All ordered classic scripts use defer so downloads overlap without changing execution order. Startup never waits for fonts, backgrounds, timers or scene animations. Script errors/slow loads expose a retry link, JavaScript-disabled browsers receive a readable explanation, and app.js can reveal the rendered shell even if boot.js fails to load. Boot tests cover initial HTML, dependency ordering, failure recovery and immediate reveal; study/progress APIs are unchanged.
+
+
+## Mobile background stability / October 24
+
+Confirmed code paths: the fixed inset background followed browser UI height changes; Sakura immediately resized (and therefore cleared) its visible canvas in one ResizeObserver, then a second observer scheduled a later frame that rebuilt thousands of flowers into multiple offscreen surfaces. Touch pointer events also activated the mouse-hover displacement WebGL surface, with no lost-context recovery. This is consistent with the reported mobile purple fallback/scroll hitch; physical Safari/Android reproduction remains a user-device verification item.
+
+The shared fixed background now uses 100lvh (100vh fallback), preventing address-bar animation from changing its layout size. Sakura has one size observer, ignores unchanged dimensions, bakes before clearing and repainting in one animation callback, and never enables mouse warp for touch/coarse pointers or paused motion. A WebP/PNG snapshot of each baked scene remains available during 2D context loss; restoration rebuilds scene resources. WebGL loss falls back to the existing 2D flowers. Object URLs/listeners/observers/frames are disposed on theme changes. All canvas renderers cap the main backing surface at 1.6 million pixels / 4096 per side; this is not a total GPU-memory limit. Chrome recompiles resources after WebGL restoration; Grid redraws after 2D restoration. Gradient and Still remain CSS backgrounds, with the same stable fixed stage.
+
+Regression coverage includes atomic resize, repeated address-bar events without layout changes, a resize bounce before a frame, touch input, 2D snapshot recovery, hidden/reopened tabs, paused motion, pixel budgets, Chrome GPU restoration and Grid restoration/cleanup. Browser QA covers phone-sized repeated scrolling, all five theme switches, and paused Sakura. No physical iPhone/Xiaomi hardware or Safari engine is attached to this session, so desktop responsive checks cannot certify those engines.

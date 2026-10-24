@@ -367,6 +367,7 @@ function createWarp(gl                       ) {
     const tBlur = mkTex()
     const tDisp = mkTex()
     return {
+        isLost() { return gl.isContextLost(); },
         destroy() { gl.deleteTexture(tCore); gl.deleteTexture(tBlur); gl.deleteTexture(tDisp); gl.deleteBuffer(buf); for(const shader of gl.getAttachedShaders(prog)||[]) gl.deleteShader(shader); gl.deleteProgram(prog); },
         upload(core                   , blur                   ) {
             gl.bindTexture(gl.TEXTURE_2D, tCore)
@@ -705,25 +706,23 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
         const ctx = canvas.getContext("2d")
         if (!ctx) return
 
-        let Wd = 0
-        let Hd = 0
-        let dpr = 1
-        const resize = () => {
-            dpr = Math.min(window.innerWidth < 700 ? 1 : 1.5, window.devicePixelRatio || 1)
-            Wd = Math.max(1, Math.round(root.offsetWidth * dpr))
-            Hd = Math.max(1, Math.round(root.offsetHeight * dpr))
-            if (canvas.width !== Wd) canvas.width = Wd
-            if (canvas.height !== Hd) canvas.height = Hd
-        }
-        const ro = new ResizeObserver(resize)
-        ro.observe(root)
-        resize()
-
+        let Wd=0,Hd=0,dpr=1,pendingSize=null,lost=false,disposed=false;
+        const finePointer=!!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches;
+        propsRef.current.petals=finePointer&&window.innerWidth>=700?64:28;
+        const fallback=document.createElement('img');fallback.className='sakura-recovery';fallback.alt='';fallback.setAttribute('aria-hidden','true');fallback.style.display='none';root.insertBefore(fallback,canvas);
+        let snapshotUrl=null,snapshotScene=null,snapshotGeneration=0;
+        const resize=()=>{
+            const size=window.KienScenes.surfaceSize(root,!finePointer||window.innerWidth<700?1:1.5);
+            if(!size)return;
+            if(size.width===Wd&&size.height===Hd){pendingSize=null;return;}
+            pendingSize=size;invalidate();
+        };
         const mq = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null
         const reduced = !settings.motion || !!(mq && mq.matches)
 
         const ptr = { x: 0, y: 0, inside: false, down: false, over: 0, press: 0 }
         const onMove = (e              ) => {
+            if(!finePointer||(e.pointerType&&e.pointerType!=='mouse'))return;
             const rect=root.getBoundingClientRect(); ptr.x=e.clientX-rect.left; ptr.y=e.clientY-rect.top
             ptr.inside = true
         }
@@ -731,6 +730,7 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
             ptr.inside = false
         }
         const onDown = (e              ) => {
+            if(!finePointer||(e.pointerType&&e.pointerType!=='mouse'))return;
             onMove(e)
             ptr.down = true
         }
@@ -756,18 +756,19 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
             }
             ng.putImageData(id, 0, 0)
         }
-        const grainPat = ctx.createPattern(noise, "repeat")
+        let grainPat = ctx.createPattern(noise, "repeat")
 
         const glc = document.createElement("canvas")
         let warp                                       = null
         try {
-            const gl = glc.getContext("webgl", {
+            const gl = finePointer && !reduced ? glc.getContext("webgl", {
                 alpha: true,
                 premultipliedAlpha: true,
-                preserveDrawingBuffer: true,
+                preserveDrawingBuffer: false,
                 antialias: false,
                 depth: false,
-            })                                
+                powerPreference: "low-power",
+            }) : null
             if (gl) warp = createWarp(gl)
         } catch (e) {
             warp = null
@@ -794,9 +795,11 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
         let t = 0
         let raf = 0
         const frame = (now        ) => {
-            raf = 0; if(document.hidden) return;
+            raf = 0; if(document.hidden||lost||disposed) return;
+            if(ctx.isContextLost?.()){contextLost();return;}
             if (!reduced) raf=requestAnimationFrame(frame);
-            if (last >= 0 && now-last < 32) return;
+            if (last >= 0 && now-last < 32 && !pendingSize) return;
+            if(pendingSize){Wd=pendingSize.width;Hd=pendingSize.height;dpr=pendingSize.dpr;pendingSize=null;}
             const dt = last < 0 ? 0 : Math.min((now - last) / 1000, 0.05)
             last = now
             if (Wd < 2 || Hd < 2) return
@@ -915,6 +918,9 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
             const gA = Math.max(0, num(P.glow, 60)) / 60
             const windMul = Math.max(0, num(P.wind, 30)) / 30
 
+            // Bake first; clear and repaint the visible bitmap in one animation task.
+            if(canvas.width!==Wd)canvas.width=Wd;
+            if(canvas.height!==Hd)canvas.height=Hd;
             ctx.setTransform(1, 0, 0, 1, 0, 0)
             ctx.globalCompositeOperation = "source-over"
             ctx.globalAlpha = 1
@@ -995,6 +1001,7 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
                 if (Math.abs(F.ox[i]) + Math.abs(F.oy[i]) > 0.05 || Math.abs(F.vx[i]) + Math.abs(F.vy[i]) > 0.5) act = true
             }
             F.active = act
+            if(warp?.isLost()){warp=null;warpScene=null;}
             if (warp && warpScene !== scene) {
                 warp.upload(scene.core, scene.coreBlur)
                 warpScene = scene
@@ -1149,15 +1156,28 @@ function mountSakura(rootEl            ,canvasEl                  ,settings    =
                 ctx.setTransform(1, 0, 0, 1, 0, 0)
                 ctx.globalAlpha = 1
             }
+            canvas.style.visibility='';fallback.style.display='none';
+            if(snapshotScene!==scene){snapshotScene=scene;const generation=++snapshotGeneration;
+                canvas.toBlob(blob=>{if(!blob||disposed||generation!==snapshotGeneration)return;const next=URL.createObjectURL(blob);const old=snapshotUrl;snapshotUrl=next;fallback.src=next;fallback.decode?.().catch(()=>{});if(old)URL.revokeObjectURL(old);if(lost)fallback.style.display='block';},'image/webp',.82);
+            }
         }
-        raf = requestAnimationFrame(frame)
-        const visibility=()=>{ if(document.hidden){cancelAnimationFrame(raf);raf=0;}else{last=-1;if(!raf)raf=requestAnimationFrame(frame);} };
-        const invalidate=()=>{last=-1;if(!raf)raf=requestAnimationFrame(frame)};
-        const redraw=new ResizeObserver(invalidate);redraw.observe(root);
+        const contextLost=()=>{lost=true;cancelAnimationFrame(raf);raf=0;canvas.style.visibility='hidden';if(snapshotUrl)fallback.style.display='block';};
+        const contextRestored=()=>{lost=false;scene=null;warpScene=null;snapshotScene=null;grainPat=ctx.createPattern(noise,'repeat');last=-1;invalidate();};
+        const warpLost=()=>{warp=null;warpScene=null;last=-1;invalidate();};
+        canvas.addEventListener('contextlost',contextLost);
+        canvas.addEventListener('contextrestored',contextRestored);
+        glc.addEventListener('webglcontextlost',warpLost);
+        const ro=new ResizeObserver(resize);ro.observe(root);
+        window.addEventListener('resize',resize,{passive:true});
+        resize();
+        const visibility=()=>{ if(document.hidden){cancelAnimationFrame(raf);raf=0;}else{last=-1;resize();invalidate();} };
+        function invalidate(){if(!raf&&!lost&&!disposed&&!document.hidden)raf=requestAnimationFrame(frame);}
         document.addEventListener("visibilitychange",visibility);
 
         return () => {
-            document.removeEventListener("visibilitychange",visibility); redraw.disconnect(); warp?.destroy();
+            disposed=true;snapshotGeneration++;document.removeEventListener("visibilitychange",visibility);warp?.destroy();
+            canvas.removeEventListener('contextlost',contextLost);canvas.removeEventListener('contextrestored',contextRestored);glc.removeEventListener('webglcontextlost',warpLost);window.removeEventListener('resize',resize);
+            fallback.remove();if(snapshotUrl)URL.revokeObjectURL(snapshotUrl);canvas.style.visibility='';
             cancelAnimationFrame(raf)
             ro.disconnect()
             window.removeEventListener("pointermove", onMove)

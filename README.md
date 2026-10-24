@@ -1,6 +1,10 @@
 # Kiến Học
 
-Vanilla JavaScript SPA + Node.js/Express + SQLite, Resend OTP, JWT và đồng bộ đa thiết bị.
+Vanilla JavaScript SPA + Express, Supabase PostgreSQL, Resend OTP, JWT và đồng bộ đa thiết bị. SQLite vẫn dùng được khi phát triển trên máy.
+
+**Chuyển sang Supabase + Cloudflare:** xem [CLOUD_MIGRATION_VI.md](CLOUD_MIGRATION_VI.md). Hướng dẫn Render bên dưới dành cho phương án SQLite cũ.
+
+Địa chỉ chính: https://study.anhdungece.id.vn . Cách chuyển tiến độ/phiên từ link Cloudflare và cấu hình DNS được mô tả trong [DOMAIN_AND_SESSIONS_VI.md](DOMAIN_AND_SESSIONS_VI.md).
 
 Đọc [DEPLOY_VI.md](DEPLOY_VI.md) để cấu hình email, chạy local, triển khai Render và trỏ `vietkienetet.id.vn` tại ZoneDNS.
 

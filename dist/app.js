@@ -71,4 +71,4 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)tickTimer(
 window.addEventListener?.('pagehide',()=>{if(session)save();});
 // An active local quiz retains its UI during cloud merges; account switching clears it.
 document.addEventListener('kien-cloud-progress',e=>{const active=view==='quiz'&&session;if(e.detail.switched){session=null;result=null;view='catalog';}if(e.detail.data.subjects){const incoming=e.detail.data.subjects;for(const id of Object.keys(QUIZ_DATA))progressRoot[id]=QuizStore.clean(incoming[id],id);}else if(e.detail.switched)progressRoot=QuizStore.root();else progressRoot.history=QuizStore.legacyHistory(e.detail.data);saved=progressRoot[currentSubject];ensurePrefs();if(active&&!e.detail.switched)saved.session=session;try{QuizStore.persist(progressRoot);}catch{}if(view==='quiz')updateNav();else render();});
-ensurePrefs();try{QuizStore.persist(progressRoot);}catch{}render();
+ensurePrefs();try{QuizStore.persist(progressRoot);}catch{}render();if(window.KienBoot)window.KienBoot.ready();else{document.querySelectorAll('[data-app-shell]').forEach(el=>el.hidden=false);$('#app-boot').hidden=true;}

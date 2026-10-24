@@ -1,0 +1,41 @@
+/* Viewfinder-style folding: transforms run only after an explicit selection. */
+.flip-carousel{--flip-size:240px;--flip-settle:590ms;--flip-spring:cubic-bezier(.22,1,.36,1);width:100%;min-width:0;padding:20px 0;color:#f3eaf8;outline:none;touch-action:pan-y pinch-zoom}
+.flip-carousel:focus-visible{outline:2px solid #c9b5ef;outline-offset:5px;border-radius:24px}
+.flip-eyebrow{display:flex;justify-content:space-between;gap:12px;padding:0 12px;color:#c3afcf;font-size:9px;letter-spacing:1.4px;line-height:1.6}
+.flip-eyebrow span:last-child{white-space:nowrap;opacity:.6}
+.flip-stage{position:relative;height:calc(var(--flip-size) + 90px);width:100%;overflow:hidden;touch-action:pan-y pinch-zoom;isolation:isolate}
+.flip-slot{position:absolute;left:50%;top:50%;width:var(--flip-size);height:var(--flip-size);margin-left:calc(var(--flip-size) / -2);margin-top:calc(var(--flip-size) / -2);perspective:800px;transition:transform var(--flip-settle) var(--flip-spring)}
+.flip-holder{width:100%;height:100%;transform-style:preserve-3d;transition:transform .44s cubic-bezier(1,-.03,.413,.965)}
+.flip-photo{display:block;width:100%;height:100%;padding:0;border:1px solid #ffffff35;border-radius:18px;background:#252033;overflow:hidden;color:inherit;cursor:pointer;box-shadow:0 12px 30px -15px #0009;user-select:none;-webkit-user-select:none;touch-action:pan-y pinch-zoom}
+.flip-photo:focus-visible{outline:3px solid #e2cef6;outline-offset:4px}
+.flip-photo .wheel-cover{box-sizing:border-box}
+.flip-photo .wheel-cover-top{font-size:9px;letter-spacing:1px}
+.flip-photo .wheel-cover strong{font-size:clamp(18px,1.8vw,23px);font-weight:600;bottom:22%;max-width:84%;line-height:1.3}
+.flip-photo .wheel-cover small{font-size:11px;bottom:10%}
+.flip-photo .wheel-cover-icon{top:17%;height:38%;width:35%}
+.flip-photo .wheel-cover-action{display:none}
+.flip-frame{position:absolute;left:50%;top:50%;width:calc(var(--flip-size) + 16px);height:calc(var(--flip-size) + 16px);transform:translate(-50%,-50%);border:1px solid #e0c9f448;border-radius:24px;pointer-events:none;z-index:5}
+.flip-moving .flip-frame{animation:flip-frame-pulse .44s ease-in-out}
+@keyframes flip-frame-pulse{50%{opacity:.2;scale:1.025}}
+.flip-readout{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:86px;padding:0 12px}
+.flip-readout>div{min-width:0;flex:1}
+.flip-current-code{font-size:9px;letter-spacing:1.5px;color:#baa3ca}
+.flip-current-title{font-family:inherit;font-size:18px;line-height:1.35;letter-spacing:-.2px;margin:5px 0;color:#f6eefb}
+.flip-current-count{font-size:11px;color:#c1b4ca;margin:0}
+.night-theme .flip-open{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 13px;font-size:11px;white-space:nowrap;border-radius:14px}
+.flip-open svg,.flip-control svg{width:18px;height:18px}
+.flip-controls{display:flex;align-items:center;justify-content:center;gap:8px;margin:15px 0 0}
+.flip-control,.flip-dot{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0;cursor:pointer;color:#eee0fa;border:1px solid #ffffff25;border-radius:50%;background:#24213280}
+.flip-control:disabled{opacity:.3;cursor:default}
+.flip-control:not(:disabled):hover{background:#bca5e02b;border-color:#c5afe978}
+.flip-dots{display:flex;align-items:center}
+.flip-dot{border:0;background:transparent;min-width:36px;min-height:44px;border-radius:12px}
+.flip-dot span{width:6px;height:6px;border-radius:10px;background:#9989ac;transition:width .2s,background .2s}
+.flip-dot[aria-current=true] span{width:20px;background:#ddc5fa}
+.flip-counter{font-size:10px;font-variant-numeric:tabular-nums;color:#bcaacb;white-space:nowrap;margin:0 4px}
+.flip-control:focus-visible,.flip-dot:focus-visible,.flip-open:focus-visible{outline:2px solid #e3c8ff;outline-offset:3px}
+.flip-hint{text-align:center;font-size:10px;color:#ac9bb9;margin:10px 0 0}
+.flip-measuring .flip-slot,.flip-measuring .flip-holder,.flip-static .flip-slot,.flip-static .flip-holder,.flip-static .flip-dot span{transition:none!important}
+.flip-static .flip-frame{animation:none!important}
+@media(max-width:600px){.flip-carousel{padding:15px 0 24px}.flip-eyebrow{font-size:8px;letter-spacing:1px;padding:0 4px}.flip-readout{padding:0 4px;gap:10px}.flip-current-title{font-size:16px}.flip-photo .wheel-cover strong{font-size:18px}.flip-photo .wheel-cover-top{font-size:8px}.night-theme .flip-open{font-size:10px;padding:10px}.flip-stage{height:calc(var(--flip-size) + 70px)}}
+@media(prefers-reduced-motion:reduce){.flip-carousel *{transition:none!important;animation:none!important}}
