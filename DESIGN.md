@@ -80,3 +80,8 @@ The supplied four prompt/component references are preserved in design-references
 ## Character brand mark / October 24
 
 At the owner's request, the K monograms in the dock, footer and sign-in wordmark are replaced with a transparent cutout derived from their supplied illustration. The white face remains filled; only the exterior background is transparent. Shared asset: dist/assets/kienhoc-mascot.png. Decorative images have empty alt text beside the existing accessible Kiến Học name, with explicit dimensions and no glass tile surrounding the character.
+
+
+## Footer author signatures / October 24
+
+The owner's Apple Hello reference contains fixed SVG strokes for hello/xin chào, not a font. The footer now has purpose-drawn monoline signatures for Dũng Phạm and Viết Kiên, including Vietnamese diacritics, plus real accessible text. SVG paths draw sequentially on first footer intersection; animations pause offscreen/when hidden and become static when system reduced motion or the site motion-off preference is active. Both signatures stack on narrow screens. This is isolated to the author credit and does not change the hero wordmark. Source prompt preserved in design-references/2026-glass/apple-hello-effect.txt.
