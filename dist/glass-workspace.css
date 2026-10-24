@@ -84,3 +84,11 @@
 @media(forced-colors:active){.lg-material:before{display:none}.subject-picker-panel [aria-selected="true"],.calendar-days [aria-pressed="true"]{outline:2px solid Highlight}.calendar-days .has-note:after{background:CanvasText}}
 
 @media(prefers-reduced-transparency:reduce){.night-theme .sidebar,.subject-picker-panel,.glass-calendar{background:#191b2a!important}.lg-material:before{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}}
+
+/* Supplied character replaces the K monogram; preserve opaque white facial areas. */
+.brand-mascot{display:block;flex-shrink:0;object-fit:contain;object-position:center;filter:drop-shadow(0 2px 3px #0004)}
+.night-theme .brand .brandmark.brand-mascot{width:48px;height:48px;min-width:48px;border:0;border-radius:0;background:none;box-shadow:none;padding:0}
+.footer-brand .footer-monogram.brand-mascot{display:block;width:56px;height:56px;border:0;border-radius:0;background:none;box-shadow:none;padding:0}
+.auth-modal .auth-wordmark .brand-mascot{width:40px;height:40px;border:0;background:none}
+.auth-modal .auth-wordmark{gap:10px}
+@media(max-width:800px){.auth-modal .auth-wordmark{top:17px}.auth-modal .auth-wordmark .brand-mascot{width:38px;height:38px}}

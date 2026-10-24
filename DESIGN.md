@@ -75,3 +75,8 @@ Validation: schema and unique IDs for all 677 records (676 knowledge + one histo
 ## Liquid Glass, SpaceLogin and calendar / October 24
 
 The supplied four prompt/component references are preserved in design-references/2026-glass. Detailed source analysis, scope decisions, browser limitations and verification are in GLASS_UI_REVIEW_VI.md. SpaceLogin supplies the actual astronaut asset and cosmic composition; MagicLinkOtpLogin supplies the three-step interaction, connected to the existing real API. The dock and custom keyboard-accessible subject listbox use a size-aware SVG refraction layer adapted from archisvaze/liquid-glass (MIT retained), with frosted CSS fallback outside Chromium. Foreground text is never displaced. Footer credits Dũng Phạm and Viết Kiên with working internal links and no fabricated contact accounts. A secondary calendar dialog supports week/month selection, per-date local notes, explicit/transition saves, storage failure feedback and JSON export. Notes do not sync with accounts or devices; planning and events remain out of scope. No framework, runtime dependency or database schema change.
+
+
+## Character brand mark / October 24
+
+At the owner's request, the K monograms in the dock, footer and sign-in wordmark are replaced with a transparent cutout derived from their supplied illustration. The white face remains filled; only the exterior background is transparent. Shared asset: dist/assets/kienhoc-mascot.png. Decorative images have empty alt text beside the existing accessible Kiến Học name, with explicit dimensions and no glass tile surrounding the character.
