@@ -16,7 +16,9 @@ function validAvatar(value){
   pos+=size+12;if(type==='IEND'){if(size!==0||pos!==bytes.length)return false;ended=true;break;}
  }
  if(!ended||!data.length)return false;
- try{const row=width*channels+1,raw=zlib.inflateSync(Buffer.concat(data),{maxOutputLength:row*height});if(raw.length!==row*height)return false;for(let y=0;y<height;y++)if(raw[y*row]>4)return false;return true;}catch{return false;}
+ // workerd grows inflate buffers in chunks. Leave bounded allocation headroom,
+ // then enforce the exact pixel length (at most 262,400 bytes) ourselves.
+ try{const row=width*channels+1,raw=zlib.inflateSync(Buffer.concat(data),{maxOutputLength:1024*1024});if(raw.length!==row*height)return false;for(let y=0;y<height;y++)if(raw[y*row]>4)return false;return true;}catch{return false;}
 }
 function profileInput(body){
  if(!body||!Number.isSafeInteger(body.expectedRevision)||body.expectedRevision<0)throw Error('Hồ sơ chưa được tải đầy đủ. Hãy mở lại và thử lại.');
