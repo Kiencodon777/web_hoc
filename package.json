@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node --env-file-if-exists=.env server/index.cjs",
-    "test": "node --test tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
+    "test": "node --test tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs tests/ui-preview.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
     "backup": "node --env-file-if-exists=.env scripts/backup.cjs",
     "dev": "node server/preview.cjs",
     "setup:local": "node scripts/setup-local.cjs",
@@ -17,7 +17,8 @@
     "cf:dev": "wrangler dev",
     "cf:check": "wrangler deploy --dry-run --outdir build/worker",
     "cf:deploy": "wrangler deploy",
-    "cf:gateway": "node scripts/build-gateway.cjs && wrangler pages deploy --cwd gateway --project-name kienhoc-study --branch main"
+    "cf:gateway": "node scripts/build-gateway.cjs && wrangler pages deploy --cwd gateway --project-name kienhoc-study --branch main",
+    "cf:preview:deploy": "wrangler deploy --config preview/wrangler.jsonc"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
