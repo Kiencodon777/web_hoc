@@ -70,3 +70,12 @@ test('domain router rejects unrelated storage, malformed JSON and nested prototy
  const malformed=empty();malformed.local['kienhoc-layout-v1']='not json';assert(!validTransfer(malformed));
  assert(validTransfer(empty()));
 });
+
+test('old public domain and www transfer browser progress to the canonical study host',async()=>{
+ const live=JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname,'../wrangler.jsonc'),'utf8'));
+ for(const origin of ['https://vietkienetet.id.vn','https://www.vietkienetet.id.vn']){
+  const r=await handleDomainRouting(new Request(origin+'/'),live.vars);assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'no-store');const html=await r.text();assert(html.includes('"mode":"export"'));assert(html.includes(canonical));
+ }
+ assert.equal(await handleDomainRouting(new Request(canonical+'/'),live.vars),null);
+});
+

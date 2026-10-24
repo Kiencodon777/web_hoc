@@ -4,11 +4,22 @@
   "account_id": "dea1d41355c5cb6bd9c128f72ec85a0f",
   "main": "worker/index.mjs",
   "compatibility_date": "2026-10-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "workers_dev": true,
   "preview_urls": false,
-  "triggers":{"crons":["*/5 * * * *"]},
-  "hyperdrive": [{"binding":"HYPERDRIVE","id":"90035687e0384e4c9f27530c6cf88e0e"}],
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "90035687e0384e4c9f27530c6cf88e0e"
+    }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -17,13 +28,29 @@
   "vars": {
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
-    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev",
+    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn",
     "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
     "CANONICAL_ENABLED": "true",
-    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev"
+    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn"
   },
-  "ratelimits": [{
-    "name": "AUTH_LIMITER", "namespace_id": "1001",
-    "simple": { "limit": 60, "period": 60 }
-  }]
+  "ratelimits": [
+    {
+      "name": "AUTH_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "vietkienetet.id.vn/*",
+      "zone_name": "vietkienetet.id.vn"
+    },
+    {
+      "pattern": "www.vietkienetet.id.vn/*",
+      "zone_name": "vietkienetet.id.vn"
+    }
+  ]
 }
