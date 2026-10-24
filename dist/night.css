@@ -2,7 +2,9 @@
 .night-theme{--paper:#090a11;--surface:#15151e;--ink:#f2edf7;--muted:#b4afc1;--line:#ffffff1c;--red:#b9a8e9;--redlight:#322843;--green:#95d8bf;--gold:#d8b486;background:#090a11;color:var(--ink);font-size:16px;isolation:isolate}
 .night-theme button,.night-theme input,.night-theme select{font-family:'Be Vietnam Pro',system-ui,sans-serif}
 .night-theme a{color:#d0b8f2}.night-theme p{color:var(--muted)}
-#scene-background{position:fixed;inset:0 0 auto;height:100vh;height:100lvh;z-index:-2;pointer-events:none;overflow:hidden;background:#090a11;--scene-brightness:.45}
+/* A dialog scroll lock must not resize/rebake the background canvas. */
+html{scrollbar-gutter:stable}
+#scene-background{position:fixed;inset:0 auto auto 0;width:100vw;width:100lvw;height:100vh;height:100lvh;z-index:-2;pointer-events:none;overflow:hidden;background:#090a11;--scene-brightness:.45}
 #scene-background>canvas,#scene-background>.sakura-recovery{position:absolute;inset:0;width:100%;height:100%;opacity:calc(.25 + var(--scene-brightness)*.9)}
 .scene-shade{position:absolute;inset:0;background:linear-gradient(90deg,#090a1155,#090a1122 60%,#090a1133),linear-gradient(0deg,#090a11a6,transparent 65%)}
 .ambient-moon{position:absolute;width:410px;height:410px;border-radius:50%;right:12%;top:8%;background:radial-gradient(circle at 35% 30%,#c1b0d02e,#8270990a 65%,transparent 70%);filter:blur(1px)}
