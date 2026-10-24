@@ -10,7 +10,7 @@ function postgresSQL(sql) {
     query = query.replace('INSERT OR IGNORE', 'INSERT') + ' ON CONFLICT(email) DO NOTHING';
   }
   if (query.startsWith('INSERT INTO otps(')) query += ' RETURNING id';
-  return query.replace(/\b(users|otps|sessions|progress)\b/g, 'kienhoc.$1');
+  return query.replace(/\b(users|otps|sessions|progress|user_profiles)\b/g, 'kienhoc.$1');
 }
 
 function postgresStorage(pool) {

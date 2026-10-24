@@ -75,6 +75,12 @@ test('PostgreSQL API: OTP, password, isolation, simultaneous first writes and lo
   try {
     const a = await s.login('pg-a@example.com'), b = await s.login('pg-b@example.com');
     const auth = 'Bearer '+a.token, password = 'Postgres-test-only-123';
+    const avatar='data:image/png;base64,'+require('./avatar-fixture.cjs').png().toString('base64');
+    const profile=(await s.api.post('/api/auth/profile').set('Authorization',auth).send({username:'Viết Kiên',avatar,expectedRevision:0}).expect(200)).body.user;
+    assert.equal(profile.username,'Viết Kiên');assert.equal(profile.avatar,avatar);assert.equal(profile.profileCompleted,true);
+    assert.equal((await s.api.get('/api/auth/me').set('Authorization','Bearer '+b.token).expect(200)).body.user.avatar,null);
+    await s.api.post('/api/auth/profile').set('Authorization',auth).send({username:'Stale',avatar:null,expectedRevision:0}).expect(409);
+    assert.equal((await s.api.get('/api/auth/me').set('Authorization',auth).expect(200)).body.user.username,'Viết Kiên');
     assert.equal((await s.db.consumeRate('test-ip',60000)).totalHits,1);
     await s.db.saveHandoff('test-hash','encrypted-test-value',2000,1000);
     assert.equal(await s.db.takeHandoff('test-hash',1001),'encrypted-test-value');
