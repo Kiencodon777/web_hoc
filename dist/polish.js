@@ -77,14 +77,14 @@
   const setSubject=(tile,index)=>{const n=index%subjects.length,s=subjects[n];tile.dataset.course=s.id;tile.setAttribute('aria-label','Mở môn '+s.title);tile.querySelectorAll('.reel-slice').forEach(el=>el.style.backgroundImage=`url("${assets[n]}")`);};
   const measure=()=>{
    const g=P.measure(viewport.clientWidth,viewport.clientHeight);if(!g)return;const sig=JSON.stringify(g);if(sig===currentLayout)return;currentLayout=sig;
-   const {h,radius,unit,columns,sweep,limit}=g,aspect=1.12,share=aspect/16,duration=columns*5.5;
+   const {h,radius,columns,sweep,limit}=g,aspect=1.12,duration=columns*5.5;
    const turn=deg=>`translateZ(${radius}px) rotateY(${deg}deg) translateZ(${-radius}px)`;
    const hide=(sweep-limit)/(2*sweep)*100;
    style.textContent=`@keyframes course-arc{from{transform:${turn(-sweep)}}to{transform:${turn(sweep)}}0%,${hide}%,${100-hide}%,100%{visibility:hidden}${hide+.001}%,${100-hide-.001}%{visibility:visible}}`;
    band.style.perspective=radius*1.6+'px';band.replaceChildren();
    for(let t=0;t<columns;t++){
     const first=columns-1-t,tile=document.createElement('button');tile.className='reel-tile';Object.assign(tile.style,{left:`calc(50% - ${h*aspect/2}px)`,top:`calc(50% - ${h/2}px)`,width:h*aspect+'px',height:h+'px',animation:`course-arc ${duration}s linear ${-t*5.5}s infinite`});
-    for(let k=0;k<16;k++){const slice=document.createElement('span');slice.className='reel-slice';slice.setAttribute('aria-hidden','true');Object.assign(slice.style,{left:h*(aspect-share)/2+'px',width:h*share+(k===15?0:1)+'px',height:h+'px',backgroundSize:`${h*aspect}px ${h}px`,backgroundPosition:`${-h*k*share}px 0`,transform:turn((aspect/2-(k+.5)*share)*unit)});tile.append(slice);}
+    for(let k=0;k<16;k++){const f=P.reelFacet(h,radius,k),slice=document.createElement('span');slice.className='reel-slice';slice.setAttribute('aria-hidden','true');Object.assign(slice.style,{left:f.left+'px',width:f.width+'px',height:h+'px',transformOrigin:`${f.origin}px 50%`,backgroundSize:`${f.textureWidth}px ${h}px`,backgroundPosition:`${f.textureX}px 0`,transform:turn(f.angle)});tile.append(slice);}
     tile.style.setProperty('--arc-duration',duration+'s');tile.style.setProperty('--arc-delay',(-t*5.5)+'s');setSubject(tile,first);tile.addEventListener('animationiteration',e=>setSubject(tile,Math.round(e.elapsedTime/duration)*columns+first));band.append(tile);
    }sync();
   };

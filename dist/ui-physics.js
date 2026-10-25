@@ -10,6 +10,15 @@ window.KienPhysics={
   return `translateX(${-m*bow*(1-Math.cos(drumDeg*Math.PI/180))}px) rotateZ(${(1-m)*ringDeg}deg) translateY(${-(1-m)*ringR}px) rotateX(${m*drumDeg}deg) translateZ(${m*drumR}px)`;
  },
  influence(distance,radius=150){return Math.max(0,1-Math.abs(distance)/radius);},
+ reelFacet(height,radius,index,count=16,aspect=1.12){
+  // Tangent planes need a chord-sized face, not the arc's length. Symmetric
+  // overscan hides subpixel compositor cracks without shifting texture UVs.
+  const span=height*aspect/count,angle=span/radius,face=2*radius*Math.tan(angle/2),scale=face/span,bleed=1.5;
+  const leftBleed=index===0?0:bleed,rightBleed=index===count-1?0:bleed;
+  return {left:height*aspect/2-face/2-leftBleed,width:face+leftBleed+rightBleed,
+   origin:face/2+leftBleed,textureWidth:height*aspect*scale,
+   textureX:-index*face+leftBleed,angle:(height*aspect/2-(index+.5)*span)/radius*180/Math.PI};
+ },
  step(x,v,target,dt,{mass=.1,stiffness=150,damping=12}={}){
   const steps=Math.max(1,Math.ceil(Math.min(dt,.05)/(1/240))),h=Math.min(dt,.05)/steps;
   for(let i=0;i<steps;i++){v+=((target-x)*stiffness-damping*v)/mass*h;x+=v*h;}
