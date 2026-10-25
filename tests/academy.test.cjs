@@ -51,3 +51,11 @@ for(const subject of ['history','ai','information']){
  if(reviewApp.run('!!reviewPending')){reviewApp.run("resultFilter='pending'");const pending=reviewApp.run('resultPage()');assert(pending.includes('Chưa có đáp án duy nhất'));assert(pending.includes('class="bank-answer" open'));assert(!pending.includes('review-tag accepted'));}
 }
 console.log('PASS: shared schemas/counts, legacy migration/idempotence, cross-subject routing/bookmarks/sessions, 115-question timed exam with delayed feedback, two-option safety, full pending/multiple-answer grading, timed auto-submit, filtered retries, numerical practice recomputation and reload preservation.');
+
+// Session numbering is independent of source numbering, gaps and shuffled pools.
+const numbering=app();numbering.run("openSubject('ai');mode='exam';size=0;order='original';start(CORE);moveQuestion(96)");
+assert(numbering.run('quiz()').includes('Câu 97 / 115'));assert(numbering.run('quiz()').includes('Câu gốc: 98'));
+assert(numbering.run('quiz()').includes('data-jump="96"'));assert.equal(numbering.run('session.keys[96]'),'ai.98');
+numbering.run("start([BYKEY['ai.115'],BYKEY['ai.18']]);moveQuestion(1)");
+assert(numbering.run('quiz()').includes('Câu 2 / 2'));assert(numbering.run('quiz()').includes('Câu gốc: 18'));
+for(const subject of ['history','ai','information']){numbering.run('openSubject('+JSON.stringify(subject)+')');assert(!numbering.run('bankList(CORE)').includes('· ID '));}

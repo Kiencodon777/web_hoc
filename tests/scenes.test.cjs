@@ -24,3 +24,33 @@ test('all canvas scenes cap resolution and the fixed stage uses stable large vie
 
 test('Chrome recompiles GPU resources after context restore and releases its listeners',()=>{const h=harness();h.dispose();let programs=0,draws=0,prevented=false;const gl=new Proxy({createProgram:()=>({id:++programs}),createShader:()=>({}),getShaderParameter:()=>true,getProgramParameter:()=>true,createVertexArray:()=>({}),getUniformLocation:(_,n)=>n,isContextLost:()=>false,drawArrays(){draws++}}, {get:(o,k)=>k in o?o[k]:()=>{}});h.canvas.getContext=()=>gl;vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scenes-chrome.js','utf8'),h.context);const end=h.win.KienScenes.chrome(h.root,h.canvas,{motion:true});h.frame(100);assert.equal(draws,1);h.canvas.events.get('webglcontextlost')({preventDefault(){prevented=true}});assert(prevented);assert.equal(h.frames.size,0);h.canvas.events.get('webglcontextrestored')();h.frame(200);assert.equal(programs,2);assert.equal(draws,2);end();assert.equal(h.canvas.events.size,0);assert.equal(h.frames.size,0);});
 test('Grid redraws after 2D restoration and ignores interaction during context loss',()=>{const h=harness();h.dispose();const s=fs.readFileSync(__dirname+'/../dist/night-ui.js','utf8'),a=s.indexOf(' function gridScene('),b=s.indexOf(' function applyAppearance()',a);vm.runInNewContext(s.slice(a,b)+';window.testGrid=gridScene;',h.context);const end=h.win.testGrid(h.root,h.canvas,{motion:true}),strokes=h.strokes;h.canvas.events.get('contextlost')();h.winEvents.get('pointermove')({clientX:100,clientY:100});assert.equal(h.frames.size,0);h.canvas.events.get('contextrestored')();assert(h.strokes>strokes);end();assert.equal(h.canvas.events.size,0);assert.equal(h.frames.size,0);});
+
+test('landscape GPU lifecycle bounds pixels, preserves buffers on mobile resize, pauses and releases resources',()=>{
+ const h=harness();h.dispose();let deletes=0,draws=0,builds=0,resizes=0;
+ const gl={createBuffer:()=>({}),deleteBuffer(){deletes++},getExtension:()=>null};
+ h.canvas.getContext=()=>gl;
+ vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scene-gpu-stage.js','utf8'),h.context);
+ const factory=tracked=>{builds++;tracked.createBuffer();return {resize(){resizes++},draw(){draws++}}};
+ const end=h.win.KienScenes.gpuStage(h.root,h.canvas,{motion:false},factory);h.frame(100);assert.equal(draws,1);assert.equal(h.frames.size,0);assert(h.canvas.width*h.canvas.height<=900000);
+ const writes=h.canvas.writes;for(let i=0;i<20;i++){h.win.innerHeight=500+i;h.resize();}assert.equal(h.canvas.writes,writes);assert.equal(h.frames.size,0);assert.equal(resizes,1);
+ h.doc.hidden=true;h.docEvents.get('visibilitychange')();assert.equal(h.frames.size,0);h.doc.hidden=false;h.docEvents.get('visibilitychange')();h.frame(200);assert.equal(draws,2);
+ let prevented=false;h.canvas.events.get('webglcontextlost')({preventDefault(){prevented=true}});assert(prevented);assert.equal(h.canvas.style.visibility,'hidden');assert.equal(h.frames.size,0);
+ h.canvas.events.get('webglcontextrestored')();h.frame(300);assert.equal(builds,2);assert.equal(h.canvas.style.visibility,'');assert.equal(draws,3);
+ end();assert.equal(deletes,1);assert.equal(h.frames.size,0);assert.equal(h.canvas.events.size,0);assert.equal(h.docEvents.size,0);assert(h.observers.every(o=>o.disconnected));
+});
+test('failed landscape shader releases partial allocations and retains the CSS fallback',()=>{
+ const h=harness();h.dispose();let deleted=0;h.context.console={warn(){}};h.canvas.getContext=()=>({createProgram:()=>({}),deleteProgram(){deleted++},getExtension:()=>null});
+ vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scene-gpu-stage.js','utf8'),h.context);
+ const end=h.win.KienScenes.gpuStage(h.root,h.canvas,{motion:true},gl=>{gl.createProgram();throw new Error('compile failed')});assert.equal(deleted,1);assert.equal(h.canvas.style.visibility,'hidden');assert.equal(h.frames.size,0);end();assert.equal(h.canvas.events.size,0);
+});
+
+test('moving landscapes throttle paints, ignore touch pointers and stop completely in hidden tabs',()=>{
+ const h=harness();h.dispose();let paints=0,moves=0;h.canvas.getContext=()=>({getExtension:()=>null});
+ vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scene-gpu-stage.js','utf8'),h.context);
+ const end=h.win.KienScenes.gpuStage(h.root,h.canvas,{motion:true},()=>({resize(){},draw(){paints++},move(){moves++}}));
+ h.frame(100);h.frame(120);assert.equal(paints,1);h.frame(150);assert.equal(paints,2);
+ h.winEvents.get('pointermove')({pointerType:'touch',clientX:1,clientY:2});assert.equal(moves,0);
+ h.winEvents.get('pointermove')({pointerType:'mouse',clientX:1,clientY:2});assert.equal(moves,1);
+ h.doc.hidden=true;h.docEvents.get('visibilitychange')();assert.equal(h.frames.size,0);h.winEvents.get('pointermove')({pointerType:'mouse',clientX:1,clientY:2});assert.equal(moves,1);
+ end();assert.equal(h.winEvents.size,0);assert.equal(h.docEvents.size,0);assert.equal(h.canvas.events.size,0);
+});
