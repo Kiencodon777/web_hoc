@@ -1,0 +1,86 @@
+/* One material palette for every scene. Translucency picks up the actual scene;
+   tint tokens keep text and controls legible without sampling pixels per frame.
+   No new blur/displacement layers: preserve the mobile modal/scroll fixes. */
+.night-theme{--ui-hue:278;--ui-chroma:22%;--ui-accent:hsl(var(--ui-hue) 62% 82%);--ui-soft:hsl(var(--ui-hue) 28% 82%);--ui-text:hsl(var(--ui-hue) 25% 96%);--ui-muted:hsl(var(--ui-hue) 14% 79%);--ui-edge:hsl(var(--ui-hue) 32% 85% / .22);--ui-fill:hsl(var(--ui-hue) var(--ui-chroma) 11% / .74);--ui-deep:hsl(var(--ui-hue) var(--ui-chroma) 7% / .86);--ui-solid:hsl(var(--ui-hue) var(--ui-chroma) 12%);--ui-highlight:hsl(var(--ui-hue) 45% 80% / .13);--ui-selection:hsl(var(--ui-hue) 42% 65% / .23);--ui-glass:linear-gradient(135deg,#ffffff0c,transparent 55%),linear-gradient(160deg,var(--ui-highlight),transparent 65%),var(--ui-fill);--ui-control:linear-gradient(160deg,#ffffff14,#ffffff03 50%),var(--ui-deep);--ui-menu:linear-gradient(145deg,var(--ui-highlight),transparent 65%),var(--ui-solid);--ink:var(--ui-text);--text:var(--ui-text);--muted:var(--ui-muted);--accent:var(--ui-accent);--line:var(--ui-edge);--surface:var(--ui-solid);--card:var(--ui-solid);--bg:hsl(var(--ui-hue) var(--ui-chroma) 5%);--lg-text:var(--ui-text);--lg-muted:var(--ui-muted);--lg-accent:var(--ui-accent);--lg-base:var(--ui-solid);--glass-fill:var(--ui-fill);color:var(--ui-text)}
+.night-theme[data-scene="wave"]{--ui-hue:202;--ui-chroma:25%}
+.night-theme[data-scene="sakura"]{--ui-hue:285;--ui-chroma:14%}
+.night-theme[data-scene="grid"]{--ui-hue:190;--ui-chroma:20%}
+.night-theme[data-scene="gradient"]{--ui-hue:260;--ui-chroma:20%}
+.night-theme[data-scene="chrome"]{--ui-hue:215;--ui-chroma:9%}
+.night-theme[data-scene="topography"]{--ui-hue:220;--ui-chroma:15%}
+.night-theme[data-scene="still"]{--ui-hue:215;--ui-chroma:5%}
+
+/* Reading and navigation surfaces. Keep light rims and inner highlights. */
+.night-theme .shell :is(.panel,.bankitem,.quizcard,.stats,.chapter,.target,.quizaside,.resultcard,.lesson-card,.subject-progress-card,.academy-strip,.course-card,.method-grid article,.academy-bottom,.studybox,.resumebox,.continue-card,.filters,.practice-setup,.course-next,.formula-box,.hint-panel,.profile-upload-row){background:var(--ui-glass);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme .sidebar,.night-theme.dock-open .sidebar{background:var(--ui-glass);border-color:var(--ui-edge)}
+.night-theme :is(.subject-picker-panel,.glass-calendar){background:var(--ui-menu);border-color:var(--ui-edge)}
+.night-theme :is(.choice-list,.auth-account-menu){background:var(--ui-menu);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme :is(.appearance-dialog,.auth-modal){background:linear-gradient(145deg,var(--ui-highlight),transparent 55%),var(--ui-deep);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme dialog.appearance-dialog{background:var(--ui-menu)}
+.night-theme .journey-compact .quizaside{background:var(--ui-glass)}
+.night-theme :is(.btn.primary,.academy-cta,.course-open).metal-css-active{background:linear-gradient(155deg,var(--ui-highlight),transparent 65%),var(--ui-control);border-color:var(--ui-accent)}
+.night-theme .btn.btn-auth{background:var(--ui-control);border-color:var(--ui-edge)}
+.night-theme .mobile-topbar{background:var(--ui-fill);border-color:var(--ui-edge)}
+.night-theme :is(.dock-reveal,.course-search,.speech-rate,.empty){background:var(--ui-fill);border-color:var(--ui-edge);color:var(--ui-muted)}
+.night-theme :is(.subject-intro,.profile-banner){background:linear-gradient(125deg,var(--ui-highlight),transparent 60%),var(--ui-fill);border-color:var(--ui-edge)}
+.night-theme :is(.explanation,.lesson-example){background:hsl(var(--ui-hue) 20% 70% / .09);color:var(--ui-text);border-color:var(--ui-accent)}
+.night-theme :is(.review-comparison,.profile-upload-row){background:linear-gradient(115deg,var(--ui-highlight),#ffffff03);border-color:var(--ui-edge)}
+
+/* Ordinary controls; correct/wrong/warning variants are restored below. */
+.night-theme :is(.btn,.academy-cta,.course-open,.bookmark,.category-tabs button,.questiongrid button,.choice-trigger,.option,.hint-button,.profile-upload-button){background:var(--ui-control);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme :is(.btn.primary,.academy-cta,.course-open,.metal-css-active){background:linear-gradient(155deg,hsl(var(--ui-hue) 50% 80% / .3),transparent 65%),var(--ui-control);border-color:hsl(var(--ui-hue) 42% 81% / .55);color:var(--ui-text)}
+.night-theme .btn.link{background:none;border-color:transparent;color:var(--ui-accent)}
+.night-theme :is(.choice-trigger[aria-expanded="true"],.category-tabs button.active,.target.selected,.option.selected,.theme-choice[aria-pressed="true"],.questiongrid button.answered){background:linear-gradient(125deg,var(--ui-selection),#ffffff04),var(--ui-fill);border-color:var(--ui-accent);color:var(--ui-text)}
+.night-theme .questiongrid button.current{outline-color:var(--ui-accent)}
+.night-theme :is(.choice-list-option[aria-selected="true"],.subject-picker-panel [aria-selected="true"]){background:linear-gradient(110deg,var(--ui-selection),#ffffff04);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme .choice-list-option.is-active{outline-color:var(--ui-accent)}
+.night-theme .choice-list-option[aria-selected="true"]>i{background:var(--ui-highlight);color:var(--ui-accent)}
+.night-theme :is(.filters input[type="search"],.practice-setup input[type="number"],.calendar-note textarea,.auth-modal .auth-otp-grid input){background:var(--ui-deep);border-color:var(--ui-edge);color:var(--ui-text)}
+.night-theme select,.night-theme select option{background:var(--ui-solid);color:var(--ui-text)}
+.night-theme .course-search input[type="search"]{background:transparent!important}
+.night-theme :is(.badge,.picker-code,.avatar-dot,.profile-avatar,.review-tag.chosen){background:var(--ui-highlight);color:var(--ui-soft);border-color:var(--ui-edge)}
+.night-theme .meter i{background:linear-gradient(90deg,hsl(var(--ui-hue) 38% 58%),var(--ui-accent))}
+.night-theme .target.selected .check{background:var(--ui-accent);color:var(--ui-solid);border-color:var(--ui-accent)}
+.night-theme :is(.auth-primary,.auth-modal .auth-primary,.calendar-note-actions .calendar-save,.calendar-modes [aria-pressed="true"]){background:linear-gradient(120deg,var(--ui-soft),var(--ui-accent));color:hsl(var(--ui-hue) 26% 13%)}
+.night-theme .calendar-days [aria-pressed="true"]{background:var(--ui-accent);color:var(--ui-solid)}
+.night-theme .theme-sample>b{background:var(--ui-accent);color:var(--ui-solid)}
+.night-theme .motion-toggle input:checked{background:hsl(var(--ui-hue) 35% 53%)}
+.night-theme :is(input[type="range"],input[type="checkbox"]){accent-color:var(--ui-accent)}
+
+/* Content color follows the material instead of retaining lavender labels. */
+.night-theme :is(h1,h2,h3,h4,.bank-question,.sidebar .dock-label,.course-content h3,.subject-progress-card h3,.review-comparison strong,.mobile-brand){color:var(--ui-text)}
+.night-theme :is(.micro,.field>label,.filtercheck,.choice-list-heading,.choice-trigger>svg,.speech-rate,.review-comparison>div>span,.appearance-context,.appearance-bottom>span,.appearance-controls small,.theme-choice small,.brightness-control small,.motion-toggle small,.footer-tagline,.footer-story,.footer-bottom,.night-promises,.night-hero-copy>p,.course-content>p,.course-tags span,.course-status,.navlabel,.sidebar-bottom,.brand small,.mobile-brand span,.practice-setup .field>small,.dock-heading small){color:var(--ui-muted)}
+.night-theme :is(.night-hero h2 em,.night-eyebrow,.review-question .bank-answer>summary,.explanation>strong,.resultcard .score,.brightness-control output,.profile-remove,.option b,.course-category,.course-symbol,.orbit-drawing,.live-label,.footer-credit em){color:var(--ui-accent)}
+.night-theme :is(.night-eyebrow>span,.live-label i,.night-promises i,.sidebar-bottom .dot){background:var(--ui-accent)}
+.night-theme .sidebar .dock-indicator{background:linear-gradient(120deg,#ffffff24,var(--ui-highlight) 55%,#ffffff08);border-color:var(--ui-edge)}
+.night-theme .sidebar .nav.active:before,.night-theme .sidebar .nav.active .dock-icon:after{background:var(--ui-accent)}
+.night-theme .auth-orbit{background:radial-gradient(ellipse at 10% 90%,var(--ui-highlight),transparent 60%)}
+.night-theme .auth-story{background:linear-gradient(160deg,#ffffff04,var(--ui-highlight))}
+.night-theme .auth-content{background:linear-gradient(145deg,#ffffff09,#ffffff03)}
+.night-theme .auth-envelope-back{background:var(--ui-solid)}
+.night-theme .auth-envelope-flap{background:hsl(var(--ui-hue) 20% 47%)}
+.night-theme .auth-envelope-paper{background:hsl(var(--ui-hue) 18% 23%)}
+.night-theme .auth-envelope-paper>i{background:var(--ui-selection)}
+
+/* Course illustrations and icons keep their identifying colors. Learning
+   feedback keeps green/red/amber, never recolored by the background choice. */
+.night-theme :is(.option.correct,.questiongrid button.good){background:#193b30e8;border-color:#8fd6b7;color:#d8f8e8}
+.night-theme .option.correct b{background:#79b399;color:#10271f;border-color:#a4e1c3}
+.night-theme :is(.option.incorrect,.questiongrid button.bad){background:#44242fe8;border-color:#d897a5;color:#ffe2ea}
+.night-theme .badge.amber{background:#4a352d;color:#f1c399;border-color:#b9916544}
+.night-theme .notice,.night-theme .subject-disclaimer{background:#30291fe8;color:#ecd7b7;border-color:#bb946c55}
+.night-theme .review-tag.accepted{color:#b0e2cd;background:#82c6aa13;border-color:#9bd4bb45}
+.night-theme .btn.green{background:linear-gradient(160deg,#3f6257,#142e28);border-color:#92d4b460}
+.night-theme .lesson-remember{background:#26332ee8}
+.night-theme .subject-progress-card .meter i{background:var(--green)}
+.night-theme :is(.btn,.academy-cta,.option,.choice-trigger,input,textarea):focus-visible{outline-color:var(--ui-accent)}
+@media(hover:hover){
+ .night-theme :is(.btn,.choice-trigger,.bookmark,.category-tabs button,.profile-upload-button):hover{background:linear-gradient(140deg,var(--ui-highlight),#ffffff05),var(--ui-deep);border-color:var(--ui-accent)}
+ .night-theme .choice-list-option:not([aria-disabled="true"]):hover{background-color:var(--ui-highlight)}
+}
+/* Earlier mobile fallbacks intentionally disable costly blur. Keep that rule,
+   but make its fill match the chosen scene, rather than an opaque purple. */
+@media(max-width:800px),(hover:none){
+ .night-theme .sidebar,.night-theme.dock-open .sidebar{background:var(--ui-glass)!important}
+ .night-theme .subject-picker-panel,.night-theme .glass-calendar{background:var(--ui-menu)!important}
+}
