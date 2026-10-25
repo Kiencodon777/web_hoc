@@ -172,6 +172,6 @@ SOFTWARE.
  }
  function flush(){raf=0;for(const [el,e] of entries){if(!el.isConnected){e.observer.disconnect();e.filter?.remove();entries.delete(el);}else build(el,e);}}
  function schedule(){if(!raf)raf=requestAnimationFrame(flush);}
- function refresh(){ensure();for(const el of document.querySelectorAll('.sidebar,.dock-indicator,.subject-picker-trigger,.subject-picker-panel,.glass-calendar')){el.classList.add('lg-material');if(entries.has(el))continue;const entry={id:'kh-optics-'+(++serial),sig:'',filter:null};entry.observer=new ResizeObserver(schedule);entries.set(el,entry);entry.observer.observe(el);}schedule();}
+ function refresh(){ensure();for(const el of document.querySelectorAll('.sidebar,.dock-indicator,.subject-picker-trigger,.subject-picker-panel')){el.classList.add('lg-material');if(entries.has(el))continue;const entry={id:'kh-optics-'+(++serial),sig:'',filter:null};entry.observer=new ResizeObserver(schedule);entries.set(el,entry);entry.observer.observe(el);}schedule();}
  window.KienGlass={refresh};
 })();
