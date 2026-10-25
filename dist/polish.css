@@ -59,19 +59,17 @@
 .journey-collapsed .journey-mini{display:block;order:0}.journey-collapsed .journey-toggle{order:1}.journey-collapsed .journey-toggle svg{transform:rotate(90deg)}
 .night-theme .quizlayout.journey-compact{grid-template-columns:minmax(0,1fr);gap:14px}
 .night-theme .journey-compact .quizaside{order:-1;width:330px;max-width:100%;justify-self:end;padding:10px 14px;background:#272230bd;backdrop-filter:blur(18px)}
-/* Exact cylindrical layout model from Tilted Grid Hero; each card is 16 facets. */
+/* Continuous cylindrical mesh; one canvas, with native button hit targets. */
 .course-reel{margin:12px 0 0;border:.5px solid #ffffff20;border-radius:24px;background:radial-gradient(ellipse at 50% 50%,#8d68ac1c,transparent 65%),#0d0d1622;overflow:hidden}
 .reel-topline{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 0;gap:14px}.reel-topline>span{font-size:9px;color:#bca6cb;letter-spacing:1.5px}.reel-topline>div{display:flex;align-items:center;gap:7px}
 .reel-control{width:36px;height:36px;min-width:36px;border-radius:50%;font-size:20px;line-height:1;padding:0}.reel-control[data-reel-pause]{font-size:11px}.reel-grid-toggle{font-size:11px;border-radius:18px;padding:9px 13px;margin-left:4px;min-height:36px}
 .reel-viewport{position:relative;height:480px;width:100%;overflow:hidden;container-type:size}
 .reel-band{position:absolute;inset:0;perspective-origin:50% 50%;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .reel-tile{position:absolute;transform-style:preserve-3d;border:0;background:none;padding:0;cursor:pointer;will-change:transform;isolation:auto;color:white}
-.reel-slice{display:block;position:absolute;top:0;background-repeat:no-repeat;backface-visibility:hidden;pointer-events:none;overflow:hidden}
-.reel-slice:first-child{border-radius:18px 0 0 18px}.reel-slice:last-child{border-radius:0 18px 18px 0}
+.reel-mesh>canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.reel-mesh>.reel-tile{top:0;left:0;transform-style:flat;animation:none!important;will-change:auto}
+.reel-mesh>.reel-tile[hidden]{display:none}
 .reel-tile:focus-visible{outline:3px solid var(--accent);outline-offset:8px;border-radius:20px}
-/* Filtering each facet rasterizes it into a separate clipped layer and exposes
-   vertical seams. Keep the curved faces unfiltered, including on hover. */
-.reel-paused .reel-tile{animation-play-state:paused!important}
 .reel-caption{text-align:center;font-size:11px;color:#b5a2c6!important;padding:0 20px 22px;margin:0}
 .reel-ready:not(.show-course-grid)>.course-grid{display:none!important}.show-course-grid .course-reel{background:none;border:0;border-radius:0;margin-bottom:20px}.show-course-grid .reel-topline{padding:0}.show-course-grid .reel-control{display:none}.show-course-grid .reel-viewport{display:none}
 @media(min-width:801px) and (max-height:850px){.night-theme .sidebar{padding:12px 10px}.night-theme .sidebar .nav{height:54px;min-height:54px;gap:10px}.night-theme .sidebar .dock-icon{height:36px;width:36px;border-radius:11px}.night-theme .sidebar .navlabel{margin-top:8px}.night-theme .sidebar nav,.night-theme .sidebar .history-links{gap:5px}.night-theme .sidebar .sidebar-bottom{margin-top:8px;padding-top:8px}.night-theme .sidebar .nav .dock-label{font-size:11px}}
@@ -79,7 +77,7 @@
 @media(max-width:800px){.night-theme .shell,.night-theme.dock-hidden .shell{margin-left:0}.night-theme .sidebar{left:12px;top:12px;bottom:auto;max-height:calc(100dvh - 24px);width:254px;padding:16px 12px;transform:translateX(-115%);opacity:1}.night-theme.dock-open .sidebar{transform:translateX(0);opacity:1;pointer-events:auto;background:linear-gradient(145deg,#3d3547c9,#1a1924d9)}.night-theme .sidebar .navlabel{margin:12px}.night-theme .sidebar .brand{font-size:20px}.night-theme .sidebar .brand small{font-size:9px}.dock-reveal{display:none!important}.night-theme.dock-hidden .night-breadcrumb{margin:0}.night-theme .sidebar .nav{height:58px;min-height:58px}.night-theme .sidebar .nav .dock-label{font-size:12px}.night-theme .sidebar .dock-icon{width:38px;height:38px}.night-theme .sidebar nav,.night-theme .sidebar .history-links{gap:5px}.night-theme .sidebar .nav b{display:block}.night-theme .sidebar .sidebar-bottom{margin-top:10px;padding-top:10px}.night-theme .quizaside{order:2}.night-theme .journey-compact .quizaside{order:-1}.reel-viewport{height:400px}.reel-topline{padding:18px 16px 0}.reel-topline>span{font-size:8px}.reel-topline>div{margin-left:auto}.reel-control{width:40px;height:40px}.reel-grid-toggle{min-height:40px}.night-theme .option{transform:translateX(calc(var(--dock-force,0)*1px)) scale(var(--answer-scale,1))}}
 @media(max-width:500px){.reel-viewport{height:330px}.reel-topline{gap:12px}.reel-topline>div{width:100%;justify-content:flex-end}.reel-topline>span{font-size:9px}.reel-caption{font-size:10px}.night-theme .course-search input[type=search]{font-size:16px}.night-theme .journey-compact .quizaside{width:100%}.night-theme .sidebar{max-height:calc(100dvh - 24px)}.night-theme .sidebar .nav{height:54px;min-height:54px}}
 @media(prefers-reduced-transparency:reduce){.night-theme .sidebar,.dock-reveal{background:#22212d;backdrop-filter:none;-webkit-backdrop-filter:none}}
-@media(prefers-reduced-motion:reduce){.night-theme .course-reel .reel-tile{animation-name:course-arc!important;animation-duration:var(--arc-duration)!important;animation-delay:var(--arc-delay)!important;animation-timing-function:linear!important;animation-iteration-count:infinite!important;animation-play-state:paused!important}.night-theme .sidebar,.night-theme .shell{transition:none}.night-theme .option,.night-theme .sidebar .dock-icon,.night-theme .option b{transform:none!important}}
+@media(prefers-reduced-motion:reduce){.night-theme .sidebar,.night-theme .shell{transition:none}.night-theme .option,.night-theme .sidebar .dock-icon,.night-theme .option b{transform:none!important}}
 .motion-paused .option,.motion-paused .sidebar .dock-icon,.motion-paused .option b{transform:none!important}
 .ai-key-notice{padding:16px 18px;border:1px solid #c6a06e44;border-radius:13px;background:#332a2a99;margin:14px 0 20px;font-size:13px;line-height:1.8}
 .ai-key-notice>b{color:#e4c494;font-size:13px}.ai-key-notice p{margin-top:5px;color:#d3c2cd}

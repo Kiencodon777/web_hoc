@@ -10,21 +10,4 @@ assert.equal(P.measure(0,0),null);
 for(const w of [320,390,520,960]){const g=P.wheelMetrics(w,500,3);assert(g.cardW<=w*.34+.001);assert.equal(g.cardW/g.cardH,1.45);assert.equal(g.drumR,g.cardH*2.22);assert(g.ringScale>=.16&&g.ringScale<=1);assert(g.depth>g.drumR);assert(P.wheelPlace(0,0,g.ringR,g.drumR,g.bow,1).includes(`translateZ(${g.drumR}px)`));}
 assert.equal(P.gaussian(0),1);assert.equal(P.gaussian(-86),P.gaussian(86));assert(P.gaussian(172)<P.gaussian(86));
 
-// Neighboring tangent faces meet at the same 3D point and sample the same texel.
-// Overscan extends in both directions, leaving texture scale/centers unchanged.
-for(const width of [320,390,768,1280,1920]){
- const {h,radius}=P.measure(width,480),facets=Array.from({length:16},(_,i)=>P.reelFacet(h,radius,i));
- const face=2*radius*Math.tan(h*1.12/16/radius/2);
- for(let i=0;i<15;i++){
-  const a=facets[i],b=facets[i+1],angle=a.angle*Math.PI/180,next=b.angle*Math.PI/180;
-  const right=[-radius*Math.sin(angle)+face/2*Math.cos(angle),radius-radius*Math.cos(angle)-face/2*Math.sin(angle)];
-  const left=[-radius*Math.sin(next)-face/2*Math.cos(next),radius-radius*Math.cos(next)+face/2*Math.sin(next)];
-  assert(Math.hypot(right[0]-left[0],right[1]-left[1])<1e-9,'adjacent faces meet without a geometry gap');
-  const u=(a.origin+face/2-a.textureX)/a.textureWidth,v=(b.origin-face/2-b.textureX)/b.textureWidth;
-  assert(Math.abs(u-v)<1e-12,'neighboring UVs agree at the join');
-  assert(a.width-a.origin>face/2&&b.origin>face/2,'internal joins have symmetric bleed');
- }
- assert.equal(facets[0].origin,face/2);assert.equal(facets[15].width-facets[15].origin,face/2);
-}
-
-console.log('PASS: springs, cylindrical geometry, watertight reel faces and continuous texture UVs from phone to ultrawide.');
+console.log('PASS: springs and cylindrical layout from phone to ultrawide.');

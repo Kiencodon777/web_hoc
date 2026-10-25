@@ -54,3 +54,35 @@ test('moving landscapes throttle paints, ignore touch pointers and stop complete
  h.doc.hidden=true;h.docEvents.get('visibilitychange')();assert.equal(h.frames.size,0);h.winEvents.get('pointermove')({pointerType:'mouse',clientX:1,clientY:2});assert.equal(moves,1);
  end();assert.equal(h.winEvents.size,0);assert.equal(h.docEvents.size,0);assert.equal(h.canvas.events.size,0);
 });
+
+function reelHarness(){
+ const h=harness();h.dispose();let uploads=0,draws=0,deletes=0,id=0;const images=[],fallback=[],cards=[];
+ const gl=new Proxy({createProgram:()=>({id:++id}),createShader:()=>({id:++id}),createBuffer:()=>({id:++id}),createTexture:()=>({id:++id}),getShaderParameter:()=>true,getProgramParameter:()=>true,getAttribLocation:()=>0,getUniformLocation:(_,name)=>name,getExtension:()=>null,texImage2D(){uploads++},drawElements(){draws++},deleteProgram(){deletes++},deleteShader(){deletes++},deleteBuffer(){deletes++},deleteTexture(){deletes++}}, {get:(o,k)=>k in o?o[k]:()=>{}});
+ h.canvas.getContext=()=>gl;h.context.Image=class{constructor(){images.push(this)}set src(value){this.url=value}};
+ for(const file of ['ui-physics.js','scene-gpu-stage.js','curved-reel.js'])vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/'+file,'utf8'),h.context);
+ const controller=h.win.KienReel.mount(h.root,h.canvas,['one','two','three'],value=>cards.push(value),value=>fallback.push(value));
+ return {...h,controller,images,fallback,cards,get uploads(){return uploads},get draws(){return draws},get deletes(){return deletes},async load(batch=images.slice(-3)){batch.forEach(image=>image.onload?.());await Promise.resolve();await Promise.resolve();}};
+}
+test('continuous reel uses shared canvas geometry; wheel-offset/unchanged resize never reallocates the bitmap',async()=>{
+ const h=reelHarness();await h.load();h.frame(100);assert.equal(h.uploads,3);assert(h.draws>0);const writes=h.canvas.writes,position=JSON.stringify(h.cards.at(-1));
+ for(let offset=0;offset<30;offset++){h.root.getBoundingClientRect=()=>({left:0,top:-offset*11});h.resize();}assert.equal(h.canvas.writes,writes);assert.equal(h.frames.size,0);assert.equal(JSON.stringify(h.cards.at(-1)),position);
+ h.controller.step(1);h.frame(200);assert.notEqual(JSON.stringify(h.cards.at(-1)),position);h.controller.pause(false);h.frame(300);assert.equal(h.frames.size,1);h.controller.pause(true);h.frame(400);assert.equal(h.frames.size,0);h.controller.destroy();assert.equal(h.deletes,8);assert.equal(h.frames.size,0);assert.equal(h.canvas.events.size,0);
+});
+test('reel recolors only the newest complete image batch without resetting its position',async()=>{
+ const h=reelHarness();await h.load();h.frame(100);h.controller.step(1);h.frame(200);const before=JSON.stringify(h.cards.at(-1)),old=h.uploads;
+ h.controller.setAssets(['old-a','old-b','old-c']);const stale=h.images.slice(-3);h.controller.setAssets(['new-a','new-b','new-c']);await h.load(stale);assert.equal(h.uploads,old);await h.load();h.frame(300);assert.equal(h.uploads,old+3);assert.equal(JSON.stringify(h.cards.at(-1)),before);h.controller.destroy();
+});
+test('reel falls back on context loss, restores fresh textures, and discards pending images after cleanup',async()=>{
+ const h=reelHarness();await h.load();h.frame(100);h.canvas.events.get('webglcontextlost')({preventDefault(){}});assert.equal(h.fallback.at(-1),true);assert.equal(h.frames.size,0);
+ h.canvas.events.get('webglcontextrestored')();await h.load();h.frame(200);assert.equal(h.fallback.at(-1),false);assert.equal(h.uploads,6);
+ h.controller.setAssets(['later-a','later-b','later-c']);const batch=h.images.slice(-3),uploads=h.uploads;h.controller.destroy();await h.load(batch);assert.equal(h.uploads,uploads);assert.equal(h.frames.size,0);
+});
+test('reel card positions stay finite, bounded and select valid subjects across loop seams and reverse steps',()=>{
+ const h=harness();h.dispose();vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/ui-physics.js','utf8'),h.context);vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/curved-reel.js','utf8'),h.context);
+ for(const width of [320,390,768,1280,1920]){const g=h.win.KienPhysics.measure(width,440);for(const phase of [-100.1,-1,0,.01,1,3,100.3])for(let slot=0;slot<g.columns;slot++){const c=h.win.KienReel.cardState(g,phase,slot,3,width,440);assert(c.index>=0&&c.index<3);for(const k of ['left','top','width','height','angle'])assert(Number.isFinite(c[k]));assert(c.left>=0&&c.left+c.width<=width+.001);assert(c.top>=0&&c.top+c.height<=440+.001);}}
+});
+
+test('unavailable GPU keeps the native course grid usable without allocating a render loop',()=>{
+ const h=harness();h.dispose();for(const file of ['scene-gpu-stage.js','curved-reel.js'])vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/'+file,'utf8'),h.context);
+ const fallback=[];const controller=h.win.KienReel.mount(h.root,h.canvas,['one','two'],()=>assert.fail('unsupported GPU must not publish hit targets'),value=>fallback.push(value));assert.equal(fallback.at(-1),true);controller.pause(false);controller.step(1);controller.setAssets(['new','new']);assert.equal(h.frames.size,0);controller.destroy();assert.equal(h.canvas.events.size,0);
+});
