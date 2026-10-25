@@ -13,3 +13,15 @@ test('invalid stored choices and malformed values fall back safely; invalid sele
  assert.equal(read('{"brightness":1000}').brightness,80);assert.equal(read('{"brightness":-20}').brightness,15);assert.equal(read('{"brightness":"bad"}').brightness,45);
  const state=read(null),before=JSON.stringify(state);assert.equal(select(state,'bad'),false);assert.equal(JSON.stringify(state),before);
 });
+
+test('curved-card SVG text follows live theme colors while illustration colors stay intact',()=>{
+ const source=fs.readFileSync(__dirname+'/../dist/polish.js','utf8'),cardWindow={};let palette={'--ui-text':'#ffffff','--ui-muted':'#e1e8ed'};
+ const context={window:cardWindow,document:{body:{}},getComputedStyle:()=>({getPropertyValue:name=>palette[name]}),academyIcon:()=>'<svg stroke="currentColor"></svg>'};
+ vm.runInNewContext(source.slice(source.indexOf(' function wrapWords('),source.indexOf(' function refreshCourses('))+';window.card=artwork;',context);
+ const subject={id:'ai',title:'Khoa học dữ liệu & Trí tuệ nhân tạo',desc:'Học hiểu từng câu.',code:'AI',category:'Công nghệ',count:'115 câu hỏi'};
+ const draw=()=>decodeURIComponent(cardWindow.card(subject)),wave=draw();
+ const colors=svg=>[...new Set([...svg.matchAll(/<text\b[^>]*fill="([^"]+)"/g)].map(m=>m[1]))];
+ assert.deepEqual(colors(wave),['#ffffff','#e1e8ed']);assert(wave.includes('stroke="#d7bef4"'),'subject illustration keeps its own color');
+ palette={'--ui-text':'#e8d7fc','--ui-muted':'#cdb7df'};assert.deepEqual(colors(draw()),['#e8d7fc','#cdb7df']);
+ assert(wave.includes('Khoa học dữ liệu &amp; Trí'),'text remains XML-escaped');
+});
