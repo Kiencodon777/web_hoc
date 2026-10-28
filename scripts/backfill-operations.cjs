@@ -1,0 +1,7 @@
+// Explicit maintenance task; never executes during startup or deploy.
+const {openPostgres}=require('../server/postgres.cjs'),{learningRows}=require('../server/operations.cjs');
+(async()=>{const db=openPostgres(process.env.DATABASE_URL),apply=process.argv.includes('--apply');let cursor='',count=0;try{
+ while(true){const rows=await db.prepare('SELECT user_id,data,revision FROM progress WHERE user_id>? ORDER BY user_id LIMIT 100').all(cursor);if(!rows.length)break;
+  for(const row of rows){const summary=learningRows(JSON.parse(row.data));if(apply)await db.transaction(async tx=>{for(const r of summary)await tx.prepare('INSERT INTO ops_learning(user_id,subject,answered,attempts,correct,bookmarks,updated_at,revision) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(user_id,subject) DO UPDATE SET answered=excluded.answered,attempts=excluded.attempts,correct=excluded.correct,bookmarks=excluded.bookmarks,updated_at=excluded.updated_at,revision=excluded.revision WHERE excluded.revision>=ops_learning.revision').run(row.user_id,r.subject,r.answered,r.attempts,r.correct,r.bookmarks,Date.now(),row.revision);},'ops-backfill:'+row.user_id);count++;cursor=row.user_id;}
+ }console.log(JSON.stringify({mode:apply?'apply':'dry-run',accountsWithProgress:count,sourceProgressChanged:false}));
+ }finally{await db.close();}})().catch(()=>{console.error('Backfill failed. No source progress was changed. Check private server configuration.');process.exitCode=1});

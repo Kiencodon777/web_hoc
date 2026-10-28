@@ -5,6 +5,7 @@ import appModule from '../server/app.cjs';
 import postgresModule from '../server/postgres.cjs';
 import domainRouting from '../server/domain-routing.cjs';
 import domainHandoff from '../server/domain-handoff.cjs';
+import operations from '../server/operations.cjs';
 
 // TCP connections belong to a request in Workers, not to a global isolate.
 const requests = new AsyncLocalStorage();
@@ -30,18 +31,24 @@ const handler = httpServerHandler({ port: 3000 });
 export default {
   async scheduled(controller,bindings,ctx){
     const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
-    try{await store.purgeHandoffs(Date.now());}finally{ctx.waitUntil(store.close());}
+    try{await store.purgeHandoffs(Date.now());if(bindings.TELEMETRY_ENABLED==='true')await operations.pruneOperations(store,Date.now());}finally{ctx.waitUntil(store.close());}
   },
   async fetch(request, bindings, ctx) {
+    const incomingURL=new URL(request.url);
+    if(bindings.ADMIN_ORIGIN&&incomingURL.origin===bindings.ADMIN_ORIGIN&&!operations.adminPathAllowed(incomingURL.pathname)){
+      if(incomingURL.pathname==='/')return Response.redirect(incomingURL.origin+'/ops/login',302);
+      return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store'}});
+    }
     if(new URL(request.url).pathname.startsWith('/api/domain-transfer/')){
       const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
       try{return await domainHandoff.handleHandoff(request,bindings,store,request.headers.get('CF-Connecting-IP')||'unknown');}
       finally{ctx.waitUntil(store.close());}
     }
-    const migration = await domainRouting.handleDomainRouting(request, bindings);
+    const isAdminHost=bindings.ADMIN_ORIGIN&&new URL(request.url).origin===bindings.ADMIN_ORIGIN;
+    const migration = isAdminHost?null:await domainRouting.handleDomainRouting(request, bindings);
     if(migration)return migration;
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/api/')) return bindings.ASSETS.fetch(request);
+    if (!url.pathname.startsWith('/api/') && url.pathname!=='/ops' && !url.pathname.startsWith('/ops/')) return bindings.ASSETS.fetch(request);
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
     if (url.pathname.startsWith('/api/auth/') && bindings.AUTH_LIMITER) {
       const result = await bindings.AUTH_LIMITER.limit({ key: ip });
