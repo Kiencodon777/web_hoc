@@ -74,3 +74,7 @@ Kiểm tra: `npm test`, `npm run cf:check`. Test dùng SQLite và PGlite Postgre
 ## Kiểm tra bản triển khai đầu tiên
 
 `npm test`: 86 test pass, academy và UI physics pass. `cf:check` pass. Production health HTTP 200, database/email ready; `/ops`, `/ops/login`, `/api/ops/overview` đều HTTP 404 khi cửa quản trị đóng. Telemetry sai payload HTTP 400; request bucket đã được ghi. Supabase advisor chỉ báo INFO RLS không policy, đúng chủ đích schema private chỉ backend truy cập. Chưa tạo DNS hoặc Access application. Host dự kiến `https://ops.vietkienetet.id.vn` (zone này hiện đã thuộc tài khoản Cloudflare), `ADMIN_REQUIRE_ACCESS=true`; cần Access TEAM/AUD, ứng dụng allowlist ba email và kiểm tra login thực tế trước khi đặt ADMIN_ENABLED=true. Không đổi JWT_SECRET hay cấu hình phiên người học.
+
+## Cập nhật sau khi kích hoạt Zero Trust Free
+
+Cloudflare đã xác nhận gói Free, team `empty-union-9700`. Phương thức One-time PIN đã thêm. Custom domain `ops.vietkienetet.id.vn` đã gắn Worker và HTTPS hoạt động; Worker `4f8f539e-d150-4ae4-9f4f-fe31608f29bf` vẫn ADMIN_ENABLED=false. Chính sách ba email đã soạn trong trình duyệt nhưng CHƯA lưu/chưa tạo Access application: đang chờ xác nhận tại thời điểm cấp quyền theo quy tắc trình duyệt. Sau xác nhận: Save policy, Create application (30m, only One-time PIN), lấy AUD, bật ADMIN_ENABLED với TEAM/AUD và kiểm tra Access/host gate. Kiểm tra mới nhất: admin login 404 khi đóng, study health200, workers.dev ops404. Không coi việc kích hoạt gói Free là đã bảo vệ một ứng dụng.

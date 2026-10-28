@@ -55,6 +55,10 @@
     {
       "pattern": "www.vietkienetet.id.vn/*",
       "zone_name": "vietkienetet.id.vn"
+    },
+    {
+      "pattern": "ops.vietkienetet.id.vn",
+      "custom_domain": true
     }
   ]
 }
