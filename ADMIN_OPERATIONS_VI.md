@@ -1,6 +1,6 @@
 # Kiến Học Operations
 
-Trạng thái 29/10/2026: chủ dự án đã duyệt triển khai. Mã backend và telemetry đã lên production (Worker `f2d7ccb1-f7a5-4ed3-b3e1-fb50b88ed026`); migration đã áp dụng và backfill 9 tài khoản thành 27 bản tổng hợp môn học. **Cửa quản trị vẫn đóng (`ADMIN_ENABLED=false`) trong khi chờ chủ tài khoản kích hoạt Cloudflare Zero Trust Free.** Trang checkout yêu cầu thẻ/địa chỉ thanh toán, chấp nhận điều khoản và ủy quyền tính phí vượt mức; chủ tài khoản phải tự hoàn tất. Các sửa card/tiêu đề trước đó đã triển khai riêng từ commit `1cf6c85`. Không dùng link preview PR của website học tập để xem quản trị vì preview đó chỉ phục vụ `dist/` và khóa API thật.
+Trạng thái 29/10/2026: đã triển khai quản trị thật tại https://ops.vietkienetet.id.vn/ops/login . Cloudflare Access và backend đều giới hạn đúng bốn email chủ dự án đã duyệt; OTP email, phiên 30 phút. Worker `1d9672cc-f03e-4d85-a47d-73efffd4bfc6`, ADMIN_ENABLED=true, ADMIN_REQUIRE_ACCESS=true, TELEMETRY_ENABLED=true. Đã xác minh chặn truy cập chưa xác thực và chặn host thay thế. Chủ dự án đang tự nhập OTP Cloudflare cho lần đăng nhập thật đầu tiên; chưa xác nhận được toàn bộ luồng vào dashboard qua OTP thật.
 
 ## Xem giao diện
 
@@ -51,7 +51,7 @@ Production yêu cầu đồng thời:
 5. Cookie quản trị `__Host-kienhoc_ops`, HttpOnly, Secure, SameSite=Strict, Path=/, 30 phút. Cookie không lưu ở localStorage. Mỗi request kiểm tra lại cả phiên quản trị, phiên nguồn trong DB và allowlist hiện tại.
 6. Đăng xuất quản trị cần Origin đúng và token CSRF; thu hồi phiên quản trị không làm mất phiên học. Logout/thu hồi phiên nguồn cũng làm quản trị mất hiệu lực.
 
-Không có link quản trị trong website học, không index, no-store, không iframe. Đường dẫn không phải yếu tố xác thực. Ba email chủ dự án cung cấp được lưu tại `.env.admin.local` bị Git bỏ qua; **không commit allowlist thật vào repo công khai**. Bản mẫu chỉ dùng `example.test`. Không đặt `ADMIN_REQUIRE_ACCESS=false` trên production; cờ đó chỉ dùng cho unit test cookie.
+Không có link quản trị trong website học, không index, no-store, không iframe. Đường dẫn không phải yếu tố xác thực. Bốn email chủ dự án cung cấp được lưu tại `.env.admin.local` bị Git bỏ qua; **không commit allowlist thật vào repo công khai**. Bản mẫu chỉ dùng `example.test`. Không đặt `ADMIN_REQUIRE_ACCESS=false` trên production; cờ đó chỉ dùng cho unit test cookie.
 
 Tài liệu xác minh [Cloudflare Access JWT](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/) và [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
@@ -61,7 +61,7 @@ Migration `supabase/migrations/20261028172755_private_operations_console.sql` t�
 
 Index cho last_seen, user_id, day/kind, request minute và audit time. Endpoint users phân trang 20 dòng, email che mặc định và chỉ trả trường được chọn. Không trả password_hash, OTP, token, avatar blob, đáp án, IP thô hoặc raw URL/query/stack. JSON telemetry giới hạn 2 KiB và enum; input SQL là tham số. Dữ liệu 90 ngày được xóa theo cron hiện có khi telemetry bật; audit 365 ngày, phiên hết hạn được dọn. Sessions nguồn có expiry được kiểm tra mỗi lần, không đếm theo số session còn hạn.
 
-## Các bước mở quyền quản trị còn lại
+## Quy trình triển khai (các bước hạ tầng đã hoàn tất)
 
 1. Tạo/gắn host quản trị riêng với Worker, cấu hình Access allowlist/MFA tại Cloudflare, giữ site học hiện tại nguyên vẹn. Chốt `ADMIN_ORIGIN`, `ADMIN_ACCESS_TEAM`, `ADMIN_ACCESS_AUD`; thêm origin quản trị vào `APP_ORIGINS`. Chưa tạo DNS trong đợt preview.
 2. Đã áp dụng migration qua Supabase MCP; xác minh sáu bảng ops có RLS, anon/authenticated không có SELECT. Không bật public Data API.
@@ -71,10 +71,26 @@ Index cho last_seen, user_id, day/kind, request minute và audit time. Endpoint 
 
 Kiểm tra: `npm test`, `npm run cf:check`. Test dùng SQLite và PGlite PostgreSQL, có chữ ký Access thật với khóa test, sai audience/algorithm, email ngoài allowlist, OTP cũ, cookie/CSRF/revocation, đếm browser, retention và RLS. Chưa nghiệm thu trên host quản trị production hay trên điện thoại thật.
 
-## Kiểm tra bản triển khai đầu tiên
+## Lịch sử kiểm tra bản triển khai đầu tiên
 
 `npm test`: 86 test pass, academy và UI physics pass. `cf:check` pass. Production health HTTP 200, database/email ready; `/ops`, `/ops/login`, `/api/ops/overview` đều HTTP 404 khi cửa quản trị đóng. Telemetry sai payload HTTP 400; request bucket đã được ghi. Supabase advisor chỉ báo INFO RLS không policy, đúng chủ đích schema private chỉ backend truy cập. Chưa tạo DNS hoặc Access application. Host dự kiến `https://ops.vietkienetet.id.vn` (zone này hiện đã thuộc tài khoản Cloudflare), `ADMIN_REQUIRE_ACCESS=true`; cần Access TEAM/AUD, ứng dụng allowlist ba email và kiểm tra login thực tế trước khi đặt ADMIN_ENABLED=true. Không đổi JWT_SECRET hay cấu hình phiên người học.
 
-## Cập nhật sau khi kích hoạt Zero Trust Free
+## Lịch sử chuẩn bị sau khi kích hoạt Zero Trust Free
 
 Cloudflare đã xác nhận gói Free, team `empty-union-9700`. Phương thức One-time PIN đã thêm. Custom domain `ops.vietkienetet.id.vn` đã gắn Worker và HTTPS hoạt động; Worker `4f8f539e-d150-4ae4-9f4f-fe31608f29bf` vẫn ADMIN_ENABLED=false. Chính sách ba email đã soạn trong trình duyệt nhưng CHƯA lưu/chưa tạo Access application: đang chờ xác nhận tại thời điểm cấp quyền theo quy tắc trình duyệt. Sau xác nhận: Save policy, Create application (30m, only One-time PIN), lấy AUD, bật ADMIN_ENABLED với TEAM/AUD và kiểm tra Access/host gate. Kiểm tra mới nhất: admin login 404 khi đóng, study health200, workers.dev ops404. Không coi việc kích hoạt gói Free là đã bảo vệ một ứng dụng.
+
+
+## Cấu hình production hiện tại
+
+Access application `c5bbec0e-b092-4e8b-91ae-52b0c78e43ba`; policy `7c4bfd49-48ff-49b4-957e-fa0f70611be8`, đúng một rule Emails chứa bốn địa chỉ, không có Everyone, không cho toàn bộ Gmail. Chỉ bật One-time PIN, không cho mọi IdP hoặc WARP tự xác thực. Session ứng dụng 30m; HTTPOnly và binding cookie bật, App Launcher ẩn. Team `empty-union-9700`, AUD được lưu trong wrangler.jsonc. ADMIN_EMAILS là Worker secret và file ignored, không commit danh sách thật.
+
+Kiểm tra: chưa xác thực ở `/ops` và `/api/ops/overview` trên ops host được chuyển HTTP302 tới Access; trên study/Workers.dev admin API trả404, kể cả header assertion giả + forwarded host. Study health200, database/email ready. Policy đã đọc lại sau lưu: đủ bốn email. Không đổi JWT_SECRET, không sửa tiến độ học. Migration đã áp dụng và backfill27 bản tổng hợp từ9 tài khoản. Chỉ số truy cập bắt đầu tính từ ngày bật telemetry.
+
+### Đăng nhập thật
+
+1. Mở https://ops.vietkienetet.id.vn/ops/login (không cần localhost hoặc bật máy này).
+2. Nhập một email được cấp quyền vào Cloudflare Access, nhận PIN trong email, nhập và Verify.
+3. Tại form Kiến Học, dùng CÙNG email, bấm Gửi mã xác minh; nhập mã mới do Kiến Học gửi rồi Vào trang quản trị. Đây là hai bước xác thực độc lập, không dùng lại PIN của Cloudflare.
+4. Phiên quản trị30 phút, không làm thay đổi phiên học. Nếu hết hạn, xác thực lại.
+
+Chưa tự kiểm tra hoàn tất bước2–3 vì OTP thuộc hộp thư chủ dự án; không lấy token hoặc bỏ qua xác thực để giả lập thành công production.

@@ -32,10 +32,12 @@
     "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
     "CANONICAL_ENABLED": "true",
     "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn",
-    "ADMIN_ENABLED": "false",
+    "ADMIN_ENABLED": "true",
     "TELEMETRY_ENABLED": "true",
     "ADMIN_ORIGIN": "https://ops.vietkienetet.id.vn",
-    "ADMIN_REQUIRE_ACCESS": "true"
+    "ADMIN_REQUIRE_ACCESS": "true",
+    "ADMIN_ACCESS_TEAM": "empty-union-9700",
+    "ADMIN_ACCESS_AUD": "69391bced00568199a38b355b6a400a50ffe00dda5511238b35562fd2bc39621"
   },
   "ratelimits": [
     {
