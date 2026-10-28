@@ -43,7 +43,14 @@
     const token=++generation;cancelImages();
     Promise.all(urls.map(url=>new Promise((resolve,reject)=>{const image=new Image();pending.push(image);image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Reel artwork unavailable'));image.src=url;}))).then(images=>{
      if(dead||token!==generation)return;cancelImages();
-     images.forEach((image,i)=>{gl.bindTexture(gl.TEXTURE_2D,textures[i]);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);});
+     const anisotropy=gl.getExtension('EXT_texture_filter_anisotropic')||gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+     images.forEach((image,i)=>{
+      gl.bindTexture(gl.TEXTURE_2D,textures[i]);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);
+      const powerOfTwo=n=>n>0&&(n&(n-1))===0,mipmaps=powerOfTwo(image.naturalWidth)&&powerOfTwo(image.naturalHeight);
+      if(mipmaps)gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,mipmaps?gl.LINEAR_MIPMAP_LINEAR:gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      if(anisotropy)gl.texParameterf(gl.TEXTURE_2D,anisotropy.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(4,gl.getParameter(anisotropy.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+     });
      texturesReady=true;onFallback(false);handle?.invalidate();
     }).catch(()=>{if(!dead&&token===generation)onFallback(true);});
    }
@@ -63,7 +70,7 @@
     destroy(){dead=true;generation++;cancelImages();}
    };
    onFallback(false);setAssets(assets);return engine;
-  });
+  },{interval:0,maxDpr:3,maxPixels:4000000,antialias:true,powerPreference:'default'});
   if(!handle.available())onFallback(true);
   const lost=()=>{lastTime=null;onFallback(true);};canvas.addEventListener('webglcontextlost',lost);
   return {

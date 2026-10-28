@@ -1,12 +1,13 @@
 'use strict';
-// Shared lifecycle for the two landscape adapters. The fixed root, never the
-// shrinking mobile visual viewport, determines the backing bitmap dimensions.
+// Landscapes keep their low-power defaults; foreground content opts into a
+// separate quality profile. Only root size changes resize the backing bitmap.
 (()=>{
- window.KienScenes.gpuStage=function(root,canvas,settings={},factory){
-  const gl=canvas.getContext('webgl',{alpha:true,antialias:false,depth:false,powerPreference:'low-power'});
+ window.KienScenes.gpuStage=function(root,canvas,settings={},factory,quality={}){
+  const gl=canvas.getContext('webgl',{alpha:true,antialias:quality.antialias===true,depth:false,powerPreference:quality.powerPreference||'low-power'});
   if(!gl){canvas.style.visibility='hidden';const empty=()=>{};empty.invalidate=()=>{};empty.available=()=>false;return empty;}
-  const coarse=window.matchMedia('(pointer: coarse)').matches,interval=coarse?1000/15:1000/24;
-  let renderer,resources=[],raf=0,last=0,time=9000,size='',stopped=false,lost=false;
+  const coarse=window.matchMedia('(pointer: coarse)').matches,interval=quality.interval??(coarse?1000/15:1000/24);
+  const measure=()=>window.KienScenes.surfaceSize(root,quality.maxDpr??1,quality.maxPixels??(coarse?600000:900000));
+  let renderer,resources=[],raf=0,last=0,time=9000,size='',pixels=null,stopped=false,lost=false;
   const kinds={createShader:'deleteShader',createProgram:'deleteProgram',createBuffer:'deleteBuffer',createTexture:'deleteTexture'};
   const methods=new Map(),tracked=new Proxy(gl,{get(target,key){
    const value=target[key];if(typeof value!=='function')return value;
@@ -18,21 +19,22 @@
   function draw(now){
    raf=0;if(stopped||lost||document.hidden||!renderer)return;
    if(settings.motion&&last&&now-last<interval){kick();return;}
-   if(settings.motion&&last)time+=Math.min(now-last,100);last=now;
-   const pixels=window.KienScenes.surfaceSize(root,1,coarse?600000:900000);if(!pixels)return;
+   if(settings.motion&&last)time+=Math.min(now-last,100);last=settings.motion?now:0;
+   if(!pixels)return;
    const next=pixels.width+'x'+pixels.height;
    if(next!==size){if(canvas.width!==pixels.width)canvas.width=pixels.width;if(canvas.height!==pixels.height)canvas.height=pixels.height;renderer.resize(pixels);size=next;}
    renderer.draw(time,pixels);if(settings.motion)kick();
   }
   function kick(){if(!raf&&!stopped&&!lost&&!document.hidden&&renderer)raf=requestAnimationFrame(draw);}
-  const resize=()=>{const p=window.KienScenes.surfaceSize(root,1,coarse?600000:900000);if(p&&p.width+'x'+p.height!==size)kick();};
+  // ResizeObserver owns layout reads; a running frame only touches GPU state.
+  const resize=()=>{pixels=measure();if(pixels&&pixels.width+'x'+pixels.height!==size)kick();};
   const visibility=()=>{cancelAnimationFrame(raf);raf=0;last=0;kick();};
   const contextLost=e=>{e.preventDefault();lost=true;cancelAnimationFrame(raf);raf=0;renderer?.destroy?.();canvas.style.visibility='hidden';};
   const contextRestored=()=>{if(stopped)return;resources=[];initialize();lost=false;last=0;kick();};
   // Mouse interactions are decorative. Touch scrolling never enters this path.
   const pointer=(method,event)=>{if(!settings.motion||coarse||event.pointerType==='touch'||document.hidden||lost||stopped||!renderer?.[method])return;const rect=root.getBoundingClientRect();renderer[method](event.clientX-rect.left,event.clientY-rect.top);};
   const move=e=>pointer('move',e),down=e=>pointer('down',e),leave=()=>renderer?.leave?.();
-  initialize();
+  initialize();pixels=measure();
   const observer=new ResizeObserver(resize);observer.observe(root);
   document.addEventListener('visibilitychange',visibility);
   window.addEventListener('pointermove',move,{passive:true});window.addEventListener('pointerdown',down,{passive:true});window.addEventListener('blur',leave);

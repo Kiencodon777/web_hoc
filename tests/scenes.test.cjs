@@ -1,5 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-function harness({motion=true,fine=false}={}){
+function harness({motion=true,fine=false,coarse=false}={}){
  const frames=new Map(),observers=[],objects=[],winEvents=new Map(),docEvents=new Map(),revoked=[];let serial=0,webglRequests=0,draws=0,strokes=0;
  function element(tag='canvas'){
   const events=new Map();let w=300,h=150,writes=0;
@@ -8,7 +8,7 @@ function harness({motion=true,fine=false}={}){
   node.getContext=type=>{if(type!=='2d'){webglRequests++;return null;}return ctx;};objects.push(node);return node;
  }
  const root={clientWidth:412,clientHeight:900,get offsetWidth(){return this.clientWidth},get offsetHeight(){return this.clientHeight},insertBefore(el){this.fallback=el},getBoundingClientRect:()=>({left:0,top:0})},canvas=element();
- const win={innerWidth:412,devicePixelRatio:3,matchMedia:q=>({matches:q.includes('hover')?fine:false}),addEventListener:(k,f)=>winEvents.set(k,f),removeEventListener:k=>winEvents.delete(k)};
+ const win={innerWidth:412,devicePixelRatio:3,matchMedia:q=>({matches:q.includes('hover')?fine:q.includes('coarse')?coarse:false}),addEventListener:(k,f)=>winEvents.set(k,f),removeEventListener:k=>winEvents.delete(k)};
  const doc={hidden:false,createElement:element,addEventListener:(k,f)=>docEvents.set(k,f),removeEventListener:k=>docEvents.delete(k)};
  const context={performance:{now:()=>100},window:win,document:doc,ResizeObserver:class{constructor(f){this.f=f;observers.push(this)}observe(){}disconnect(){this.disconnected=true}},URL:{createObjectURL:()=>`blob:${++serial}`,revokeObjectURL:u=>revoked.push(u)},requestAnimationFrame:f=>{const n=++serial;frames.set(n,f);return n},cancelAnimationFrame:n=>frames.delete(n)};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scene-runtime.js','utf8'),context);vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/scenes-sakura.js','utf8'),context);
@@ -55,14 +55,29 @@ test('moving landscapes throttle paints, ignore touch pointers and stop complete
  end();assert.equal(h.winEvents.size,0);assert.equal(h.docEvents.size,0);assert.equal(h.canvas.events.size,0);
 });
 
-function reelHarness(){
- const h=harness();h.dispose();let uploads=0,draws=0,deletes=0,id=0;const images=[],fallback=[],cards=[];
+function reelHarness(options={}){
+ const h=harness(options);h.dispose();let uploads=0,draws=0,deletes=0,id=0,mipmaps=0,contextOptions;const images=[],fallback=[],cards=[];
  const gl=new Proxy({createProgram:()=>({id:++id}),createShader:()=>({id:++id}),createBuffer:()=>({id:++id}),createTexture:()=>({id:++id}),getShaderParameter:()=>true,getProgramParameter:()=>true,getAttribLocation:()=>0,getUniformLocation:(_,name)=>name,getExtension:()=>null,texImage2D(){uploads++},drawElements(){draws++},deleteProgram(){deletes++},deleteShader(){deletes++},deleteBuffer(){deletes++},deleteTexture(){deletes++}}, {get:(o,k)=>k in o?o[k]:()=>{}});
- h.canvas.getContext=()=>gl;h.context.Image=class{constructor(){images.push(this)}set src(value){this.url=value}};
+ gl.generateMipmap=()=>{mipmaps++};
+ h.canvas.getContext=(_,options)=>{contextOptions=options;return gl};h.context.Image=class{constructor(){images.push(this);this.naturalWidth=this.naturalHeight=1024}set src(value){this.url=value}};
  for(const file of ['ui-physics.js','scene-gpu-stage.js','curved-reel.js'])vm.runInNewContext(fs.readFileSync(__dirname+'/../dist/'+file,'utf8'),h.context);
  const controller=h.win.KienReel.mount(h.root,h.canvas,['one','two','three'],value=>cards.push(value),value=>fallback.push(value));
- return {...h,controller,images,fallback,cards,get uploads(){return uploads},get draws(){return draws},get deletes(){return deletes},async load(batch=images.slice(-3)){batch.forEach(image=>image.onload?.());await Promise.resolve();await Promise.resolve();}};
+ return {...h,controller,images,fallback,cards,get contextOptions(){return contextOptions},get mipmaps(){return mipmaps},get uploads(){return uploads},get draws(){return draws},get deletes(){return deletes},async load(batch=images.slice(-3)){batch.forEach(image=>image.onload?.());await Promise.resolve();await Promise.resolve();}};
 }
+test('reel draws every display frame on mouse and touch, with retina pixels and filtered textures',async()=>{
+ for(const coarse of [false,true]){
+  const h=reelHarness({coarse});await h.load();h.frame(100);
+  assert.equal(h.contextOptions.antialias,true);assert.equal(h.mipmaps,3);
+  assert(h.canvas.width>h.root.clientWidth);assert(h.canvas.width*h.canvas.height<=4000000);
+  let reads=0;const width=h.root.clientWidth;Object.defineProperty(h.root,'clientWidth',{get(){reads++;return width}});
+  h.controller.pause(false);const before=h.draws;
+  for(let i=1;i<=60;i++)h.frame(100+i*1000/60);
+  assert.equal(h.cards.length,61);assert(h.draws>before);assert.equal(reads,0,'animation must not read layout each frame');
+  h.controller.pause(true);h.frame(1200);assert.equal(h.frames.size,0);
+  const paused=JSON.stringify(h.cards.at(-1));h.controller.pause(false);h.frame(12000);
+  assert.equal(JSON.stringify(h.cards.at(-1)),paused,'resume must not jump across time spent paused');h.controller.destroy();
+ }
+});
 test('continuous reel uses shared canvas geometry; wheel-offset/unchanged resize never reallocates the bitmap',async()=>{
  const h=reelHarness();await h.load();h.frame(100);assert.equal(h.uploads,3);assert(h.draws>0);const writes=h.canvas.writes,position=JSON.stringify(h.cards.at(-1));
  for(let offset=0;offset<30;offset++){h.root.getBoundingClientRect=()=>({left:0,top:-offset*11});h.resize();}assert.equal(h.canvas.writes,writes);assert.equal(h.frames.size,0);assert.equal(JSON.stringify(h.cards.at(-1)),position);
