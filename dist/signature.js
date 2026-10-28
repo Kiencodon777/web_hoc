@@ -3,7 +3,7 @@
    and Apple Hello's sequential SVG stroke drawing. */
 (()=>{
  const P=window.KienPhysics,clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),motion=()=>window.KienUI.motionEnabled();
- let helloDispose=()=>{},helloPlayed=false;
+ let helloDispose=()=>{},helloPlayed=false,helloRoot=null,helloTime=0;
  const strokes=[
   ['M24 178C51 126 71 72 82 35C89 9 115 5 111 29C107 62 80 100 52 127L43 188',0,.9],
   ['M58 133C91 102 125 79 144 57C150 49 153 48 156 48',.55,.6],
@@ -25,11 +25,16 @@
  ];
  function wordmark(){return `<div class="hello-wordmark"><h1 class="sr-only">Kiến Học</h1><svg class="hello-signature" viewBox="0 0 915 250" fill="none" stroke="currentColor" stroke-width="14.8883" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${strokes.map(([d,start,duration,kind])=>`<path d="${d}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" data-start="${start}" data-duration="${duration}" class="${kind||''}"/>`).join('')}</svg></div>`;}
  function mountHello(){
-  helloDispose();helloDispose=()=>{};const root=document.querySelector('.hello-wordmark');if(!root||helloPlayed||!motion())return;helloPlayed=true;
-  const animations=[...root.querySelectorAll('path')].map(path=>path.animate([{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1}],{duration:Number(path.dataset.duration)*1000,delay:Number(path.dataset.start)*1000,easing:'cubic-bezier(.45,0,.25,1)',fill:'both'}));
-  let visible=true;const sync=()=>{if(!motion()){animations.forEach(a=>a.cancel());return;}for(const a of animations){if(a.playState==='finished'||a.playState==='idle')continue;if(document.hidden||!visible)a.pause();else if(a.playState==='paused')a.play();}};
+  const root=document.querySelector('.hello-wordmark');
+  // Refreshing unrelated UI must not cancel a signature halfway through “Học”.
+  if(root&&root===helloRoot)return;
+  helloDispose();helloDispose=()=>{};helloRoot=root;if(!root||helloPlayed)return;
+  if(!motion()){helloPlayed=true;return;}
+  const animations=[...root.querySelectorAll('path')].map(path=>{const a=path.animate([{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1}],{duration:Number(path.dataset.duration)*1000,delay:Number(path.dataset.start)*1000,easing:'cubic-bezier(.45,0,.25,1)',fill:'both'});a.pause();a.currentTime=helloTime;return a;});
+  const clock=animations[animations.length-1];if(clock)clock.onfinish=()=>{helloPlayed=true;};
+  let visible=false;const sync=()=>{if(!motion()){helloPlayed=true;animations.forEach(a=>a.cancel());return;}for(const a of animations){if(a.playState==='finished'||a.playState==='idle')continue;if(document.hidden||!visible)a.pause();else if(a.playState==='paused')a.play();}};
   const io=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync();});io.observe(root);document.addEventListener('visibilitychange',sync);document.addEventListener('kien-motion-change',sync);
-  helloDispose=()=>{io.disconnect();animations.forEach(a=>a.cancel());document.removeEventListener('visibilitychange',sync);document.removeEventListener('kien-motion-change',sync);};
+  helloDispose=()=>{helloTime=Number(clock?.currentTime)||helloTime;io.disconnect();animations.forEach(a=>{a.onfinish=null;a.cancel();});document.removeEventListener('visibilitychange',sync);document.removeEventListener('kien-motion-change',sync);};
  }
  function learningGlyph(kind){
   const paths={library:'<path d="m3 7 9-4 9 4-9 4-9-4Zm4 3v6c3 3 7 3 10 0v-6M21 7v8"/>',search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',play:'<path d="m8 5 11 7-11 7V5Z"/>',history:'<path d="M5 3h13v18H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 14h13M7 7h7M7 11h5"/>',information:'<path d="M3 13c2-10 4-10 6 0s4 10 6 0 4-10 6 0M3 21h18"/>',ai:'<rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4m-9-11-3 5h4l-3 5"/>',wrong:'<path d="M19 7a8 8 0 1 0 1 9M19 3v5h-5M12 7v5l3 2"/>',saved:'<path d="M6 3h12v18l-6-4-6 4V3Z"/>',guide:'<path d="M4 3v18M4 7h12l-3 4 3 4H4M20 21H2"/>',theme:'<circle cx="12" cy="12" r="8"/><path d="m12 4 1 7 7 1M12 12l-6 6"/><circle cx="8" cy="8" r=".5"/>'};
