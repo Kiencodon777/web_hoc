@@ -28,10 +28,14 @@
   "vars": {
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
-    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn",
+    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn,https://ops.vietkienetet.id.vn",
     "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
     "CANONICAL_ENABLED": "true",
-    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn"
+    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn",
+    "ADMIN_ENABLED": "false",
+    "TELEMETRY_ENABLED": "true",
+    "ADMIN_ORIGIN": "https://ops.vietkienetet.id.vn",
+    "ADMIN_REQUIRE_ACCESS": "true"
   },
   "ratelimits": [
     {

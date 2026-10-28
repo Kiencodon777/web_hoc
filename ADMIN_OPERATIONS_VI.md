@@ -1,6 +1,6 @@
 # Kiến Học Operations
 
-Trạng thái: bản xem trước trên máy, **chưa triển khai quản trị hay telemetry lên production**. Các sửa card/tiêu đề trước đó đã triển khai riêng từ commit `1cf6c85`. Không dùng link preview PR của website học tập để xem quản trị vì preview đó chỉ phục vụ `dist/` và khóa API thật.
+Trạng thái 29/10/2026: chủ dự án đã duyệt triển khai. Mã backend và telemetry đã lên production (Worker `f2d7ccb1-f7a5-4ed3-b3e1-fb50b88ed026`); migration đã áp dụng và backfill 9 tài khoản thành 27 bản tổng hợp môn học. **Cửa quản trị vẫn đóng (`ADMIN_ENABLED=false`) trong khi chờ chủ tài khoản kích hoạt Cloudflare Zero Trust Free.** Trang checkout yêu cầu thẻ/địa chỉ thanh toán, chấp nhận điều khoản và ủy quyền tính phí vượt mức; chủ tài khoản phải tự hoàn tất. Các sửa card/tiêu đề trước đó đã triển khai riêng từ commit `1cf6c85`. Không dùng link preview PR của website học tập để xem quản trị vì preview đó chỉ phục vụ `dist/` và khóa API thật.
 
 ## Xem giao diện
 
@@ -61,12 +61,16 @@ Migration `supabase/migrations/20261028172755_private_operations_console.sql` t�
 
 Index cho last_seen, user_id, day/kind, request minute và audit time. Endpoint users phân trang 20 dòng, email che mặc định và chỉ trả trường được chọn. Không trả password_hash, OTP, token, avatar blob, đáp án, IP thô hoặc raw URL/query/stack. JSON telemetry giới hạn 2 KiB và enum; input SQL là tham số. Dữ liệu 90 ngày được xóa theo cron hiện có khi telemetry bật; audit 365 ngày, phiên hết hạn được dọn. Sessions nguồn có expiry được kiểm tra mỗi lần, không đếm theo số session còn hạn.
 
-## Sau khi chủ dự án duyệt (chưa thực hiện)
+## Các bước mở quyền quản trị còn lại
 
 1. Tạo/gắn host quản trị riêng với Worker, cấu hình Access allowlist/MFA tại Cloudflare, giữ site học hiện tại nguyên vẹn. Chốt `ADMIN_ORIGIN`, `ADMIN_ACCESS_TEAM`, `ADMIN_ACCESS_AUD`; thêm origin quản trị vào `APP_ORIGINS`. Chưa tạo DNS trong đợt preview.
-2. Áp dụng migration bằng `npm run db:migrate` với credential server; không bật public Data API.
-3. Backfill bản tổng hợp từ snapshot có sẵn: `node --env-file=.env scripts/backfill-operations.cjs` mặc định dry-run; thêm `--apply` khi đã kiểm tra. Chỉ ghi bảng ops_learning, không sửa tiến độ nguồn.
+2. Đã áp dụng migration qua Supabase MCP; xác minh sáu bảng ops có RLS, anon/authenticated không có SELECT. Không bật public Data API.
+3. Đã dry-run rồi backfill 9 snapshot, không sửa tiến độ gốc. Lệnh dùng lại khi cần: `node --env-file=.env scripts/backfill-operations.cjs` mặc định dry-run; thêm `--apply` khi đã kiểm tra. Chỉ ghi bảng ops_learning, không sửa tiến độ nguồn.
 4. Đặt `ADMIN_EMAILS` bằng secret server, `ADMIN_ENABLED=true`, `TELEMETRY_ENABLED=true`, Access đúng. Giữ `JWT_SECRET` hiện tại để không ngắt phiên người học. Không đặt `ADMIN_DEMO=true` trong production.
 5. Build/test/dry-run rồi triển khai theo lệnh riêng của chủ dự án. Kiểm tra không quyền, đúng quyền, workers.dev không vượt host gate, logout/revocation, telemetry thật, dữ liệu rỗng và quyền Data API.
 
 Kiểm tra: `npm test`, `npm run cf:check`. Test dùng SQLite và PGlite PostgreSQL, có chữ ký Access thật với khóa test, sai audience/algorithm, email ngoài allowlist, OTP cũ, cookie/CSRF/revocation, đếm browser, retention và RLS. Chưa nghiệm thu trên host quản trị production hay trên điện thoại thật.
+
+## Kiểm tra bản triển khai đầu tiên
+
+`npm test`: 86 test pass, academy và UI physics pass. `cf:check` pass. Production health HTTP 200, database/email ready; `/ops`, `/ops/login`, `/api/ops/overview` đều HTTP 404 khi cửa quản trị đóng. Telemetry sai payload HTTP 400; request bucket đã được ghi. Supabase advisor chỉ báo INFO RLS không policy, đúng chủ đích schema private chỉ backend truy cập. Chưa tạo DNS hoặc Access application. Host dự kiến `https://ops.vietkienetet.id.vn` (zone này hiện đã thuộc tài khoản Cloudflare), `ADMIN_REQUIRE_ACCESS=true`; cần Access TEAM/AUD, ứng dụng allowlist ba email và kiểm tra login thực tế trước khi đặt ADMIN_ENABLED=true. Không đổi JWT_SECRET hay cấu hình phiên người học.
