@@ -20,7 +20,7 @@ function createOperations({app,db,config,secret,clock,authenticated,limiter}){
  const closed=async(req,res,next)=>{
   if(!enabled||!emails.size)return res.status(404).end();
   if(production){let host;try{host=new URL(config.ADMIN_ORIGIN).host;}catch{return res.status(404).end();}if(req.get('host')!==host)return res.status(404).end();
-   if(config.ADMIN_REQUIRE_ACCESS!=='false')try{req.accessEmail=await require('./operations-access.cjs').verifyAccess(req.get('cf-access-jwt-assertion'),config);if(!emails.has(req.accessEmail))throw Error();}catch{return res.status(403).json({error:'Yêu cầu Cloudflare Access hợp lệ.'});}
+   if(config.ADMIN_REQUIRE_ACCESS!=='false')try{req.accessEmail=await require('./operations-access.cjs').verifyAccess(req.get('cf-access-jwt-assertion'),config);if(!emails.has(req.accessEmail))throw Error();}catch(error){const known=['Access required','Invalid Access token','Access unavailable','Invalid Access keys','Access key unavailable','Access identity missing','jwt expired','invalid signature','jwt not active'];console.error('OPS_ACCESS_REJECTED',JSON.stringify({name:error?.name||'Error',reason:known.includes(error?.message)?error.message:'verification-error',code:typeof error?.code==='string'?error.code.slice(0,64):''}));return res.status(403).json({error:'Yêu cầu Cloudflare Access hợp lệ.'});}
   }next();
  };
  app.use(['/ops','/api/ops'],(req,res,next)=>{res.set({'Cache-Control':'no-store, private','X-Robots-Tag':'noindex, nofollow, noarchive','Referrer-Policy':'no-referrer'});closed(req,res,next);});

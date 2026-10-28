@@ -55,9 +55,14 @@ test('production requires a configured host and signed Cloudflare Access identit
 });
 test('Access verifier pins algorithm, issuer, audience, signature and email',async()=>{
  const {verifyAccess}=require('../server/operations-access.cjs'),jwt=require('jsonwebtoken'),{privateKey,publicKey}=crypto.generateKeyPairSync('rsa',{modulusLength:2048}),jwk=publicKey.export({format:'jwk'});jwk.kid='test-kid';
- const config={ADMIN_ACCESS_TEAM:'ops-test',ADMIN_ACCESS_AUD:'test-audience'},fetcher=async()=>({ok:true,json:async()=>({keys:[jwk]})});
+ const config={ADMIN_ACCESS_TEAM:'ops-test',ADMIN_ACCESS_AUD:'test-audience'},fetcher=async(url,options)=>{assert.equal(options.redirect,'manual');return {ok:true,json:async()=>({keys:[jwk]})};};
  const sign=(audience='test-audience')=>jwt.sign({email:'Owner@Example.test'},privateKey,{algorithm:'RS256',keyid:jwk.kid,issuer:'https://ops-test.cloudflareaccess.com',audience,expiresIn:120});
  assert.equal(await verifyAccess(sign(),config,fetcher),'owner@example.test');await assert.rejects(()=>verifyAccess(sign('wrong-audience'),config,fetcher));await assert.rejects(()=>verifyAccess(jwt.sign({email:'owner@example.test'},'fake-secret'),config,fetcher));
+});
+test('Access key fetch rejects redirects and unavailable responses without reading their body',async()=>{
+ const {verifyAccess}=require('../server/operations-access.cjs'),jwt=require('jsonwebtoken'),{privateKey}=crypto.generateKeyPairSync('rsa',{modulusLength:2048});
+ const token=jwt.sign({email:'owner@example.test'},privateKey,{algorithm:'RS256',keyid:'redirect-key',issuer:'https://redirect-test.cloudflareaccess.com',audience:'redirect-audience',expiresIn:120});
+ for(const status of [302,503]){let calls=0;await assert.rejects(()=>verifyAccess(token,{ADMIN_ACCESS_TEAM:'redirect-test',ADMIN_ACCESS_AUD:'redirect-audience'},async(url,options)=>{calls++;assert.equal(options.redirect,'manual');return {ok:false,status,json:async()=>{throw Error('Untrusted body must not be read')}};}),/Access unavailable/);assert.equal(calls,1);}
 });
 test('learning summaries preserve source progress and retention removes only old operations records',async()=>{
  const data={subjects:{ai:{progress:{'ai.1':{attempts:3,correct:2}},bookmarks:['ai.1']}}},copy=JSON.stringify(data);assert.deepEqual(learningRows(data),[{subject:'ai',answered:1,attempts:3,correct:2,bookmarks:1}]);assert.equal(JSON.stringify(data),copy);assert.equal(dayOf(Date.parse('2026-10-28T18:00:00Z')),'2026-10-29');

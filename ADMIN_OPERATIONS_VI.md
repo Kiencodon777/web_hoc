@@ -94,3 +94,10 @@ Kiểm tra: chưa xác thực ở `/ops` và `/api/ops/overview` trên ops host 
 4. Phiên quản trị30 phút, không làm thay đổi phiên học. Nếu hết hạn, xác thực lại.
 
 Chưa tự kiểm tra hoàn tất bước2–3 vì OTP thuộc hộp thư chủ dự án; không lấy token hoặc bỏ qua xác thực để giả lập thành công production.
+
+
+## Sửa lỗi Access khi đăng nhập thật
+
+Worker `e086c131-aa26-41f5-a706-c1381cc3bd05`: Access verifier trước đây dùng fetch redirect:error, Workers không hỗ trợ nên phát sinh TypeError và trả403 dù Access đã xác thực. Đã đổi redirect:manual và vẫn kiểm tra !response.ok để từ chối301/302, giữ nguyên thuật toán/chữ ký/issuer/audience/email allowlist. Thêm log phân loại lỗi không chứa token/email và regression test chặn redirect.
+
+Xác minh bằng workerd địa phương với endpoint khóa Cloudflare thật: hết TypeError, chữ ký giả vẫn bị từ chối invalid signature.11 test operations pass. Trên tab đã có phiên Access thật, reload /ops/login trả form Không gian quản trị thành công. Đang chờ OTP Kiến Học để hoàn tất dashboard (không dùng lại PIN Cloudflare).
