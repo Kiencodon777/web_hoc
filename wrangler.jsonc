@@ -37,7 +37,8 @@
     "ADMIN_ORIGIN": "https://ops.vietkienetet.id.vn",
     "ADMIN_REQUIRE_ACCESS": "true",
     "ADMIN_ACCESS_TEAM": "empty-union-9700",
-    "ADMIN_ACCESS_AUD": "69391bced00568199a38b355b6a400a50ffe00dda5511238b35562fd2bc39621"
+    "ADMIN_ACCESS_AUD": "69391bced00568199a38b355b6a400a50ffe00dda5511238b35562fd2bc39621",
+    "PK_ENABLED": "true"
   },
   "ratelimits": [
     {
@@ -61,6 +62,22 @@
     {
       "pattern": "ops.vietkienetet.id.vn",
       "custom_domain": true
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PK_ROOMS",
+        "class_name": "BattleRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "pk-production-v1",
+      "new_sqlite_classes": [
+        "BattleRoom"
+      ]
     }
   ]
 }

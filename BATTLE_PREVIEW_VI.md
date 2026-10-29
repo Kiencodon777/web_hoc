@@ -1,8 +1,8 @@
-# Phòng tranh đấu — bản duyệt riêng
+# Phòng tranh đấu — preview và production
 
 Preview: https://kienhoc-pk-preview.anhdungcasi.workers.dev/#tranh-dau
 
-Không triển khai Worker `kienhoc`, không đổi cơ sở dữ liệu học thật, không bật phòng PK trên miền chính trong lần thay đổi này. Nhánh này dựa trên nhánh cập nhật câu chữ và dock của PR #5.
+Đã được chủ dự án duyệt và triển khai production ngày 29/10/2026: https://study.anhdungece.id.vn/#tranh-dau . Preview tiếp tục tách riêng. Không chuyển hồ sơ thử sang tài khoản thật, không thay khóa đăng nhập hay dữ liệu tiến độ.
 
 ## Cách thử
 
@@ -60,4 +60,12 @@ npm run pk:dev
 npm run pk:preview:deploy
 ```
 
-Lệnh preview chỉ dùng `battle-preview/wrangler.jsonc`, Worker `kienhoc-pk-preview`. Cấu hình production hiện chưa có `PK_ENABLED`, binding hay migration PK. Sau khi được duyệt mới chuẩn bị cấu hình production, kế hoạch TURN, xác minh phiên và kiểm tra hai thiết bị; không bật production bằng cách sao chép danh tính/hồ sơ thử.
+Lệnh preview chỉ dùng `battle-preview/wrangler.jsonc`, Worker `kienhoc-pk-preview`. Production đã bật `PK_ENABLED=true`, binding `PK_ROOMS` và migration SQLite Durable Object `pk-production-v1`. Namespace phòng production độc lập với preview; không có migration schema Supabase cho tính năng này. Chưa cấu hình TURN.
+
+## Xác nhận phát hành 29/10/2026
+
+- Worker `kienhoc`, version `f44426c9-d721-44bc-bd22-feff02870a00`. Bản trước: `e086c131-aa26-41f5-a706-c1381cc3bd05`.
+- 97 kiểm thử tự động, academy/UI physics và dry-run Cloudflare đều qua.
+- Kiểm thử trên tên miền chính bằng hai tài khoản tạm thuộc miền email dành cho kiểm thử: JWT/phiên database, hồ sơ/avatar, WebSocket qua Pages gateway, chat, sẵn sàng, đủ 5 câu theo alarm thật, điểm trong giới hạn, lời giải cuối lượt, từ chối phiên đã thu hồi.
+- Hai tài khoản tạm được xóa theo đúng UUID + email dành riêng cho kiểm thử; không chỉnh sửa tài khoản/tiến độ học thật.
+- Kiểm tra giao diện và nút đăng nhập trên production; trang quản trị vẫn sau Cloudflare Access. Voice vẫn cần thử thực tế giữa hai thiết bị/mạng, không tuyên bố đã xác nhận thông thoại qua mọi NAT.
