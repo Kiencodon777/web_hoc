@@ -1,0 +1,48 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "kienhoc-pk-preview",
+  "account_id": "dea1d41355c5cb6bd9c128f72ec85a0f",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "../dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PK_ROOMS",
+        "class_name": "BattleRoom"
+      },
+      {
+        "name": "PK_HUB",
+        "class_name": "BattlePreviewHub"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "pk-preview-v1",
+      "new_sqlite_classes": [
+        "BattleRoom",
+        "BattlePreviewHub"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.html",
+        "**/*.txt"
+      ],
+      "fallthrough": true
+    }
+  ]
+}

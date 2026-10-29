@@ -6,6 +6,8 @@ import postgresModule from '../server/postgres.cjs';
 import domainRouting from '../server/domain-routing.cjs';
 import domainHandoff from '../server/domain-handoff.cjs';
 import operations from '../server/operations.cjs';
+import {routeBattle} from '../battle/router.mjs';
+export {BattleRoom} from '../battle/room.mjs';
 
 // TCP connections belong to a request in Workers, not to a global isolate.
 const requests = new AsyncLocalStorage();
@@ -39,6 +41,9 @@ export default {
       if(incomingURL.pathname==='/')return Response.redirect(incomingURL.origin+'/ops/login',302);
       return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store'}});
     }
+    if(incomingURL.pathname==='/pk-config.js')return new Response('window.PK_CONFIG='+JSON.stringify({enabled:bindings.PK_ENABLED==='true',preview:false})+';',{headers:{'Content-Type':'text/javascript','Cache-Control':'no-store'}});
+    if(incomingURL.pathname.startsWith('/api/pk/')&&bindings.PK_ENABLED!=='true')return new Response('Not found',{status:404});
+    if(incomingURL.pathname.startsWith('/api/pk/')){const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);try{return await routeBattle(request,bindings,store);}finally{ctx.waitUntil(store.close());}}
     if(new URL(request.url).pathname.startsWith('/api/domain-transfer/')){
       const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
       try{return await domainHandoff.handleHandoff(request,bindings,store,request.headers.get('CF-Connecting-IP')||'unknown');}
@@ -48,7 +53,7 @@ export default {
     const migration = isAdminHost?null:await domainRouting.handleDomainRouting(request, bindings);
     if(migration)return migration;
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/api/') && url.pathname!=='/ops' && !url.pathname.startsWith('/ops/')) return bindings.ASSETS.fetch(request);
+    if (!url.pathname.startsWith('/api/') && url.pathname!=='/ops' && !url.pathname.startsWith('/ops/')) {const asset=await bindings.ASSETS.fetch(request);if(bindings.PK_ENABLED!=='true')return asset;const headers=new Headers(asset.headers);headers.set('Permissions-Policy','camera=(), microphone=(self), geolocation=()');headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss://"+url.host+"; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");return new Response(asset.body,{status:asset.status,headers});}
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
     if (url.pathname.startsWith('/api/auth/') && bindings.AUTH_LIMITER) {
       const result = await bindings.AUTH_LIMITER.limit({ key: ip });

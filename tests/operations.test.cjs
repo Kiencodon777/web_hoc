@@ -75,3 +75,16 @@ test('successful progress saves refresh learning summaries without changing the 
  const read=await request(h.app).get('/api/progress').auth(auth.token,{type:'bearer'}).expect(200);assert.deepEqual(read.body.progressData,data);
  await request(h.app).post('/api/progress').auth(auth.token,{type:'bearer'}).send({progressData:require('../dist/progress-merge.js').blank(),expectedRevision:1}).expect(200);assert.equal(h.raw.prepare('SELECT answered FROM ops_learning WHERE user_id=?').get(auth.user.id).answered,0);h.raw.close();
 });
+
+test('public community counters reveal only aggregates and deduplicate browsers across visits',async()=>{
+ const h=fixture();await login(h,'learner@example.test');
+ await request(h.app).post('/api/telemetry').send(payload()).expect(204);
+ await request(h.app).post('/api/telemetry').send(payload({visit:crypto.randomUUID(),kind:'heartbeat'})).expect(204);
+ const r=await request(h.app).get('/api/community/stats').expect(200);
+ assert.deepEqual(Object.keys(r.body).sort(),['accounts','generatedAt','online','preview','visitors','windowDays']);
+ assert.equal(r.body.accounts,1);assert.equal(r.body.visitors,1);assert.equal(r.body.online,1);assert.equal(r.body.windowDays,90);
+ assert(!JSON.stringify(r.body).includes('learner@example.test'));assert(!JSON.stringify(r.body).includes(payload().visitor));
+ h.raw.prepare('UPDATE ops_visits SET last_seen=?').run(Date.now()-121000);
+ assert.equal((await request(h.app).get('/api/community/stats').expect(200)).body.online,0);h.raw.close();
+ const closed=fixture({TELEMETRY_ENABLED:'false'});await request(closed.app).get('/api/community/stats').expect(404);closed.raw.close();
+});

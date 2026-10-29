@@ -9,7 +9,7 @@
   "scripts": {
     "pretest": "node scripts/build-admin.cjs",
     "start": "node --env-file-if-exists=.env server/index.cjs",
-    "test": "node --test tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs tests/ui-preview.test.cjs tests/boot.test.cjs tests/scenes.test.cjs tests/auth-modal.test.cjs tests/profile.test.cjs tests/learning-controls.test.cjs tests/journey-state.test.cjs tests/appearance-state.test.cjs tests/signature.test.cjs tests/operations.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
+    "test": "node --test tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs tests/ui-preview.test.cjs tests/boot.test.cjs tests/scenes.test.cjs tests/auth-modal.test.cjs tests/profile.test.cjs tests/learning-controls.test.cjs tests/journey-state.test.cjs tests/appearance-state.test.cjs tests/signature.test.cjs tests/operations.test.cjs tests/battle.test.cjs tests/battle-voice.test.cjs tests/battle-chat.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
     "backup": "node --env-file-if-exists=.env scripts/backup.cjs",
     "dev": "node server/preview.cjs",
     "setup:local": "node scripts/setup-local.cjs",
@@ -21,7 +21,10 @@
     "cf:check": "node scripts/build-admin.cjs && wrangler deploy --dry-run --outdir build/worker",
     "cf:deploy": "node scripts/build-admin.cjs && wrangler deploy",
     "cf:gateway": "node scripts/build-gateway.cjs && wrangler pages deploy --cwd gateway --project-name kienhoc-study --branch main",
-    "cf:preview:deploy": "wrangler deploy --config preview/wrangler.jsonc"
+    "cf:preview:deploy": "wrangler deploy --config preview/wrangler.jsonc",
+    "pk:build": "node scripts/build-battle-bank.cjs && node scripts/build-pk-avatar.cjs",
+    "pk:dev": "npm run pk:build && wrangler dev --config battle-preview/wrangler.jsonc --ip 127.0.0.1 --port 3199",
+    "pk:preview:deploy": "npm run pk:build && wrangler deploy --config battle-preview/wrangler.jsonc"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -36,7 +39,10 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.11",
+    "blobatar": "2.7.0",
+    "esbuild": "0.28.2",
     "supertest": "^7.1.4",
-    "wrangler": "^4.152.0"
+    "wrangler": "^4.152.0",
+    "ws": "8.21.0"
   }
 }

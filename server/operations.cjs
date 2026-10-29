@@ -2,7 +2,7 @@ const crypto=require('node:crypto'),jwt=require('jsonwebtoken');
 const COOKIE='__Host-kienhoc_ops',LOCAL_COOKIE='kienhoc_ops_local';
 const scenes=new Set(['sakura','grid','gradient','chrome','topography','wave','still']);
 const subjects=new Set(['history','information','ai','none']);
-const views=new Set(['catalog','subject','home','bank','wrong','saved','guide','quiz','result']);
+const views=new Set(['catalog','subject','home','bank','wrong','saved','guide','quiz','result','battle']);
 const dayOf=t=>new Date(t+7*3600000).toISOString().slice(0,10);
 const mask=email=>{const [name,domain]=String(email).split('@');return name.slice(0,2)+'•••@'+(domain||'');};
 const num=x=>Number(x)||0;
@@ -47,8 +47,10 @@ function createOperations({app,db,config,secret,clock,authenticated,limiter}){
  app.use('/ops',authorize);app.use('/api/ops',authorize,limiter(60e3,90,'Bạn tải thống kê quá nhanh.'));
  app.get('/ops',async(req,res)=>{await audit(req.ops.sub,'console.open');res.type('html').send(assets.index);});
  app.get('/ops/app.js',(req,res)=>res.type('js').send(assets.js));
+ app.get('/ops/count-up.js',(req,res)=>res.type('js').send(assets.countup));
  app.get('/ops/style.css',(req,res)=>res.type('css').send(assets.css));
  app.post('/api/ops/logout',async(req,res)=>{if(!originOK(req)||req.get('x-ops-csrf')!==req.ops.csrf)return res.status(403).json({error:'Yêu cầu không hợp lệ.'});await db.prepare('DELETE FROM ops_sessions WHERE id=?').run(req.ops.jti);await audit(req.ops.sub,'admin.logout');res.clearCookie(cookieName,{...cookieOptions,maxAge:0}).json({ok:true});});
+ app.get('/api/community/stats',limiter(60000,60,'Thử lại sau.'),async(req,res)=>{if(!telemetry)return res.status(404).end();const now=clock(),start=dayOf(now-89*86400000);const accounts=await db.prepare('SELECT COUNT(*) n FROM users').get(),visitors=await db.prepare('SELECT COUNT(DISTINCT visitor) n FROM ops_visits WHERE day>=?').get(start),online=await db.prepare('SELECT COUNT(DISTINCT visitor) n FROM ops_visits WHERE last_seen>?').get(now-120000);res.set('Cache-Control','public, max-age=15');res.json({accounts:num(accounts.n),visitors:num(visitors.n),online:num(online.n),windowDays:90,generatedAt:now,preview:false});});
  app.get('/api/ops/overview',async(req,res)=>{
   const days=[1,7,30,90].includes(Number(req.query.days))?Number(req.query.days):7,now=clock(),since=now-(days-1)*86400000,startDay=dayOf(since),start=Date.parse(startDay+'T00:00:00+07:00');
   const accounts=await db.prepare('SELECT COUNT(*) n FROM users').get(),newAccounts=await db.prepare('SELECT COUNT(*) n FROM users WHERE created_at>=?').get(new Date(start).toISOString());
