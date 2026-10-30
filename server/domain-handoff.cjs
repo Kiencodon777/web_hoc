@@ -1,4 +1,4 @@
-const crypto=require('node:crypto');
+const crypto=require('node:crypto'),jwt=require('jsonwebtoken'),sessionAuth=require('./session-auth.cjs');
 const {validTransfer}=require('./domain-routing.cjs');
 const digest=token=>crypto.createHash('sha256').update(token).digest('hex');
 const keyFor=secret=>crypto.createHmac('sha256',secret).update('kienhoc-domain-handoff-v1').digest();
@@ -20,6 +20,36 @@ async function readJSON(request){
    if(total>2_100_000){await reader.cancel();throw Object.assign(Error('Too large'),{status:413});}chunks.push(value);}
  try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}
  catch{throw Object.assign(Error('Invalid JSON'),{status:400});}
+}
+async function verifiedIdentity(token,legacy,config,store,now){
+ if(!token||legacy&&!sessionAuth.legacyAllowed(config,now))return null;
+ let payload;try{payload=jwt.verify(token,config.JWT_SECRET,{algorithms:['HS256'],issuer:'kienhoc',audience:legacy?'kienhoc-web':'kienhoc-cookie'});}catch{return null;}
+ const session=await store.prepare('SELECT * FROM sessions WHERE id=? AND user_id=? AND expires_at>?').get(payload.jti,payload.sub,now);
+ const user=await store.prepare('SELECT id,email FROM users WHERE id=?').get(payload.sub);
+ return session&&user?{payload,user,session}:null;
+}
+async function receiveIdentity(value,request,config,store,now){
+ const current=await verifiedIdentity(sessionAuth.cookieToken(request.headers,config),false,config,store,now);
+ const token=value.auth?.token||value.state.local['su-ky-auth-token'];
+ const legacy=value.auth?false:true;
+ const incoming=await verifiedIdentity(token,legacy,config,store,now);
+ // Never send a bearer token back to the browser or trust a transferred profile as authentication.
+ delete value.auth;delete value.state.local['su-ky-auth-token'];delete value.state.local['su-ky-auth-user'];value.state.session={};
+ if(current){value.activeUserId=current.user.id;return null;}
+ if(!incoming)return null;
+ const {payload,user,session}=incoming,seconds=Math.floor((Math.min(session.expires_at,payload.exp*1000)-now)/1000);
+ if(seconds<=0)return null;
+ const id=crypto.randomUUID(),remember=!!payload.remember;
+ const next=jwt.sign({sub:user.id,jti:id,method:payload.method,authAt:payload.authAt,remember},config.JWT_SECRET,{algorithm:'HS256',issuer:'kienhoc',audience:'kienhoc-cookie',expiresIn:seconds});
+ await store.transaction(async tx=>{
+  const live=await tx.prepare('SELECT id FROM sessions WHERE id=? AND user_id=? AND expires_at>?').get(payload.jti,user.id,now);
+  if(!live)throw Error('Session revoked');
+  await tx.prepare('INSERT INTO sessions VALUES(?,?,?)').run(id,user.id,now+seconds*1000);
+  await tx.prepare('DELETE FROM sessions WHERE id=?').run(payload.jti);
+ },user.email);
+ value.activeUserId=user.id;
+ value.state.local['su-ky-auth-user']=JSON.stringify({...user,authMode:'cookie',remember,expiresAt:now+seconds*1000});
+ return sessionAuth.cookieHeader(next,remember,seconds,config);
 }
 async function handleHandoff(request,config,store,ip,now=Date.now()){
  const url=new URL(request.url),canonical=config.CANONICAL_ORIGIN;
@@ -43,7 +73,7 @@ async function handleHandoff(request,config,store,ip,now=Date.now()){
      if(!returnTo.startsWith('/')||returnTo.startsWith('//')||next.origin!==canonical||next.pathname.startsWith('/domain-transfer/'))
        return reply({error:'Đường dẫn tiếp tục không hợp lệ.'},400);
      const token=crypto.randomBytes(32).toString('base64url');
-     const encrypted=seal({state:body.state,returnTo:next.pathname+next.search+next.hash,sourceOrigin:url.origin,targetOrigin:canonical},config.JWT_SECRET);
+     const encrypted=seal({state:body.state,returnTo:next.pathname+next.search+next.hash,sourceOrigin:url.origin,targetOrigin:canonical,auth:sessionAuth.cookieToken(request.headers,config)?{token:sessionAuth.cookieToken(request.headers,config)}:null},config.JWT_SECRET);
      await store.saveHandoff(digest(token),encrypted,now+120000,now);
      return reply({token});
    }
@@ -52,7 +82,7 @@ async function handleHandoff(request,config,store,ip,now=Date.now()){
    if(!encrypted)return reply({error:'Mã chuyển phiên đã hết hạn hoặc đã dùng. Hãy mở lại địa chỉ cũ để thử lại.'},410);
    const value=open(encrypted,config.JWT_SECRET);
    if(value.targetOrigin!==canonical||!sources.includes(value.sourceOrigin)||!validTransfer(value.state))throw Error('Invalid transfer');
-   return reply(value);
+   const cookie=await receiveIdentity(value,request,config,store,now);const response=reply(value);if(cookie)response.headers.set('Set-Cookie',cookie);return response;
  }catch(error){return reply({error:'Chưa chuyển được phiên học. Dữ liệu ở địa chỉ cũ vẫn được giữ.'},error.status||500);}
 }
 module.exports={handleHandoff,seal,open,digest};

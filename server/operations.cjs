@@ -93,7 +93,7 @@ function createOperations({app,db,config,secret,clock,authenticated,limiter}){
     if(b.kind!=='heartbeat'){const errorTypes=['TypeError','ReferenceError','RangeError','SyntaxError','UnhandledRejection'];const label=b.kind==='js_error'?(errorTypes.includes(b.errorType)?b.errorType:'browser.runtime'):b.kind==='page_view'?b.view:['LCP','CLS','INP'].includes(b.label)?b.label:'other';const value=b.kind==='metric'?Math.min(60000,Math.max(0,num(b.value))):0;await tx.prepare('INSERT INTO ops_events(id,at,day,visitor,user_id,kind,label,value,subject,scene) VALUES(?,?,?,?,?,?,?,?,?,?)').run(crypto.randomUUID(),now,day,visitor,user,b.kind,label,value,b.subject,b.scene);}
    },'ops:'+visitor);res.status(204).end();
   };
-  if(req.get('authorization'))return authenticated(req,res,()=>ingest().catch(next));await ingest();
+  if(req.get('authorization')||require('./session-auth.cjs').cookieToken({get:k=>req.get(k)},config))return authenticated(req,res,()=>ingest().catch(next));await ingest();
  });
  async function observeResponse(req,res,next){if(!telemetry||!req.path.startsWith('/api/')||req.path.startsWith('/api/ops')||req.path==='/api/telemetry')return next();const start=clock(),json=res.json.bind(res);let done=false;
   res.json=function(body){if(done)return json(body);done=true;const duration=Math.max(0,clock()-start),minute=Math.floor(clock()/60000)*60000,route=['/api/auth/send-otp','/api/auth/verify-otp','/api/auth/password-login','/api/auth/me','/api/auth/logout','/api/auth/profile','/api/auth/set-password','/api/progress','/api/health'].includes(req.path)?req.path:'/api/other';
