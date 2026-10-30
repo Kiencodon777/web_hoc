@@ -15,6 +15,10 @@ services:
         value: 22
       - key: NODE_ENV
         value: production
+      - key: ALLOW_PERSISTENT_SQLITE
+        value: true
+      - key: BEHIND_TRUSTED_PROXY
+        value: true
       - key: DATABASE_PATH
         value: /var/data/kienhoc.sqlite
       - key: JWT_SECRET

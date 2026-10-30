@@ -6,6 +6,7 @@ import postgresModule from '../server/postgres.cjs';
 import domainRouting from '../server/domain-routing.cjs';
 import domainHandoff from '../server/domain-handoff.cjs';
 import operations from '../server/operations.cjs';
+import securityMaintenance from '../server/security-maintenance.cjs';
 import {routeBattle} from '../battle/router.mjs';
 export {BattleRoom} from '../battle/room.mjs';
 
@@ -16,9 +17,8 @@ const db = {
   prepare: (...args) => requests.getStore().prepare(...args),
   transaction: (...args) => requests.getStore().transaction(...args)
 };
-let limiterId = 0;
-function rateLimitStore() {
-  const prefix = `api:${limiterId++}:`;
+function rateLimitStore(identifier) {
+  const prefix = `api-v2:${identifier}:`;
   return {
     init(options) { this.windowMs = options.windowMs; },
     increment(key) { return requests.getStore().consumeRate(prefix+key, this.windowMs); },
@@ -33,7 +33,7 @@ const handler = httpServerHandler({ port: 3000 });
 export default {
   async scheduled(controller,bindings,ctx){
     const store=postgresModule.openHyperdrive(bindings.HYPERDRIVE);
-    try{await store.purgeHandoffs(Date.now());if(bindings.TELEMETRY_ENABLED==='true')await operations.pruneOperations(store,Date.now());}finally{ctx.waitUntil(store.close());}
+    try{await securityMaintenance.securityMaintenance(store,bindings);await store.purgeHandoffs(Date.now());if(bindings.TELEMETRY_ENABLED==='true')await operations.pruneOperations(store,Date.now());}finally{ctx.waitUntil(store.close());}
   },
   async fetch(request, bindings, ctx) {
     const incomingURL=new URL(request.url);
@@ -53,8 +53,9 @@ export default {
     const migration = isAdminHost?null:await domainRouting.handleDomainRouting(request, bindings);
     if(migration)return migration;
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/api/') && url.pathname!=='/ops' && !url.pathname.startsWith('/ops/')) {const asset=await bindings.ASSETS.fetch(request);if(bindings.PK_ENABLED!=='true')return asset;const headers=new Headers(asset.headers);headers.set('Permissions-Policy','camera=(), microphone=(self), geolocation=()');headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss://"+url.host+"; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");return new Response(asset.body,{status:asset.status,headers});}
+    if (!url.pathname.startsWith('/api/') && url.pathname!=='/ops' && !url.pathname.startsWith('/ops/')) {const asset=await bindings.ASSETS.fetch(request);if(bindings.PK_ENABLED!=='true')return asset;const headers=new Headers(asset.headers);headers.set('Permissions-Policy','camera=(), microphone=(self), geolocation=()');headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss://"+url.host+"; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");return new Response(asset.body,{status:asset.status,headers});}
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
+    if(url.pathname==='/api/progress'&&bindings.PROGRESS_LIMITER){const result=await bindings.PROGRESS_LIMITER.limit({key:ip});if(!result.success)return Response.json({error:'Đồng bộ quá nhanh.'},{status:429,headers:{'Retry-After':'60','Cache-Control':'no-store'}});}
     if (url.pathname.startsWith('/api/auth/') && bindings.AUTH_LIMITER) {
       const result = await bindings.AUTH_LIMITER.limit({ key: ip });
       if (!result.success) return Response.json({ error: 'Quá nhiều yêu cầu. Thử lại sau.' },
