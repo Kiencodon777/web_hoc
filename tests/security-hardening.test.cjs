@@ -50,3 +50,9 @@ test('domain handoff moves cookie authentication server-side without returning t
  const fresh=await h.login('fresh@example.test'),next=await handleHandoff(req(source,'create',{state},fresh.cookie),config,store,'test',now+2),opaque=await next.json();const kept=await handleHandoff(req(canonical,'consume',{token:opaque.token},b.cookie),config,store,'test',now+3),data=await kept.json();assert.equal(data.activeUserId,b.body.user.id);assert.equal(kept.headers.get('set-cookie'),null);
  }finally{h.raw.close();}
 });
+
+test('Worker startup accepts a valid grace date with frozen clock; runtime rejects oversized production grace',()=>{
+ const {legacyAllowed}=require('../server/session-auth.cjs'),raw=openDatabase(':memory:'),current=Date.now(),realNow=Date.now,config={JWT_SECRET:'frozen-worker-test-'+ 'x'.repeat(48),NODE_ENV:'production',AUTH_LEGACY_UNTIL:new Date(current+2*86400000).toISOString()};
+ try{Date.now=()=>0;assert.doesNotThrow(()=>createApp({db:raw,config,sendMail:async()=>{}}));}finally{Date.now=realNow;raw.close();}
+ assert(legacyAllowed(config,current));assert(!legacyAllowed({...config,AUTH_LEGACY_UNTIL:new Date(current+8*86400000).toISOString()},current));
+});

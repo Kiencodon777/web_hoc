@@ -29,6 +29,7 @@
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
     "BEHIND_TRUSTED_PROXY": "true",
+    "AUTH_LEGACY_UNTIL": "2026-11-01T09:11:30.493Z",
     "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn,https://ops.vietkienetet.id.vn",
     "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
     "CANONICAL_ENABLED": "true",

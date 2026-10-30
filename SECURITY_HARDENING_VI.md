@@ -1,6 +1,6 @@
 # Gia cố bảo mật Kiến Học — 30/10/2026
 
-Trạng thái: mã đã sửa và kiểm tra trong nhánh `codex/security-hardening`; CHƯA triển khai production, CHƯA chạy migration trên Supabase thật. Nhánh này dựa trên production, độc lập với PR giao diện bộ đếm #7.
+Trạng thái: đã triển khai production ngày 30/10/2026; migration bảng security_mail đã chạy và xác minh quyền trên Supabase thật. Nhánh này dựa trên production, độc lập với PR giao diện bộ đếm #7.
 
 ## Phần có ảnh hưởng tới đăng nhập/cấu trúc
 
@@ -30,7 +30,7 @@ Trạng thái: mã đã sửa và kiểm tra trong nhánh `codex/security-harden
 
 ## Kiểm tra
 
-- `npm test`: 106/106 tests, cộng kiểm tra academy và physics đều đạt.
+- `npm test`: 107/107 tests, cộng kiểm tra academy và physics đều đạt.
 - `npm run cf:check`: build Worker/dry-run đạt, không triển khai.
 - Các ca mới: cookie flags và không trả token, CSRF sai, cookie không dùng như Bearer, legacy deadline/replay/race, không kéo dài OTP age/expiry, account rate limit, hai user chung IP, padding/hints, outbox retry/concurrent claim, cleanup và clock skew, PK cookie, chuyển miền không lộ JWT/không ghi đè tài khoản hiện tại.
 - Client integration kiểm tra sync thực, snapshot ba môn, deadline bài thi, hai thiết bị, cookie đổi cùng tài khoản và đổi sang người khác.
@@ -49,3 +49,14 @@ Trạng thái: mã đã sửa và kiểm tra trong nhánh `codex/security-harden
 Rollback code cũ có thể khiến người đã dùng cookie phải đăng nhập lại vì code cũ chỉ hiểu Bearer. Không xóa local progress hoặc drop bảng outbox để rollback. Cần thông báo tác động đăng nhập này nếu chọn rollback.
 
 Không có cơ sở để cam kết an toàn tuyệt đối hoặc đã xử lý mọi loại tấn công ngoài phạm vi audit. Các rủi ro vận hành (đĩa bền vững, đồng hồ và backup) cần được xác minh trên hạ tầng thật khi triển khai.
+
+## Kết quả phát hành thực tế
+
+- Worker: `9ed51879-d213-49dd-9a87-e89830c0a644`; Worker trước phát hành: `f44426c9-d721-44bc-bd22-feff02870a00`.
+- Deadline chuyển tiếp: `2026-11-01T09:11:30.493Z` (16:11:30 ngày 01/11/2026, giờ Việt Nam). Đã lưu deadline trong config nguồn để deploy sau không vô tình cắt sớm cửa sổ này.
+- Cloudflare đóng băng đồng hồ ở global scope khi khởi tạo: chuyển kiểm tra thời hạn tối đa 7 ngày sang thời điểm xử lý request; thêm test clock=0. Bản upload bị từ chối trước đó không thay Worker đang phục vụ.
+- Đã snapshot nhất quán 13 bảng trước migration vào bản sao mã hóa AES-256-GCM trong thư mục build cục bộ, kiểm tra giải mã và nội dung bằng nhau. Khóa giải mã dẫn xuất từ JWT_SECRET tại thời điểm snapshot với context kienhoc-release-backup-v1; giữ bản secret gốc nếu cần khôi phục sau khi xoay khóa. Đây là snapshot dữ liệu ứng dụng, không thay thế backup toàn bộ hạ tầng Supabase.
+- Đã kiểm tra RLS bật cho bảng mới, anon/authenticated không có USAGE schema và không có SELECT trên bảng. Advisor chỉ báo thông tin RLS không có policy — chủ ý của schema backend riêng, không thêm policy public.
+- Smoke test HTTPS bằng hai tài khoản UUID @example.invalid: chuyển phiên Bearer cũ một lần, cookie Secure/HttpOnly, OTP verify không gửi mail thật, password login, cách ly tài khoản, lưu và đọc deadline bài thi, CSRF sai bị chặn, lưu hồ sơ, ticket PK và WebSocket qua tên miền chính, logout thu hồi phiên cho cả API và PK.
+- Tài khoản thử và OTP thử đã được dọn. Các account ID và progress row có trước phát hành vẫn hiện diện, revision tiến độ không giảm.
+- Cloudflare Access vẫn trả challenge/redirect cho người chưa đăng nhập; script quản trị không được phục vụ từ miền học.

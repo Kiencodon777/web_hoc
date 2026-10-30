@@ -1,7 +1,8 @@
 const jwt=require('jsonwebtoken'),crypto=require('node:crypto');
 const {parseOrigins,sameOrigin}=require('./origins.cjs');
 const name=config=>config.NODE_ENV==='production'?'__Host-kienhoc_session':'kienhoc_session_local';
-const legacyAllowed=(config,now=Date.now())=>Number.isFinite(Date.parse(config.AUTH_LEGACY_UNTIL))&&now<Date.parse(config.AUTH_LEGACY_UNTIL);
+// Workers freezes Date.now() during isolate initialization. Check the grace window per request.
+const legacyAllowed=(config,now=Date.now())=>Number.isFinite(Date.parse(config.AUTH_LEGACY_UNTIL))&&now<Date.parse(config.AUTH_LEGACY_UNTIL)&&(config.NODE_ENV!=='production'||Date.parse(config.AUTH_LEGACY_UNTIL)<=now+7*86400000);
 const cookieToken=(headers,config)=>String(headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(name(config)+'='))?.slice(name(config).length+1);
 const csrf=(id,secret)=>crypto.createHmac('sha256',secret).update('web-csrf\0'+id).digest('hex');
 function readSession(headers,method,config,now=Date.now()){
