@@ -30,7 +30,7 @@
   }
   function identity(state,now){
     const u=parse(state.local[USER],null);
-    return u?.id&&u.email&&Number.isFinite(u.expiresAt)&&u.expiresAt>now&&state.local[TOKEN]&&
+    return u?.id&&u.email&&Number.isFinite(u.expiresAt)&&u.expiresAt>now&&(state.local[TOKEN]||u.authMode==='cookie')&&
       (u.remember||state.session[SESSION]===u.id)?u:null;
   }
   function progressWrites(data){
@@ -55,7 +55,7 @@
     }else{
       Object.assign(local,progressWrites(Progress.merge(snapshot(current.local),snapshot(incoming.local))));
       if(!owner&&incomingOwner)local[OWNER]=incomingOwner;
-      if(!before&&after){local[TOKEN]=incoming.local[TOKEN];local[USER]=incoming.local[USER];
+      if(!before&&after){if(incoming.local[TOKEN])local[TOKEN]=incoming.local[TOKEN];local[USER]=incoming.local[USER];
         if(after.remember)delete session[SESSION];else session[SESSION]=incoming.session[SESSION];}
       for(const key of [keys[9],keys[10]])if(!local[key]&&incoming.local[key])local[key]=incoming.local[key];
     }

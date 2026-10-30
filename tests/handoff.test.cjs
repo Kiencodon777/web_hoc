@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {handleHandoff,digest,open}=require('../server/domain-handoff.cjs');
 const source='https://kienhoc.anhdungcasi.workers.dev',canonical='https://study.anhdungece.id.vn';
-const config={CANONICAL_ENABLED:'true',CANONICAL_ORIGIN:canonical,MIGRATION_SOURCE_ORIGINS:source,JWT_SECRET:'test-only-'+ 's'.repeat(48)};
+const config={CANONICAL_ENABLED:'true',CANONICAL_ORIGIN:canonical,MIGRATION_SOURCE_ORIGINS:source,AUTH_LEGACY_UNTIL:new Date(Date.now()+6*86400000).toISOString(),JWT_SECRET:'test-only-'+ 's'.repeat(48)};
 function fixture(){const rows=new Map();return{rows,
  consumeRate:async()=>({totalHits:1}),
  saveHandoff:async(hash,payload,expires)=>rows.set(hash,{payload,expires}),
@@ -16,7 +16,7 @@ test('handoff encrypts browser data at rest, hashes the opaque code and consumes
  assert.deepEqual(open(row.payload,config.JWT_SECRET).state,state());
  const received=await handleHandoff(request(canonical,'consume',{token}),config,store,'test-ip',200);
  assert.equal(received.status,200);assert.equal(received.headers.get('Cache-Control'),'no-store');
- assert.deepEqual((await received.json()).state,state());
+ const publicState=(await received.json()).state;assert.equal(publicState.local['su-ky-auth-token'],undefined);assert.equal(publicState.local['su-ky-auth-user'],undefined);
  assert.equal((await handleHandoff(request(canonical,'consume',{token}),config,store,'test-ip',201)).status,410);
 });
 test('handoff expires, validates origins and blocks open redirects and storage injection',async()=>{

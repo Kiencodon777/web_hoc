@@ -5,9 +5,9 @@ test('production PK requires a live signed session and derives identity only fro
  const db={prepare:sql=>({get:async(...args)=>sql.includes('FROM sessions')?(live&&args[0]==='session-1'&&args[1]==='learner-1'?{id:'session-1'}:null):sql.includes('FROM users')?{id:'learner-1'}:{username:'Server profile',avatar:null}})};
  const token=jwt.sign({sub:'learner-1',jti:'session-1',name:'Spoofed admin'},secret,{issuer:'kienhoc',audience:'kienhoc-web',expiresIn:60});
  const req=new Request('https://example.test/api/pk/session',{headers:{Authorization:'Bearer '+token}});
- assert.deepEqual(await battleActor(req,{JWT_SECRET:secret},db),{id:'learner-1',name:'Server profile',avatar:null});
- live=false;await assert.rejects(battleActor(req,{JWT_SECRET:secret},db),/revoked/);
- await assert.rejects(battleActor(req,{JWT_SECRET:'wrong'},db));
+ assert.deepEqual(await battleActor(req,{AUTH_LEGACY_UNTIL:new Date(Date.now()+6*86400000).toISOString(),JWT_SECRET:secret},db),{id:'learner-1',name:'Server profile',avatar:null});
+ live=false;await assert.rejects(battleActor(req,{AUTH_LEGACY_UNTIL:new Date(Date.now()+6*86400000).toISOString(),JWT_SECRET:secret},db),/revoked/);
+ await assert.rejects(battleActor(req,{AUTH_LEGACY_UNTIL:new Date(Date.now()+6*86400000).toISOString(),JWT_SECRET:'wrong'},db));
  assert.equal((await routeBattle(req,{},db)).status,404);
 });
 async function fixture(){const {createRoom,BattleEngine}=await import('../battle/engine.mjs');let now=100000;const bank={ai:Array.from({length:25},(_,i)=>({key:'ai.'+i,question:'Question '+i,options:['One','Two'],answers:['A'],explanation:'Because',review:i===24})),history:[],information:[]};const state=createRoom('ABC234',actor('host'),{subject:'ai',count:5,seconds:15},bank,now,()=>.5),engine=new BattleEngine(state,()=>now);return {state,engine,advance:n=>now+=n,set:n=>now=n,bank};}

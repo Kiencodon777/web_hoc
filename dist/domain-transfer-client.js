@@ -7,7 +7,7 @@
   const handoff=new URLSearchParams(location.hash.slice(1)).get('handoff');
   if(config.mode==='receive')history.replaceState(null,'',location.pathname);
   async function api(path,body){
-    const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(20000)});
+    const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store',credentials:'same-origin',signal:AbortSignal.timeout(20000)});
     if(!response.ok)throw Error('Transfer failed');return response.json();
   }
   download.onclick=()=>{try{
@@ -37,8 +37,9 @@
         const received=await api('/api/domain-transfer/consume',{token:handoff});
         config.payload=received.state;config.returnTo=received.returnTo;config.sourceOrigin=received.sourceOrigin;
         const current=KienDomainState.capture(localStorage,sessionStorage);
+        if(received.activeUserId&&!current.local['kienhoc-progress-owner'])current.local['kienhoc-progress-owner']=received.activeUserId;
         const result=KienDomainState.plan(current,config.payload);
-        KienDomainState.apply(localStorage,sessionStorage,result);
+        KienDomainState.apply(localStorage,sessionStorage,result);if(received.activeUserId)localStorage.removeItem('su-ky-auth-token');
         document.body.className='done';heading.textContent='Phiên học đã được chuyển';
         next.href=config.canonicalOrigin+config.returnTo;next.hidden=false;
         if(result.conflict){download.hidden=false;message.textContent='Địa chỉ mới đang dùng một tài khoản khác. Tiến độ từ địa chỉ cũ đã được giữ riêng để tránh trộn tài khoản. Bạn có thể tải bản sao, hoặc tiếp tục rồi đăng nhập đúng tài khoản.';}

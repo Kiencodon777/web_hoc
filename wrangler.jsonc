@@ -28,6 +28,7 @@
   "vars": {
     "NODE_ENV": "production",
     "TRUST_PROXY_HOPS": "1",
+    "BEHIND_TRUSTED_PROXY": "true",
     "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn,https://ops.vietkienetet.id.vn",
     "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
     "CANONICAL_ENABLED": "true",
@@ -41,6 +42,7 @@
     "PK_ENABLED": "true"
   },
   "ratelimits": [
+    {"name":"PROGRESS_LIMITER","namespace_id":"1002","simple":{"limit":240,"period":60}},
     {
       "name": "AUTH_LIMITER",
       "namespace_id": "1001",

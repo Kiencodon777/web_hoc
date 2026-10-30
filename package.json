@@ -9,7 +9,7 @@
   "scripts": {
     "pretest": "node scripts/build-admin.cjs",
     "start": "node --env-file-if-exists=.env server/index.cjs",
-    "test": "node --test tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs tests/ui-preview.test.cjs tests/boot.test.cjs tests/scenes.test.cjs tests/auth-modal.test.cjs tests/profile.test.cjs tests/learning-controls.test.cjs tests/journey-state.test.cjs tests/appearance-state.test.cjs tests/signature.test.cjs tests/operations.test.cjs tests/battle.test.cjs tests/battle-voice.test.cjs tests/battle-chat.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
+    "test": "node --test tests/security-hardening.test.cjs tests/backend.test.cjs tests/postgres.test.cjs tests/domain.test.cjs tests/handoff.test.cjs tests/sync.test.cjs tests/cloud-client.test.cjs tests/flip-carousel.test.cjs tests/ui-preview.test.cjs tests/boot.test.cjs tests/scenes.test.cjs tests/auth-modal.test.cjs tests/profile.test.cjs tests/learning-controls.test.cjs tests/journey-state.test.cjs tests/appearance-state.test.cjs tests/signature.test.cjs tests/operations.test.cjs tests/battle.test.cjs tests/battle-voice.test.cjs tests/battle-chat.test.cjs && node tests/academy.test.cjs && node tests/ui-physics.test.cjs",
     "backup": "node --env-file-if-exists=.env scripts/backup.cjs",
     "dev": "node server/preview.cjs",
     "setup:local": "node scripts/setup-local.cjs",

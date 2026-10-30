@@ -57,7 +57,7 @@ async function fixture() {
     end: () => engine.close()
   };
   const db = postgresStorage(pool), emails = [];
-  const config = { JWT_SECRET: 'test-only-'+'s'.repeat(48), NODE_ENV:'test' };
+  const config = { AUTH_LEGACY_UNTIL:new Date(Date.now()+6*86400000).toISOString(),JWT_SECRET: 'test-only-'+'s'.repeat(48), NODE_ENV:'test' };
   const { app } = createApp({ db, config, sendMail: async(email,code) => emails.push({email,code}) });
   const api = request(app);
   async function login(email) {
