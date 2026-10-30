@@ -1,4 +1,43 @@
 'use strict';
-(()=>{let latest=null,busy=false;function paint(){const hero=document.querySelector('.night-hero');if(!hero)return;let band=document.querySelector('#community-band');if(!band){band=document.createElement('section');band.id='community-band';band.className='community-band';band.setAttribute('aria-label','Cộng đồng Kiến Học');hero.after(band);}if(!latest){band.innerHTML='<p>Đang kết nối nhịp học cộng đồng…</p>';return;}const d=latest;band.innerHTML=`<div class="community-title"><span class="pk-kicker">CÙNG NHAU TIẾN BỘ</span><h2>Một góc học. Nhiều người đồng hành.</h2><small>${d.preview?'Số liệu riêng của bản thử nghiệm.':'Số liệu ghi nhận từ hệ thống.'}</small></div><dl>${[['online','Đang hoạt động','Trình duyệt có tương tác trong 2 phút'],['visitors','Đã ghé thăm','Trình duyệt duy nhất trong 90 ngày'],['accounts','Tài khoản đã tạo',d.preview?'Hồ sơ của bản thử nghiệm':'Tổng số tài khoản trên Kiến Học']].map(([key,label,note])=>`<div><dt>${label}</dt><dd data-count-id="community-${key}" data-count-to="${d[key]}">${d[key]}</dd><small>${note}</small></div>`).join('')}</dl><p class="community-note">Một người có thể dùng nhiều trình duyệt. Không đếm thiết bị chặn đo lường; không phải số người tuyệt đối.</p>`;window.KienCountUp?.mount(band);}
- async function refresh(){if(busy||document.hidden)return;busy=true;try{const r=await fetch('/api/community/stats',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok){document.querySelector('#community-band')?.remove();return;}const d=await r.json();if(!['online','visitors','accounts'].every(k=>Number.isFinite(d[k])&&d[k]>=0))return;latest=d;paint();}catch{const el=document.querySelector('#community-band');if(el&&!latest)el.innerHTML='<p>Thống kê tạm chưa kết nối. Bạn vẫn có thể học bình thường.</p>';}finally{busy=false;}}
- document.addEventListener('kien-page-view',()=>{if(latest)paint();else refresh();});document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});setInterval(refresh,30000);refresh();})();
+// counting.txt adaptation: a rounded numeric tween, with no React runtime.
+(()=>{
+ const format=n=>new Intl.NumberFormat('vi-VN').format(n),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let latest=null,busy=false,displayed=0,frame=0,target=null;
+ function stop(){cancelAnimationFrame(frame);frame=0;}
+ function paint(){
+  document.querySelector('#community-band')?.remove();
+  const corner=document.querySelector('.appearance-quick');if(!corner||!latest)return;
+  let badge=document.querySelector('#community-presence');
+  if(!badge){
+   badge=document.createElement('aside');badge.id='community-presence';badge.className='community-presence';
+   badge.innerHTML='<span class="community-presence-dot" aria-hidden="true"></span><strong class="community-presence-number" aria-hidden="true">0</strong><span aria-hidden="true">đang online</span><span class="sr-only" role="status" aria-atomic="true"></span>';
+   corner.append(badge);target=null;
+  }
+  badge.title=(latest.preview?'Số liệu của bản thử. ':'')+'Số trình duyệt có tương tác trong 2 phút gần nhất; không phải số người tuyệt đối.';
+  const count=latest.online,node=badge.querySelector('strong');badge.dataset.active=String(count>0);
+  if(target===count)return;
+  stop();target=count;badge.querySelector('[role="status"]').textContent=format(count)+' trình duyệt đang hoạt động trong 2 phút gần nhất.';
+  const from=displayed,start=performance.now();node.textContent=format(from);
+  function tick(now){
+   if(!node.isConnected){stop();return;}
+   const t=document.hidden||reduced.matches||window.KienUI?.motionEnabled?.()===false?1:Math.min(1,(now-start)/700);
+   const eased=t*t*(3-2*t);displayed=Math.round(from+(count-from)*eased);node.textContent=format(displayed);
+   if(t<1)frame=requestAnimationFrame(tick);else frame=0;
+  }
+  tick(start);
+ }
+ function unavailable(){stop();latest=null;target=null;document.querySelector('#community-presence')?.remove();}
+ async function refresh(){
+  if(busy||document.hidden)return;busy=true;
+  try{
+   const r=await fetch('/api/community/stats',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+   if(!r.ok){unavailable();return;}
+   const data=await r.json();if(!Number.isSafeInteger(data.online)||data.online<0){unavailable();return;}
+   latest={online:data.online,preview:data.preview===true};paint();
+  }catch{unavailable();}finally{busy=false;}
+ }
+ document.addEventListener('kien-page-view',()=>{if(latest)paint();else refresh();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(latest){displayed=latest.online;const n=document.querySelector('.community-presence-number');if(n)n.textContent=format(displayed);}}else refresh();});
+ window.addEventListener('pagehide',stop);
+ setInterval(refresh,30000);refresh();
+})();
