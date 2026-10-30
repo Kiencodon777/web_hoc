@@ -1,0 +1,5 @@
+/* counting.txt: one number over its caption, floating without a container. */
+.community-presence{position:fixed;left:24px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;flex-direction:column;align-items:center;gap:3px;width:max-content;max-width:calc(100vw - 48px);padding:0;border:0;background:none;box-shadow:none;color:var(--ui-muted,#c4c7ce);font:400 12px/1.5 'Be Vietnam Pro',system-ui,sans-serif;white-space:nowrap;text-align:center;text-shadow:0 1px 3px #0009,0 3px 12px #0005}
+.community-presence-number{font-size:32px;font-weight:700;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ui-text,#f3f4f7)}
+.night-theme:not(.dock-hidden) .community-presence{left:290px}
+@media(max-width:800px){.night-theme:not(.dock-hidden) .community-presence,.community-presence{left:20px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}.community-presence-number{font-size:28px}}
