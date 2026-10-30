@@ -1,5 +1,10 @@
-/* counting.txt: one number over its caption, floating without a container. */
-.community-presence{position:fixed;left:24px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;flex-direction:column;align-items:center;gap:3px;width:max-content;max-width:calc(100vw - 48px);padding:0;border:0;background:none;box-shadow:none;color:var(--ui-muted,#c4c7ce);font:400 12px/1.5 'Be Vietnam Pro',system-ui,sans-serif;white-space:nowrap;text-align:center;text-shadow:0 1px 3px #0009,0 3px 12px #0005}
-.community-presence-number{font-size:32px;font-weight:700;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ui-text,#f3f4f7)}
-.night-theme:not(.dock-hidden) .community-presence{left:290px}
-@media(max-width:800px){.night-theme:not(.dock-hidden) .community-presence,.community-presence{left:20px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}.community-presence-number{font-size:28px}}
+/* A quiet inline count in the header; never overlays the page. */
+.community-presence{display:flex;align-items:center;gap:6px;width:max-content;max-width:100%;margin:0;padding:0;border:0;background:none;box-shadow:none;color:var(--ui-muted,#c4c7ce);font:400 11px/1.5 'Be Vietnam Pro',system-ui,sans-serif;letter-spacing:0;white-space:nowrap}
+.community-presence-number{font-size:13px;font-weight:600;line-height:1.5;letter-spacing:0;font-variant-numeric:tabular-nums;color:var(--ui-text,#f3f4f7)}
+.community-presence-dot{display:block;flex:0 0 5px;width:5px;height:5px;margin:0;border-radius:50%;background:var(--ui-accent,#c4c7ce);opacity:.45}
+.community-presence[data-active="true"] .community-presence-dot{opacity:1}
+.night-breadcrumb:has(>.community-presence){display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:28px}
+.night-breadcrumb:has(>.community-presence)>span,.night-breadcrumb:has(>.community-presence)>strong{grid-column:1}
+.night-breadcrumb>.community-presence{grid-column:2;grid-row:1/3}
+@media(min-width:801px) and (max-width:1200px){.night-breadcrumb:has(>.community-presence){grid-template-columns:minmax(0,1fr);row-gap:2px}.night-breadcrumb>.community-presence{grid-column:1;grid-row:3}}
+@media(max-width:800px){.mobile-topbar .mobile-brand .community-presence{font-size:9px;gap:4px;margin-top:3px;line-height:1.4}.mobile-topbar .mobile-brand .community-presence-number{font-size:11px;line-height:1.4}.mobile-topbar .mobile-brand .community-presence-label{display:inline;font:inherit;letter-spacing:0;color:inherit}.mobile-topbar .mobile-brand .community-presence .sr-only{display:block}.community-presence-dot{flex-basis:4px;width:4px;height:4px}}

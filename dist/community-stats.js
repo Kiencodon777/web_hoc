@@ -1,18 +1,21 @@
 'use strict';
 // counting.txt adaptation: a rounded numeric tween, with no React runtime.
 (()=>{
- const format=n=>new Intl.NumberFormat('vi-VN').format(n),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const format=n=>new Intl.NumberFormat('vi-VN').format(n),reduced=matchMedia('(prefers-reduced-motion: reduce)'),mobile=matchMedia('(max-width:800px)');
  let latest=null,busy=false,displayed=0,frame=0,target=null;
  function stop(){cancelAnimationFrame(frame);frame=0;}
  function paint(){
   document.querySelector('#community-band')?.remove();
   if(!latest)return;
+  const host=document.querySelector(mobile.matches?'.mobile-brand':'.night-breadcrumb');
+  if(!host)return;
   let badge=document.querySelector('#community-presence');
   if(!badge){
-   badge=document.createElement('aside');badge.id='community-presence';badge.className='community-presence';
-   badge.innerHTML='<strong class="community-presence-number" aria-hidden="true">0</strong><span aria-hidden="true">đang online</span><span class="sr-only" role="status" aria-atomic="true"></span>';
-   document.body.append(badge);target=null;
+   badge=document.createElement('div');badge.id='community-presence';badge.className='community-presence';
+   badge.innerHTML='<i class="community-presence-dot" aria-hidden="true"></i><strong class="community-presence-number" aria-hidden="true">0</strong><span class="community-presence-label" aria-hidden="true">đang online</span><span class="sr-only" role="status" aria-atomic="true"></span>';
+   target=null;
   }
+  if(badge.parentElement!==host)host.append(badge);
   badge.title=(latest.preview?'Số liệu của bản thử. ':'')+'Số trình duyệt có tương tác trong 2 phút gần nhất; không phải số người tuyệt đối.';
   const count=latest.online,node=badge.querySelector('strong');badge.dataset.active=String(count>0);
   if(target===count)return;
@@ -37,6 +40,7 @@
   }catch{unavailable();}finally{busy=false;}
  }
  document.addEventListener('kien-page-view',()=>{if(latest)paint();else refresh();});
+ mobile.addEventListener('change',()=>{if(latest)paint();});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(latest){displayed=latest.online;const n=document.querySelector('.community-presence-number');if(n)n.textContent=format(displayed);}}else refresh();});
  window.addEventListener('pagehide',stop);
  setInterval(refresh,30000);refresh();
