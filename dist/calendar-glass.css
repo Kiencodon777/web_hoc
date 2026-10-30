@@ -1,0 +1,33 @@
+/* Material translated directly from the supplied glasscalendar.txt:
+   bg-black/20, backdrop-blur-xl, border-white/10, rounded-3xl,
+   shadow-2xl, white active tab and pink-500 → orange-400 selection.
+   Keep the existing week/month layout and note editor. One panel blur only. */
+.night-theme dialog.calendar-dialog{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);color:var(--ui-text)}
+.night-theme .calendar-dialog::backdrop{background:rgba(0,0,0,.2);backdrop-filter:none;-webkit-backdrop-filter:none}
+.night-theme .calendar-dialog .glass-calendar{background:transparent!important;border:0;border-radius:inherit;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.night-theme .calendar-dialog .glass-calendar::before{content:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.night-theme .calendar-dialog .calendar-modes{background:rgba(0,0,0,.2);border:0;border-radius:8px;padding:4px;gap:4px}
+.night-theme .calendar-dialog .calendar-modes button{border-radius:6px;color:var(--ui-muted);transition:color .2s,background-color .2s,box-shadow .2s}
+.night-theme .calendar-dialog .calendar-modes [aria-pressed="true"]{background:#fff;color:#111;box-shadow:0 4px 6px -1px #0002;font-weight:700}
+.night-theme .calendar-dialog .glass-icon-button{background:transparent;border-color:transparent;color:var(--ui-muted);transition:color .2s,background-color .2s}
+.night-theme .calendar-dialog .calendar-days button{transition:color .2s,background-color .2s,box-shadow .2s}
+.night-theme .calendar-dialog .calendar-days [aria-pressed="true"]{background:linear-gradient(to bottom right,#ec4899,#fb923c);color:#171119;border-color:transparent;box-shadow:0 10px 15px -3px #0002;font-weight:700;animation:calendar-date-in .2s ease-out}
+.night-theme .calendar-dialog .calendar-days [aria-current="date"]:not([aria-pressed="true"]){color:var(--ui-text);border-color:#f472b680}
+.night-theme .calendar-dialog .calendar-days [aria-current="date"]:not([aria-pressed="true"])::before{content:"";position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:#f472b6}
+.night-theme .calendar-dialog .calendar-days .has-note::after{bottom:4px;right:5px;background:var(--ui-accent)}
+.night-theme .calendar-dialog .calendar-note{border-top-color:rgba(255,255,255,.2)}
+.night-theme .calendar-dialog .calendar-note textarea{background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.1);color:var(--ui-text)}
+.night-theme .calendar-dialog .calendar-note textarea::placeholder{color:var(--ui-muted);opacity:.8}
+.night-theme .calendar-dialog .calendar-note-actions button{background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.1);border-radius:8px;color:var(--ui-text);box-shadow:0 4px 6px -1px #0002;transition:background-color .2s,color .2s}
+.night-theme .calendar-dialog .calendar-storage{border-top-color:rgba(255,255,255,.1)}
+.night-theme .calendar-dialog button:focus-visible,.night-theme .calendar-dialog textarea:focus-visible{outline-color:var(--ui-accent);outline-offset:3px}
+@media(hover:hover){
+ .night-theme .calendar-dialog .glass-icon-button:hover{background:rgba(0,0,0,.2);color:var(--ui-text)}
+ .night-theme .calendar-dialog .calendar-days button:not([aria-pressed="true"]):hover{background:rgba(255,255,255,.2)}
+ .night-theme .calendar-dialog .calendar-note-actions button:hover{background:rgba(0,0,0,.3)}
+}
+@keyframes calendar-date-in{from{opacity:.6}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.night-theme .calendar-dialog *{animation:none!important;transition:none!important}}
+.motion-paused .calendar-dialog *{animation:none!important;transition:none!important}
+@media(prefers-reduced-transparency:reduce){.night-theme dialog.calendar-dialog{background:var(--ui-solid);backdrop-filter:none;-webkit-backdrop-filter:none}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.night-theme dialog.calendar-dialog{background:var(--ui-solid)}}

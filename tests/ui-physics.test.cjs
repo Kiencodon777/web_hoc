@@ -9,4 +9,5 @@ assert.equal(P.measure(0,0),null);
 // Workswheel keeps the front face at the picture plane and sizes the ring to its cards.
 for(const w of [320,390,520,960]){const g=P.wheelMetrics(w,500,3);assert(g.cardW<=w*.34+.001);assert.equal(g.cardW/g.cardH,1.45);assert.equal(g.drumR,g.cardH*2.22);assert(g.ringScale>=.16&&g.ringScale<=1);assert(g.depth>g.drumR);assert(P.wheelPlace(0,0,g.ringR,g.drumR,g.bow,1).includes(`translateZ(${g.drumR}px)`));}
 assert.equal(P.gaussian(0),1);assert.equal(P.gaussian(-86),P.gaussian(86));assert(P.gaussian(172)<P.gaussian(86));
-console.log('PASS: distance influence, spring convergence at 30/60/120Hz and frame stalls, cylindrical geometry from phone to ultrawide.');
+
+console.log('PASS: springs and cylindrical layout from phone to ultrawide.');

@@ -1,0 +1,230 @@
+/* Typography bridge for legacy literal colors. Only color is overridden here;
+   fonts, illustration colors, feedback states and the hero wordmark are kept. */
+.night-theme{--ui-text:#e8d7fc;--ui-muted:#cdb7df;--ui-soft:#dcc4ef;--ui-accent:#dab6f6}
+.night-theme[data-scene="sakura"]{--ui-text:#e8d7fc;--ui-muted:#cdb7df;--ui-soft:#dcc4ef;--ui-accent:#dab6f6}
+.night-theme[data-scene="gradient"]{--ui-text:#e7dafa;--ui-muted:#cbbde0;--ui-soft:#ddd0f1;--ui-accent:#d8bbf5}
+.night-theme[data-scene="wave"]{--ui-text:#ffffff;--ui-muted:#e1e8ed;--ui-soft:#f1f5f8;--ui-accent:#ffffff}
+.night-theme[data-scene="grid"]{--ui-text:#effffa;--ui-muted:#cce3e0;--ui-soft:#dff5f0;--ui-accent:#d7fff7}
+.night-theme[data-scene="chrome"],.night-theme[data-scene="topography"],.night-theme[data-scene="still"]{--ui-text:#f5f7fa;--ui-muted:#d1d9e2;--ui-soft:#e7edf4;--ui-accent:#f1f5fa}
+.night-theme a{color:var(--ui-accent)}
+.night-breadcrumb>span{color:var(--ui-muted)}
+.night-breadcrumb strong{color:var(--ui-accent)}
+.live-label{color:var(--ui-muted)}
+.night-theme .brand{color:var(--ui-text)}
+.night-theme .brandmark{color:var(--ui-text)}
+.night-theme .brand small{color:var(--ui-accent)}
+.night-theme .navlabel{color:var(--ui-muted)}
+.night-theme .nav{color:var(--ui-accent)}
+.night-theme .nav.active{color:var(--ui-text)}
+.night-theme .nav b{color:var(--ui-muted)}
+.dock-group-label{color:var(--ui-muted)}
+.night-theme .sidebar-bottom p{color:var(--ui-muted)}
+.night-theme .sidebar-bottom small{color:var(--ui-muted)}
+.night-theme :is(.btn,.academy-cta,.option,.target,.course-open,.bookmark,.questiongrid button,.category-tabs button){color:var(--ui-text)}
+.night-theme :is(.btn.primary,.academy-cta){color:var(--ui-text)}
+.night-theme .btn.link{color:var(--ui-accent)}
+.night-eyebrow{color:var(--ui-accent)}
+.particle-wordmark h1{color:var(--ui-text)}
+.night-hero h2{color:var(--ui-text)}
+.night-hero h2 em{color:var(--ui-accent)}
+.night-hero-copy>p{color:var(--ui-accent)}
+.night-promises{color:var(--ui-muted)}
+.orbit-caption{color:var(--ui-muted)}
+.orbit-card{color:var(--ui-text)}
+.orbit-card-top{color:var(--ui-accent)}
+.orbit-drawing{color:var(--ui-accent)}
+.orbit-card small{color:var(--ui-muted)}
+.orbit-footnote{color:var(--ui-muted)}
+.night-theme .academy-strip b{color:var(--ui-text)}
+.night-theme .academy-strip span{color:var(--ui-muted)}
+.night-theme .academy-kicker{color:var(--ui-accent)}
+.night-theme .library-heading h2{color:var(--ui-text)}
+.night-theme .library-heading>span{color:var(--ui-muted)}
+.night-theme .course-search input[type=search]{color:var(--ui-text)}
+.night-theme .course-search svg{color:var(--ui-muted)}
+.night-theme .course-search input::placeholder{color:var(--ui-muted)}
+.night-theme .category-tabs button{color:var(--ui-accent)}
+.night-theme .category-tabs button.active{color:var(--ui-text)}
+.night-theme .catalog-count{color:var(--ui-muted)}
+.night-theme .lilac{color:var(--ui-accent)}
+.night-theme .course-status{color:var(--ui-text)}
+.night-theme .course-number{color:var(--ui-accent)}
+.night-theme .course-category{color:var(--ui-muted)}
+.night-theme .course-content h3{color:var(--ui-text)}
+.night-theme .course-content>p{color:var(--ui-muted)}
+.night-theme .course-tags span{color:var(--ui-accent)}
+.night-theme .course-bottom small{color:var(--ui-muted)}
+.night-theme .course-open{color:var(--ui-accent)}
+.night-theme .art-label{color:var(--ui-accent)}
+.night-theme .method-section h2{color:var(--ui-text)}
+.night-theme .method-grid article>svg{color:var(--ui-muted)}
+.night-theme .method-grid h3{color:var(--ui-text)}
+.night-theme .method-grid p{color:var(--ui-muted)}
+.night-theme .academy-bottom>span{color:var(--ui-accent)}
+.night-theme .academy-bottom h2{color:var(--ui-text)}
+.night-theme .academy-footer{color:var(--ui-muted)}
+.night-theme .academy-footer>b{color:var(--ui-text)}
+.night-theme .academy-footer .btn{color:var(--ui-accent)}
+.night-theme :is(.panel,.bankitem,.quizcard,.stats,.chapter,.target,.quizaside,.resultcard,.guidegrid .panel,.lesson-card){color:var(--ui-text)}
+.night-theme .hero h1,.night-theme .pageintro h1{color:var(--ui-text)}
+.night-theme .hero p,.night-theme .pageintro p{color:var(--ui-muted)}
+.night-theme .book{color:var(--ui-text)}
+.night-theme .target p{color:var(--ui-accent)}
+.night-theme .target .score small,.night-theme .target .count{color:var(--ui-accent)}
+.night-theme .chapter-top .index,.night-theme .chapter-bottom button{color:var(--ui-accent)}
+.night-theme .chapter .index span,.night-theme .chapter .period{color:var(--ui-muted)}
+.night-theme .studybox p,.night-theme .continue-card small{color:var(--ui-muted)}
+.night-theme .subject-disclaimer p{color:var(--ui-accent)}
+.night-theme select,.night-theme input[type=search]{color:var(--ui-text)}
+.night-theme select option{color:var(--ui-text)}
+.night-theme .field label,.night-theme .filtercheck{color:var(--ui-muted)}
+.night-theme .badge{color:var(--ui-accent)}
+.night-theme .meta{color:var(--ui-muted)}
+.night-theme .bookmark{color:var(--ui-accent)}
+.night-theme .stat label,.night-theme .stat small{color:var(--ui-muted)}
+.night-theme .bank-question{color:var(--ui-text)}
+.night-theme .bankitem .bank-answer summary{color:var(--ui-accent)}
+.night-theme .option-list li{color:var(--ui-accent)}
+.night-theme .explanation{color:var(--ui-accent)}
+.night-theme .explanation strong{color:var(--ui-muted)}
+.night-theme .source{color:var(--ui-accent)}
+.night-theme .hint-button{color:var(--ui-accent)}
+.night-theme .hint-panel strong{color:var(--ui-accent)}
+.night-theme .hint-panel p{color:var(--ui-accent)}
+.night-theme .media-button[data-tts][aria-pressed=true]{color:var(--ui-text)}
+.night-theme .media-button[data-sound][aria-pressed=false]{color:var(--ui-muted)}
+.night-theme .speech-rate{color:var(--ui-muted)}
+.night-theme .speech-rate output{color:var(--ui-accent)}
+.night-theme .quizcard h2{color:var(--ui-text)}
+.night-theme .option{color:var(--ui-text)}
+.night-theme .option b{color:var(--ui-accent)}
+.night-theme .quizaside p{color:var(--ui-accent)}
+.night-theme .questiongrid button{color:var(--ui-accent)}
+.night-theme .questiongrid button.answered{color:var(--ui-text)}
+.night-theme .resultscore{color:var(--ui-accent)}
+.night-theme .resultscore small,.night-theme .resultsummary{color:var(--ui-accent)}
+.night-theme .guidegrid ul{color:var(--ui-accent)}
+.night-theme .timeline strong{color:var(--ui-accent)}
+.night-theme .subject-intro p{color:var(--ui-accent)}
+.night-theme .lesson-card summary b{color:var(--ui-text)}
+.night-theme .lesson-index,.night-theme .lesson-chevron{color:var(--ui-accent)}
+.night-theme .lesson-card summary small{color:var(--ui-muted)}
+.night-theme .lesson-body h3{color:var(--ui-text)}
+.night-theme .lesson-body p{color:var(--ui-accent)}
+.night-theme .formula-box{color:var(--ui-text)}
+.night-theme .lesson-example b,.night-theme .lesson-remember b{color:var(--ui-accent)}
+.night-theme .empty h3{color:var(--ui-accent)}
+.night-theme dialog.appearance-dialog{color:var(--ui-text)}
+.appearance-heading>div>span{color:var(--ui-muted)}
+.appearance-heading h2{color:var(--ui-text)}
+.appearance-context{color:var(--ui-accent)!important}
+.theme-choice{color:var(--ui-text)}
+.theme-choice>small{color:var(--ui-muted)}
+.motion-toggle small{color:var(--ui-muted)}
+.brightness-control small{color:var(--ui-muted)}
+.brightness-control output{color:var(--ui-accent)}
+.appearance-bottom>span{color:var(--ui-muted)}
+.night-theme .dock-close{color:var(--ui-muted)}
+.mobile-brand{color:var(--ui-text)!important}
+.mobile-brand span{color:var(--ui-muted)}
+.dock-hide,.dock-reveal,.journey-toggle,.reel-control,.reel-grid-toggle{color:var(--ui-text)}
+.night-theme .sidebar .navlabel{color:var(--ui-muted)}
+.night-theme .sidebar .nav{color:var(--ui-accent)}
+.night-theme .sidebar .nav b{color:var(--ui-text)}
+.night-theme .sidebar .dock-group-label{color:var(--ui-accent)}
+.journey-mini{color:var(--ui-accent)}
+.reel-topline>span{color:var(--ui-muted)}
+.reel-caption{color:var(--ui-muted)!important}
+.ai-key-notice p{color:var(--ui-accent)}
+.night-theme .ai-answer-details summary{color:var(--ui-accent)}
+.night-theme .ai-answer-details summary:after{color:var(--ui-accent)}
+.night-theme .ai-answer-body p{color:var(--ui-accent)}
+.night-theme .ai-answer-body .ai-reference-answer{color:var(--ui-text)}
+.ai-answer-body>small{color:var(--ui-muted)}
+.night-theme .ai-answer-note p{color:var(--ui-accent)}
+.wheel-cover{color:var(--ui-text)}
+.cover-ai{color:var(--ui-text)}
+.works-ring-label{color:var(--ui-text)}
+.works-ring-label>span{color:var(--ui-accent)}
+.works-front-title{color:var(--ui-text)}
+.works-index button{color:var(--ui-muted)}
+.works-index button[aria-current=true]{color:var(--ui-text)}
+.works-toolbar button{color:var(--ui-text)}
+.works-help{color:var(--ui-accent)}
+.works-readout b{color:var(--ui-text)}
+.works-readout small{color:var(--ui-muted)}
+.night-theme .sidebar .nav .dock-label{color:var(--ui-text)}
+.night-theme .sidebar .nav.active .dock-label{color:var(--ui-text)}
+.picker-heading{color:var(--ui-accent)}
+.picker-heading span{color:var(--ui-accent)}
+.picker-code{color:var(--ui-text)}
+.picker-check svg{color:var(--ui-text)}
+.calendar-eyebrow{color:var(--ui-accent)}
+.calendar-today{color:var(--ui-text)}
+.calendar-weekdays span{color:var(--ui-accent)}
+.calendar-days button{color:var(--ui-text)}
+.calendar-days [aria-current="date"]{color:var(--ui-accent)}
+.calendar-note label{color:var(--ui-text)}
+.calendar-note textarea::placeholder{color:var(--ui-muted)}
+.calendar-feedback{color:var(--ui-text)}
+.calendar-storage{color:var(--ui-muted)}
+.auth-space-art .space-spark{color:var(--ui-accent)}
+.auth-space-caption{color:var(--ui-accent)}
+.auth-demo-badge{color:var(--ui-accent)}
+.auth-modal #auth-title{color:var(--ui-text)}
+.auth-modal .auth-kicker{color:var(--ui-accent)}
+.auth-modal .auth-description{color:var(--ui-accent)}
+.auth-modal .auth-field>span:first-child{color:var(--ui-text)}
+.auth-modal .auth-input-shell input{color:var(--ui-text)}
+.auth-modal .auth-input-shell input::placeholder{color:var(--ui-muted)}
+.auth-modal .auth-switch{color:var(--ui-accent)}
+.auth-modal .auth-demo-notice{color:var(--ui-accent)}
+.auth-modal .auth-otp-grid input{color:var(--ui-text)}
+.footer-description{color:var(--ui-muted)}
+.footer-authors>span{color:var(--ui-muted)}
+.footer-authors i{color:var(--ui-accent)}
+.footer-authors small{color:var(--ui-accent)}
+.footer-bottom{color:var(--ui-muted)}
+.footer-bottom button{color:var(--ui-accent)}
+.footer-bottom button:hover{color:var(--ui-text)}
+.footer-contact{color:var(--ui-muted)}
+.footer-authors .footer-author-signatures{color:var(--ui-text)}
+.footer-authors .author-signature-amp{color:var(--ui-accent)}
+.flip-carousel{color:var(--ui-text)}
+.flip-eyebrow{color:var(--ui-muted)}
+.flip-current-code{color:var(--ui-muted)}
+.flip-current-title{color:var(--ui-text)}
+.flip-current-count{color:var(--ui-muted)}
+.flip-control,.flip-dot{color:var(--ui-text)}
+.flip-counter{color:var(--ui-muted)}
+.flip-hint{color:var(--ui-muted)}
+.profile-avatar{color:var(--ui-text)}
+.profile-banner>span{color:var(--ui-accent)}
+.profile-banner i{color:var(--ui-accent)}
+.profile-upload-row strong{color:var(--ui-text)}
+.profile-upload-row small{color:var(--ui-muted)}
+.profile-upload-button{color:var(--ui-text)}
+.profile-remove{color:var(--ui-accent)}
+.profile-at{color:var(--ui-accent)}
+.profile-input-meta{color:var(--ui-muted)}
+.night-theme .choice-trigger{color:var(--ui-text)}
+.choice-trigger>svg{color:var(--ui-accent)}
+.choice-list{color:var(--ui-text)}
+.choice-list-heading{color:var(--ui-accent)}
+.choice-list-option[aria-selected="true"]{color:var(--ui-text)}
+.choice-list-option[aria-selected="true"]>i{color:var(--ui-text)}
+.filters .field>label,.practice-setup .field>label{color:var(--ui-accent)}
+.practice-setup .field>small{color:var(--ui-muted)}
+.night-theme .filters input[type="search"],.night-theme .practice-setup input[type="number"]{color:var(--ui-text)}
+.filters input[type="search"]::placeholder{color:var(--ui-muted)}
+.filters .filtercheck{color:var(--ui-accent)}
+.review-comparison>div>span{color:var(--ui-muted)}
+.review-comparison strong{color:var(--ui-text)}
+.review-question .bank-answer>summary{color:var(--ui-accent)}
+.review-question .option-list>li{color:var(--ui-accent)}
+.review-tag.chosen{color:var(--ui-accent)}
+.night-theme .night-hero h2 em,.night-theme .footer-author-signatures,.night-theme .author-signature-name,.night-theme .author-signature-amp{color:var(--ui-accent)}
+.night-theme .hello-wordmark{color:#f4eaf9}
+.night-theme .hello-signature .accent{stroke:#e4c58d}
+.night-theme .brand{color:#fff}
+.night-theme .mobile-brand{color:#f5e9ff!important}

@@ -1,0 +1,86 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kienhoc",
+  "account_id": "dea1d41355c5cb6bd9c128f72ec85a0f",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "90035687e0384e4c9f27530c6cf88e0e"
+    }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    "NODE_ENV": "production",
+    "TRUST_PROXY_HOPS": "1",
+    "BEHIND_TRUSTED_PROXY": "true",
+    "AUTH_LEGACY_UNTIL": "2026-11-01T09:11:30.493Z",
+    "APP_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://study.anhdungece.id.vn,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn,https://ops.vietkienetet.id.vn",
+    "CANONICAL_ORIGIN": "https://study.anhdungece.id.vn",
+    "CANONICAL_ENABLED": "true",
+    "MIGRATION_SOURCE_ORIGINS": "https://kienhoc.anhdungcasi.workers.dev,https://kienhoc-study.pages.dev,https://vietkienetet.id.vn,https://www.vietkienetet.id.vn",
+    "ADMIN_ENABLED": "true",
+    "TELEMETRY_ENABLED": "true",
+    "ADMIN_ORIGIN": "https://ops.vietkienetet.id.vn",
+    "ADMIN_REQUIRE_ACCESS": "true",
+    "ADMIN_ACCESS_TEAM": "empty-union-9700",
+    "ADMIN_ACCESS_AUD": "69391bced00568199a38b355b6a400a50ffe00dda5511238b35562fd2bc39621",
+    "PK_ENABLED": "true"
+  },
+  "ratelimits": [
+    {"name":"PROGRESS_LIMITER","namespace_id":"1002","simple":{"limit":240,"period":60}},
+    {
+      "name": "AUTH_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "vietkienetet.id.vn/*",
+      "zone_name": "vietkienetet.id.vn"
+    },
+    {
+      "pattern": "www.vietkienetet.id.vn/*",
+      "zone_name": "vietkienetet.id.vn"
+    },
+    {
+      "pattern": "ops.vietkienetet.id.vn",
+      "custom_domain": true
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PK_ROOMS",
+        "class_name": "BattleRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "pk-production-v1",
+      "new_sqlite_classes": [
+        "BattleRoom"
+      ]
+    }
+  ]
+}

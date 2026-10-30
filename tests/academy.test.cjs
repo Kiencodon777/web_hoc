@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),path=require('path');
 const files=['data.js','ai-questions.js','ai-answers.js','information-questions.js','academy.js','question-sources.js','info-questions.js','ai-hints.js','quiz-data.js','quiz-store.js','unified-ui.js','app.js'];
-function app(initial={}){const db={...initial},nodes={},listeners={};let now=1000000;class Clock extends Date{static now(){return now;}}function node(s){return nodes[s]??={innerHTML:'',textContent:'',style:{},dataset:{},classList:{toggle(){}},setAttribute(){},addEventListener(){},prepend(){},focus(){},scrollIntoView(){}};}
- const ctx=vm.createContext({console,Date:Clock,Math,JSON,Number,String,Object,Array,Set,localStorage:{getItem:k=>db[k]||null,setItem:(k,v)=>db[k]=v},document:{body:node('body'),querySelector:node,querySelectorAll:()=>[],addEventListener:(t,f)=>(listeners[t]||=[]).push(f),createElement:()=>node('new')},window:{scrollTo(){},confirm:()=>true,addEventListener(){}},setTimeout(){},setInterval(){return 1},clearInterval(){},URL:{},Blob});for(const file of files)vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',file),'utf8'),ctx,{filename:file});return {db,nodes,run:s=>vm.runInContext(s,ctx),advance:ms=>now+=ms,listeners};}
+function app(initial={}){const db={...initial},nodes={},listeners={},dispatched=[];let now=1000000;class Clock extends Date{static now(){return now;}}function node(s){return nodes[s]??={innerHTML:'',textContent:'',style:{},dataset:{},classList:{toggle(){}},setAttribute(){},addEventListener(){},prepend(){},focus(){},scrollIntoView(){}};}
+ const ctx=vm.createContext({console,CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},Date:Clock,Math,JSON,Number,String,Object,Array,Set,localStorage:{getItem:k=>db[k]||null,setItem:(k,v)=>db[k]=v},document:{dispatchEvent:e=>{dispatched.push(e);(listeners[e.type]||[]).forEach(fn=>fn(e));return true;},body:node('body'),querySelector:node,querySelectorAll:()=>[],addEventListener:(t,f)=>(listeners[t]||=[]).push(f),createElement:()=>node('new')},window:{scrollTo(){},confirm:()=>true,addEventListener(){}},setTimeout(){},setInterval(){return 1},clearInterval(){},URL:{},Blob});for(const file of files)vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',file),'utf8'),ctx,{filename:file});return {db,nodes,dispatched,run:s=>vm.runInContext(s,ctx),advance:ms=>now+=ms,listeners};}
 const original={version:1,progress:{'1.1':{attempts:3,correct:2,last:true,lastAnswer:'B',at:100}},bookmarks:['1.1'],session:{keys:['1.1','1.2'],index:1,answers:{'1.1':'B'},hints:{'1.1':true},hintsUsed:{'1.1':true},mode:'learn',created:100},prefs:{sound:false,speechRate:1.2}};
 const a=app({'su-ky-progress-v1':JSON.stringify(original),'kienhoc-ai-choices-v1':'{"1":"B","11":"C","50":"A","74":"D","116":"Z"}','kienhoc-info-choices-v1':'{"55":"D","63":"B","143":"A"}'}),{run,db,nodes}=a;
 assert.equal(run('currentSubject'),'history');assert.equal(run('view'),'catalog');
@@ -35,4 +35,29 @@ const again=app(db);assert.equal(again.run('progressRoot.ai.bookmarks[0]'),'ai.1
 // Every numerical question with calculation metadata is recomputed independently.
 for(const q of JSON.parse(run('JSON.stringify(INFO_PRACTICE)'))){assert(q.explanation.includes('=')||q.explanation.includes('Σ'));const c=q.calc;if(!c)continue;let v;switch(c.type){case'self':v=Math.log2(1/c.p);break;case'entropy':v=c.p.reduce((s,p)=>s+(p?p*Math.log2(1/p):0),0);break;case'length':v=c.p.reduce((s,p,i)=>s+p*c.lengths[i],0);break;case'huffman':{let weights=[...c.p],sum=0;while(weights.length>1){weights.sort((a,b)=>a-b);const x=weights.shift()+weights.shift();sum+=x;weights.push(x);}v=sum;break;}case'distance':v=[...c.a].filter((x,i)=>x!==c.b[i]).length;break;case'detect':v=c.d-1;break;case'correct':v=Math.floor((c.d-1)/2);break;case'snr':v=10**(c.db/10);break;case'capacity':v=c.b*Math.log2(1+c.snr);break;case'inverse':v=2**(c.c/c.b)-1;break;}assert(Math.abs(v-c.value)<1e-10,q.key);}
 assert(!run('QuizStore.validBackup({version:2})'));assert(run('QuizStore.validBackup(progressRoot)'));
+// Review is a rendering-only mode: bank stays collapsed; completed results open in-card.
+const reviewApp=app();
+for(const subject of ['history','ai','information']){
+ reviewApp.run(`openSubject("${subject}");go('bank');`);
+ const bankHTML=reviewApp.run('bankList(filtered())');
+ assert(!bankHTML.includes('review-comparison'),'ordinary bank has no previous-answer strip');
+ assert(!/class="bank-answer" open/.test(bankHTML),'ordinary bank answers stay collapsed, including Array.map calls');
+ reviewApp.run(`var reviewPool=CORE.filter(q=>isGradable(q));var reviewWrong=reviewPool.find(q=>q.options.length>acceptedAnswers(q).length);var reviewRight=reviewPool.find(q=>q.key!==reviewWrong.key);var reviewBlank=reviewPool.find(q=>q.key!==reviewWrong.key&&q.key!==reviewRight.key);var reviewPending=CORE.find(q=>!isGradable(q));mode='exam';order='original';start([reviewWrong,reviewRight,reviewBlank,...(reviewPending?[reviewPending]:[])]);selectAnswer('ABCD'.split('').find(a=>reviewWrong.options['ABCD'.indexOf(a)]&&!isCorrect(reviewWrong,a)));moveQuestion(1);selectAnswer(acceptedAnswers(reviewRight)[0]);finish();resultFilter='wrong';`);
+ const wrongHTML=reviewApp.run('resultPage()'),cards=wrongHTML.match(/<article[^>]*class="bankitem review-question"[\s\S]*?<\/article>/g)||[];
+ assert.equal(cards.length,2);
+ for(const card of cards){assert(card.includes('class="review-comparison is-wrong"'));assert(card.includes('Bạn chọn'));assert(card.includes('Đáp án tham khảo'));assert(card.includes('class="bank-answer" open'));assert(card.includes('GIẢI THÍCH & CÁCH NHỚ'));}
+ assert(!/<p class="micro">Bạn chọn/.test(wrongHTML));assert(wrongHTML.includes('review-tag chosen'));assert(wrongHTML.includes('review-tag accepted'));
+ reviewApp.run("resultFilter='all'");assert(reviewApp.run('resultPage()').includes('review-comparison is-correct'));
+ if(reviewApp.run('!!reviewPending')){reviewApp.run("resultFilter='pending'");const pending=reviewApp.run('resultPage()');assert(pending.includes('Chưa có đáp án duy nhất'));assert(pending.includes('class="bank-answer" open'));assert(!pending.includes('review-tag accepted'));}
+}
 console.log('PASS: shared schemas/counts, legacy migration/idempotence, cross-subject routing/bookmarks/sessions, 115-question timed exam with delayed feedback, two-option safety, full pending/multiple-answer grading, timed auto-submit, filtered retries, numerical practice recomputation and reload preservation.');
+
+// Session numbering is independent of source numbering, gaps and shuffled pools.
+const numbering=app();numbering.run("openSubject('ai');mode='exam';size=0;order='original';start(CORE);moveQuestion(96)");
+assert(numbering.run('quiz()').includes('Câu 97 / 115'));assert(numbering.run('quiz()').includes('Câu gốc: 98'));
+assert(numbering.run('quiz()').includes('data-jump="96"'));assert.equal(numbering.run('session.keys[96]'),'ai.98');
+numbering.run("start([BYKEY['ai.115'],BYKEY['ai.18']]);moveQuestion(1)");
+assert(numbering.run('quiz()').includes('Câu 2 / 2'));assert(numbering.run('quiz()').includes('Câu gốc: 18'));
+for(const subject of ['history','ai','information']){numbering.run('openSubject('+JSON.stringify(subject)+')');assert(!numbering.run('bankList(CORE)').includes('· ID '));}
+
+assert(a.dispatched.some(e=>e.type==='kien-page-view'));assert(a.dispatched.filter(e=>e.type==='kien-page-view').every(e=>Object.keys(e.detail).sort().join(',')==='subject,view'));

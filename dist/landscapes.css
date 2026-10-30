@@ -1,0 +1,12 @@
+/* The CSS layer remains visible while a GPU context is unavailable. */
+body[data-scene="topography"] #scene-background{background:#10121b}
+body[data-scene="topography"] .scene-css{background:repeating-radial-gradient(ellipse at 17% 24%,transparent 0 22px,rgba(183,171,212,.12) 23px 24px,transparent 25px 45px),radial-gradient(ellipse at 85% 80%,#22233b,transparent 65%);opacity:.55}
+body[data-scene="wave"] #scene-background{background:#172333}
+body[data-scene="wave"] .scene-css{background:radial-gradient(ellipse at 15% 80%,#91c9ee 0,transparent 55%),radial-gradient(ellipse at 85% 20%,#c9bee5 0,transparent 60%),linear-gradient(145deg,#2a729c,#a5b4dc 50%,#6274aa)}
+body[data-scene="wave"] .scene-shade{background:linear-gradient(180deg,rgba(8,10,20,.65),rgba(8,10,20,.45) 50%,rgba(8,10,20,.7))}
+body[data-scene="topography"] .ambient-moon,body[data-scene="wave"] .ambient-moon{display:none}
+.sample-topography{background:repeating-radial-gradient(ellipse at 15% 20%,#171b2b 0 7px,#8f84aa 8px 9px,#171b2b 10px 16px)!important}
+.sample-wave{background:linear-gradient(145deg,#327ba5,#e0e5f3 45%,#829bc9 64%,#bfa8d7)!important}
+.quiz-source-number{color:var(--muted);font-size:12px}
+.journey-numbering{font-size:11px;line-height:1.5;color:var(--muted);margin:0 0 10px}
+@media(prefers-reduced-motion:reduce){body[data-scene="topography"] .scene-css,body[data-scene="wave"] .scene-css{animation:none}}

@@ -5,5 +5,6 @@ function openDatabase(filename){if(filename!==':memory:')fs.mkdirSync(path.dirna
  CREATE INDEX IF NOT EXISTS otps_email ON otps(email,id DESC);
  CREATE TABLE IF NOT EXISTS progress(user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,data TEXT NOT NULL,updated_at TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1);
  CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL);
- PRAGMA user_version = 1;`);if(filename!==':memory:')fs.chmodSync(filename,0o600);return db;}
+ CREATE TABLE IF NOT EXISTS user_profiles(user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,username TEXT NOT NULL DEFAULT '',avatar TEXT,completed INTEGER NOT NULL DEFAULT 1,revision INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL);
+ PRAGMA user_version = 2;`);db.exec(require('./operations-schema.cjs').schema);db.exec(require('./security-schema.cjs'));if(filename!==':memory:')fs.chmodSync(filename,0o600);return db;}
 module.exports={openDatabase};

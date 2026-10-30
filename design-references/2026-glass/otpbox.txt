@@ -1,0 +1,470 @@
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+magic-link-otp-login.tsx
+"use client";
+
+import * as React from "react";
+import { ArrowRight, Check, KeyRound, LoaderCircle, Mail, ShieldCheck } from "lucide-react";
+
+export type MagicLinkStep = "email" | "code" | "success";
+export type MagicLinkStatus = "idle" | "sending" | "verifying" | "error";
+export type MagicLinkOtpLoginProps = {
+  email?: string;
+  defaultEmail?: string;
+  onEmailChange?: (email: string) => void;
+  step?: MagicLinkStep;
+  defaultStep?: MagicLinkStep;
+  onStepChange?: (step: MagicLinkStep) => void;
+  /** Resolve after your service accepts the request; reject to keep the email form. */
+  onSendLink?: (email: string) => unknown;
+  /** Only an explicit true advances uncontrolled success. A void result leaves step to the host. */
+  onVerifyCode?: (code: string) => unknown;
+  status?: MagicLinkStatus;
+  error?: string;
+  resendSeconds?: number;
+  codeLength?: number;
+  onResend?: (email: string) => unknown;
+  onUsePassword?: () => void;
+  /** Optional controlled code, useful for host autofill. Each value is digits only. */
+  code?: string;
+  defaultCode?: string;
+  onCodeChange?: (code: string) => void;
+  appName?: string;
+  logo?: React.ReactNode;
+  successTitle?: string;
+  className?: string;
+  ref?: React.ComponentProps<"div">["ref"];
+};
+
+const FOCUS = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card";
+const EASE = "cubic-bezier(.22,1,.36,1)";
+const digitsOnly = (value: string, length: number) => value.replace(/[^0-9]/g, "").slice(0, length);
+
+function Envelope() {
+  return (
+    <div data-envelope aria-hidden="true" className="relative mx-auto h-[78px] w-[88px]" style={{ perspective: 400 }}>
+      <div className="absolute left-2 top-7 h-12 w-[72px] rounded-lg border border-border bg-muted" />
+      <div data-envelope-flap className="absolute left-2 top-7 h-8 w-[72px] origin-top bg-primary/20" style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)", transform: "rotateX(180deg)" }} />
+      <div data-envelope-paper className="absolute left-[19px] top-6 flex h-[50px] w-[50px] flex-col items-center gap-1.5 rounded-md border border-border bg-card pt-2 shadow-sm" style={{ transform: "translateY(-10px)" }}>
+        <span data-envelope-check className="flex size-5 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-chart-2 to-chart-3 text-background"><Check className="size-3" strokeWidth={2.5} /></span><span className="h-0.5 w-6 rounded bg-primary/25" /><span className="h-0.5 w-4 rounded bg-primary/15" />
+      </div>
+      <svg viewBox="0 0 74 50" className="absolute left-[7px] top-[27px] h-[50px] w-[74px] text-muted" fill="currentColor">
+        <path d="M1 2 37 26 73 2v39a8 8 0 0 1-8 8H9a8 8 0 0 1-8-8Z" />
+        <path d="m1 2 36 24L73 2M1 40l24-17m48 17L49 23" className="text-border" fill="none" stroke="currentColor" />
+      </svg>
+    </div>
+  );
+}
+
+/** Passwordless UI only. The host owns delivery, verification, expiry and attempt limits. */
+export function MagicLinkOtpLogin({
+  email, defaultEmail = "", onEmailChange,
+  step, defaultStep = "email", onStepChange,
+  onSendLink, onVerifyCode, status, error,
+  resendSeconds = 30, codeLength = 6, onResend, onUsePassword,
+  code, defaultCode = "", onCodeChange,
+  appName = "your workspace", logo, successTitle = "You're in",
+  className = "", ref,
+}: MagicLinkOtpLoginProps) {
+  const id = React.useId();
+  const length = Number.isFinite(codeLength) ? Math.min(8, Math.max(4, Math.floor(codeLength))) : 6;
+  const cooldown = Number.isFinite(resendSeconds) ? Math.max(0, Math.ceil(resendSeconds)) : 30;
+  const [localEmail, setLocalEmail] = React.useState(defaultEmail);
+  const [localStep, setLocalStep] = React.useState(defaultStep);
+  const [localCode, setLocalCode] = React.useState(defaultCode);
+  const [localStatus, setLocalStatus] = React.useState("idle" as MagicLinkStatus);
+  const [localError, setLocalError] = React.useState("");
+  const [remaining, setRemaining] = React.useState(cooldown);
+  const [resends, setResends] = React.useState(0);
+  const [reduced, setReduced] = React.useState(true);
+  const root = React.useRef(null as HTMLDivElement | null);
+  const inputs = React.useRef([] as (HTMLInputElement | null)[]);
+  const mounted = React.useRef(false);
+  const request = React.useRef(0);
+  const pending = React.useRef(false);
+  const submitted = React.useRef(null as string | null);
+  const glowedCode = React.useRef(null as string | null);
+  const focusNext = React.useRef(false);
+  const value = email ?? localEmail;
+  const currentStep = step ?? localStep;
+  const currentCode = digitsOnly(code ?? localCode, length);
+  const currentStatus = status ?? localStatus;
+  const message = error ?? localError;
+  const busy = currentStatus === "sending" || currentStatus === "verifying" || localStatus === "sending" || localStatus === "verifying";
+  const failed = currentStatus === "error" || !!message;
+  const attachRef = React.useCallback((node: HTMLDivElement | null) => {
+    root.current = node;
+    if (typeof ref === "function") return ref(node);
+    if (ref) ref.current = node;
+  }, [ref]);
+
+  React.useEffect(() => {
+    mounted.current = true;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => { mounted.current = false; request.current += 1; pending.current = false; media.removeEventListener("change", update); };
+  }, []);
+
+  // A changed identity or host step invalidates a response still in flight.
+  React.useEffect(() => {
+    request.current += 1;
+    pending.current = false;
+    submitted.current = null;
+    setLocalStatus("idle");
+    setLocalError("");
+  }, [value, currentStep]);
+
+  React.useEffect(() => {
+    if (currentStep !== "code") return;
+    const deadline = Date.now() + cooldown * 1000;
+    setRemaining(cooldown);
+    const timer = window.setInterval(() => setRemaining(Math.max(0, Math.ceil((deadline - Date.now()) / 1000))), 250);
+    return () => window.clearInterval(timer);
+  }, [currentStep, cooldown, resends]);
+
+  React.useLayoutEffect(() => {
+    if (!focusNext.current || !root.current) return;
+    focusNext.current = false;
+    const target = currentStep === "code" ? inputs.current[0] : root.current.querySelector(currentStep === "email" ? "input" : "h2");
+    (target as HTMLElement | null)?.focus({ preventScroll: true });
+  }, [currentStep]);
+
+  React.useLayoutEffect(() => {
+    if (reduced || !root.current) return;
+    const animations: Animation[] = [];
+    const animate = (selector: string, frames: Keyframe[], duration: number) => {
+      const node = root.current?.querySelector(selector);
+      if (node) animations.push(node.animate(frames, { duration, easing: EASE }));
+    };
+    if (currentStep !== "email") animate("[data-step-body]", [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], 280);
+    if (currentStep === "code") {
+      animate("[data-envelope-flap]", [{ transform: "rotateX(0deg)" }, { transform: "rotateX(180deg)" }], 580);
+      animate("[data-envelope-paper]", [{ transform: "translateY(14px)" }, { transform: "translateY(-10px)" }], 720);
+    }
+    if (currentStep === "success") animate("[data-success-stamp]", [{ opacity: 0, transform: "scale(1.3) rotate(-16deg)" }, { opacity: 1, transform: "scale(.94) rotate(3deg)", offset: .7 }, { opacity: 1, transform: "scale(1) rotate(0deg)" }], 480);
+    return () => animations.forEach((animation) => animation.cancel());
+  }, [currentStep, reduced]);
+
+  React.useLayoutEffect(() => {
+    if (reduced || !failed || currentStep !== "code") return;
+    const animation = root.current?.querySelector("[data-code-fields]")?.animate(
+      [{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(-4px)" }, { transform: "translateX(0)" }],
+      { duration: 420, easing: "ease-in-out" },
+    );
+    return () => animation?.cancel();
+  }, [failed, message, currentStep, reduced]);
+
+  React.useLayoutEffect(() => {
+    if (currentStep !== "code" || currentCode.length !== length) { glowedCode.current = null; return; }
+    if (reduced || failed || glowedCode.current === currentCode) return;
+    glowedCode.current = currentCode;
+    const animations = inputs.current.flatMap((input) => {
+      if (!input) return [];
+      const resting = getComputedStyle(input).boxShadow;
+      const animation = input.animate([
+        { boxShadow: resting },
+        { boxShadow: "0 0 0 2px color-mix(in oklab, var(--chart-2) 85%, transparent), 0 0 14px color-mix(in oklab, var(--chart-2) 24%, transparent)", offset: .45 },
+        { boxShadow: resting },
+      ], { duration: 440, easing: "ease-out" });
+      animation.id = "magic-code-glow";
+      return [animation];
+    });
+    return () => animations.forEach((animation) => animation.cancel());
+  }, [currentCode, currentStep, length, failed, reduced]);
+
+  const changeStep = (next: MagicLinkStep) => {
+    focusNext.current = focusNext.current || !!root.current?.contains(document.activeElement);
+    if (step === undefined) setLocalStep(next);
+    onStepChange?.(next);
+  };
+  const changeCode = (next: string) => {
+    const clean = digitsOnly(next, length);
+    if (clean !== currentCode) submitted.current = null;
+    if (code === undefined) setLocalCode(clean);
+    setLocalError("");
+    if (!busy) setLocalStatus("idle");
+    onCodeChange?.(clean);
+  };
+
+  const deliver = async (resend: boolean) => {
+    const callback = resend ? onResend : onSendLink;
+    if (!callback || busy || pending.current || (resend && remaining > 0)) return;
+    focusNext.current = !!root.current?.contains(document.activeElement);
+    pending.current = true;
+    const token = ++request.current;
+    setLocalStatus("sending");
+    setLocalError("");
+    try {
+      await callback(value.trim());
+      if (!mounted.current || token !== request.current) return;
+      changeCode("");
+      if (resend) setResends((count) => count + 1);
+      else changeStep("code");
+    } catch {
+      if (!mounted.current || token !== request.current) return;
+      setLocalError(resend ? "Couldn't resend. Please try again." : "Couldn't send a link. Please try again.");
+      setLocalStatus("error");
+    } finally {
+      if (mounted.current && token === request.current) { pending.current = false; setLocalStatus((current) => current === "error" ? current : "idle"); }
+    }
+  };
+
+  React.useEffect(() => {
+    if (currentCode.length !== length) { submitted.current = null; return; }
+    if (currentStep !== "code" || busy || pending.current || !onVerifyCode || submitted.current === currentCode) return;
+    let cancelled = false;
+    // Defer one microtask so Strict Mode's effect replay never duplicates a request.
+    const verify = async () => {
+      if (cancelled || pending.current || submitted.current === currentCode) return;
+      submitted.current = currentCode;
+      pending.current = true;
+      focusNext.current = !!root.current?.contains(document.activeElement);
+      const token = ++request.current;
+      setLocalError("");
+      setLocalStatus("verifying");
+      try {
+        const result = await onVerifyCode(currentCode);
+        if (!mounted.current || token !== request.current) return;
+        if (result === true) changeStep("success");
+        if (result === false) { setLocalError("That code didn't work. Try again."); setLocalStatus("error"); }
+      } catch {
+        if (!mounted.current || token !== request.current) return;
+        setLocalError("Couldn't verify that code. Please try again.");
+        setLocalStatus("error");
+      } finally {
+        if (mounted.current && token === request.current) { pending.current = false; setLocalStatus((current) => current === "error" ? current : "idle"); }
+      }
+    };
+    queueMicrotask(() => { void verify(); });
+    return () => { cancelled = true; };
+  }, [currentCode, length, currentStep, busy, onVerifyCode]);
+
+  const putDigits = (text: string, index: number) => {
+    if (busy) return;
+    const clean = digitsOnly(text, length);
+    if (!clean) return;
+    // A full paste / one-time-code autofill replaces the whole code from any box.
+    const start = clean.length === length ? 0 : Math.min(index, currentCode.length);
+    const next = (currentCode.slice(0, start) + clean + currentCode.slice(start + clean.length)).slice(0, length);
+    changeCode(next);
+    inputs.current[Math.min(start + clean.length, length - 1)]?.focus();
+  };
+  const codeKey = (event: React.KeyboardEvent, index: number) => {
+    if (busy) return;
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      const target = currentCode[index] ? index : Math.max(0, index - 1);
+      changeCode(currentCode.slice(0, target) + currentCode.slice(target + 1));
+      inputs.current[Math.max(0, index - 1)]?.focus();
+    } else if (event.key === "Delete") {
+      event.preventDefault();
+      changeCode(currentCode.slice(0, index) + currentCode.slice(index + 1));
+    } else if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+      event.preventDefault();
+      const next = event.key === "Home" ? 0 : event.key === "End" ? length - 1 : Math.max(0, Math.min(length - 1, index + (event.key === "ArrowLeft" ? -1 : 1)));
+      inputs.current[next]?.focus();
+    }
+  };
+
+  return (
+    <div ref={attachRef} data-slot="magic-link-otp-login" data-step={currentStep} data-status={currentStatus} data-reduced={reduced} className={`w-full max-w-[420px] rounded-[28px] border border-border bg-card text-card-foreground shadow-xl shadow-primary/5 ${className}`}>
+      <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-3">
+        <span className="flex min-w-0 items-center gap-2.5 text-sm font-semibold"><span aria-hidden="true" className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">{logo ?? <KeyRound className="size-4" />}</span><span className="truncate">{appName}</span></span>
+        <span className="shrink-0 rounded-full border border-border px-2.5 py-1 text-[10px] font-medium text-muted-foreground">Passwordless</span>
+      </div>
+
+      <div data-step-body key={currentStep} className="px-6 py-4 sm:px-7">
+        {currentStep === "email" ? (
+          <form aria-labelledby={`${id}-title`} aria-busy={busy} onSubmit={(event) => { event.preventDefault(); void deliver(false); }}>
+            <div aria-hidden="true" className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-border bg-muted/50"><Mail className="size-6" strokeWidth={1.5} /></div>
+            <h2 id={`${id}-title`} className="text-[27px] font-semibold leading-tight tracking-tight">Your inbox is the key.</h2>
+            <p className="mt-2 max-w-[280px] text-[13px] leading-5 text-muted-foreground">Get a sign-in link and a one-time code.<br />No password to remember.</p>
+            <label htmlFor={`${id}-email`} className="mb-2 mt-6 block text-xs font-medium">Email address</label>
+            <input id={`${id}-email`} type="email" name="email" required autoComplete="email" autoCapitalize="none" spellCheck={false} value={value} disabled={busy} onChange={(event) => { setLocalEmail(event.target.value); onEmailChange?.(event.target.value); setLocalError(""); }} placeholder="you@example.com" aria-invalid={failed || undefined} aria-describedby={failed ? `${id}-error` : undefined} className={`h-12 w-full rounded-xl border border-border bg-background px-3.5 text-sm placeholder:text-muted-foreground disabled:opacity-60 ${FOCUS}`} />
+            <button type="submit" disabled={busy || !onSendLink} className={`mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70 ${FOCUS}`}>
+              {busy ? <><LoaderCircle aria-hidden="true" className="size-4 motion-safe:animate-spin" />Sending link…</> : <>Send magic link <ArrowRight aria-hidden="true" className="size-4" /></>}
+            </button>
+            {failed && <p id={`${id}-error`} role="alert" className="mt-3 text-xs leading-5">{message || "Something went wrong. Please try again."}</p>}
+          </form>
+        ) : currentStep === "code" ? (
+          <div aria-busy={busy}>
+            <Envelope />
+            <h2 id={`${id}-title`} className="mt-1 text-center text-[27px] font-semibold leading-tight tracking-tight">Check your inbox</h2>
+            <p className="mt-1 text-center text-xs leading-5 text-muted-foreground">Open the magic link we sent to</p>
+            <p data-sent-email className="mt-0.5 break-all text-center text-[13px] font-medium">{value}</p>
+            <div className="mb-3 mt-4 flex items-center gap-3"><span className="h-px flex-1 bg-border" /><span id={`${id}-code-label`} className="text-[11px] text-muted-foreground">or enter the {length}-digit code</span><span className="h-px flex-1 bg-border" /></div>
+            <div data-code-fields role="group" aria-labelledby={`${id}-code-label`} aria-describedby={`${id}-code-hint${failed ? ` ${id}-error` : ""}`} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${length}, minmax(0, 1fr))` }}>
+              {Array.from({ length }, (_, index) => (
+                <input key={index} ref={(node) => { inputs.current[index] = node; }} data-code-index={index} type="text" inputMode="numeric" autoComplete={index === 0 ? "one-time-code" : "off"} pattern="[0-9]*" name={`code-${index + 1}`} aria-label={`Digit ${index + 1} of ${length}`} aria-invalid={failed || undefined} value={currentCode[index] ?? ""} disabled={busy} onFocus={(event) => event.target.select()} onKeyDown={(event) => codeKey(event, index)} onChange={(event) => { if (!event.target.value) changeCode(currentCode.slice(0, index) + currentCode.slice(index + 1)); else putDigits(event.target.value, index); }} onPaste={(event) => { event.preventDefault(); putDigits(event.clipboardData.getData("text"), index); }} className={`h-14 min-w-0 rounded-xl border bg-background text-center font-mono text-2xl font-medium text-foreground caret-primary disabled:opacity-70 ${failed ? "border-transparent ring-1 ring-chart-5/70" : currentCode[index] ? "border-transparent ring-1 ring-chart-2/60" : "border-border"} ${FOCUS}`} />
+              ))}
+            </div>
+            <p id={`${id}-code-hint`} className="sr-only">Enter {length} digits. Your code is submitted automatically when complete.</p>
+            <div className="flex min-h-8 items-center justify-center pt-1 text-center text-[11px] leading-4">
+              {failed ? <p id={`${id}-error`} role="alert" className="rounded-md bg-foreground px-2 py-0.5 font-medium text-chart-5 dark:bg-background">{message || "That code didn't work. Try again."}</p> : <p className="flex items-center gap-1.5 text-muted-foreground">{currentStatus === "verifying" ? <><LoaderCircle aria-hidden="true" className="size-3.5 motion-safe:animate-spin" />Verifying your code…</> : <>Your code signs you in automatically</>}</p>}
+            </div>
+            <div className="flex items-center justify-between gap-3 text-xs">
+              <button type="button" disabled={busy} onClick={() => { request.current += 1; pending.current = false; changeCode(""); changeStep("email"); }} className={`rounded px-0.5 py-1.5 text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground disabled:opacity-50 ${FOCUS}`}>Change email</button>
+              <button data-resend type="button" disabled={remaining > 0 || busy || !onResend} onClick={() => void deliver(true)} className={`rounded px-0.5 py-1.5 font-medium tabular-nums disabled:text-muted-foreground ${FOCUS}`}>{currentStatus === "sending" ? "Sending…" : remaining > 0 ? `Resend in ${remaining}s` : "Resend"}</button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex min-h-[288px] flex-col items-center justify-center py-6 text-center">
+            <div data-success-stamp aria-hidden="true" className="mb-6 flex size-[76px] items-center justify-center rounded-full border border-border bg-linear-to-br from-chart-2 to-chart-3 text-background ring-8 ring-chart-2/10"><Check className="size-9" strokeWidth={1.75} /></div>
+            <h2 id={`${id}-title`} tabIndex={-1} className="text-[28px] font-semibold tracking-tight outline-none">{successTitle}</h2>
+            <p className="mt-2 text-[13px] text-muted-foreground">Welcome back to {appName}.</p>
+            <span className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[11px] text-muted-foreground"><ShieldCheck className="size-3.5" aria-hidden="true" />Email verified</span>
+          </div>
+        )}
+        {onUsePassword && currentStep !== "success" && <button type="button" disabled={busy} onClick={onUsePassword} className={`mx-auto mt-2 flex items-center gap-1.5 rounded px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-50 ${FOCUS}`}><KeyRound className="size-3" aria-hidden="true" />Use a password instead</button>}
+      </div>
+
+      <ol aria-label="Sign-in progress" className="flex items-center justify-center gap-4 border-t border-border px-6 py-3">
+        {(["email", "code", "success"] as const).map((item, index) => {
+          const active = currentStep === item;
+          const done = index < ["email", "code", "success"].indexOf(currentStep);
+          return <li key={item} aria-current={active ? "step" : undefined} className={`flex items-center gap-1.5 text-[10px] ${active || done ? "text-foreground" : "text-muted-foreground"}`}><span className={`flex size-4 items-center justify-center rounded-full text-[9px] ${active ? "bg-chart-2 text-foreground dark:text-background" : done ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{done ? <Check className="size-2.5" aria-hidden="true" /> : index + 1}</span>{["Email", "Code", "You're in"][index]}</li>;
+        })}
+      </ol>
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{currentStep === "success" ? successTitle : currentStatus === "sending" ? "Sending your magic link" : currentStatus === "verifying" ? "Verifying your code" : currentStep === "code" ? `Check your inbox at ${value}. Enter your ${length}-digit code.` : "Enter your email to get a magic link."}</p>
+    </div>
+  );
+}
+
+export default MagicLinkOtpLogin;
+
+
+demo.tsx
+"use client";
+
+import * as React from "react";
+import { ArrowUpRight, RotateCcw } from "lucide-react";
+import { MagicLinkOtpLogin } from "@/components/ui/magic-link-otp-login";
+import type { MagicLinkStep, MagicLinkStatus } from "@/components/ui/magic-link-otp-login";
+
+const EMAIL = "maria@example.com";
+const WRONG_CODE = "111111";
+const CODE = "241806";
+type DemoProps = { autoplay?: boolean };
+
+export default function MagicLinkOtpLoginDemo({ autoplay = true }: DemoProps = {}) {
+  const [email, setEmail] = React.useState("");
+  const [code, setCode] = React.useState("");
+  const [step, setStep] = React.useState("email" as MagicLinkStep);
+  const [status, setStatus] = React.useState("idle" as MagicLinkStatus);
+  const [error, setError] = React.useState("");
+  const [ready, setReady] = React.useState(false);
+  const [reduced, setReduced] = React.useState(true);
+  const [stopped, setStopped] = React.useState(false);
+  const [replay, setReplay] = React.useState(0);
+  const [notice, setNotice] = React.useState("");
+  const stop = React.useRef(false);
+  const tries = React.useRef(3);
+  const timers = React.useRef([] as number[]);
+  const form = React.useRef(null as HTMLDivElement | null);
+  const playing = autoplay && ready && !reduced && !stopped;
+
+  React.useLayoutEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(media.matches);
+    update(); setReady(true);
+    media.addEventListener("change", update);
+    return () => { media.removeEventListener("change", update); timers.current.forEach(window.clearTimeout); };
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (!playing) return;
+    stop.current = false;
+    const schedule = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(() => { if (!stop.current) fn(); }, ms));
+    const cycle = () => {
+      timers.current = [];
+      setEmail(""); setCode(""); setStep("email"); setStatus("idle"); setError(""); setNotice(""); tries.current = 3;
+      for (let index = 1; index <= EMAIL.length; index += 1) schedule(() => setEmail(EMAIL.slice(0, index)), 300 + (index - 1) * 900 / (EMAIL.length - 1));
+      schedule(() => setStatus("sending"), 1500);
+      schedule(() => setStatus("idle"), 1800);
+      schedule(() => setStep("code"), 1900);
+      for (let index = 1; index <= WRONG_CODE.length; index += 1) schedule(() => setCode(WRONG_CODE.slice(0, index)), 2400 + (index - 1) * 140);
+      schedule(() => setStatus("verifying"), 3300);
+      schedule(() => { tries.current = 2; setStatus("error"); setError("Wrong code · 2 tries left"); }, 3700);
+      schedule(() => { setCode(""); setError(""); setStatus("idle"); }, 4200);
+      for (let index = 1; index <= CODE.length; index += 1) schedule(() => setCode(CODE.slice(0, index)), 4500 + (index - 1) * 140);
+      schedule(() => setStatus("verifying"), 5400);
+      schedule(() => { setStatus("idle"); setStep("success"); }, 6000);
+      schedule(cycle, 7400);
+    };
+    cycle();
+    return () => { timers.current.forEach(window.clearTimeout); timers.current = []; };
+  }, [playing, replay]);
+
+  const takeOver = () => {
+    if (!playing || stop.current) return;
+    stop.current = true;
+    setStopped(true);
+    setStatus("idle");
+    // Let pointer/keyboard interaction continue from the visible demo state.
+  };
+  const send = async () => {
+    setError(""); setStatus("sending");
+    await new Promise((resolve) => window.setTimeout(resolve, 400));
+    setStatus("idle");
+  };
+  const verify = async (next: string) => {
+    if (playing && !stop.current) return;
+    setStatus("verifying"); setError("");
+    await new Promise((resolve) => window.setTimeout(resolve, 600));
+    if (next === CODE) { setStatus("idle"); return true; }
+    tries.current = Math.max(0, tries.current - 1);
+    setStatus("error");
+    setError(`Wrong code · ${tries.current} ${tries.current === 1 ? "try" : "tries"} left`);
+    return false;
+  };
+
+  return (
+    <main data-magic-demo data-playing={playing} className="flex min-h-screen w-full flex-col items-center justify-center gap-4 bg-muted/40 px-4 py-4 font-sans text-foreground">
+      <div className="flex w-full max-w-[420px] items-center justify-between px-1 text-[10px] font-medium uppercase tracking-[.16em] text-muted-foreground"><span>Magic link + one-time code</span><span className="rounded border border-border px-1.5 py-0.5 text-[9px] tracking-[.08em]">Sample app</span></div>
+      <div className="w-full max-w-[420px]" onPointerDownCapture={takeOver} onKeyDownCapture={takeOver} onFocusCapture={takeOver}>
+        <MagicLinkOtpLogin ref={form} email={email} onEmailChange={(next) => { takeOver(); setEmail(next); }} code={code} onCodeChange={(next) => { takeOver(); setCode(next); setError(""); setStatus("idle"); }} step={step} onStepChange={setStep} status={status} error={error} onSendLink={send} onResend={send} onVerifyCode={verify} onUsePassword={() => setNotice("Demo only · password sign-in selected")} appName="Forma" successTitle="You're in, Maria" logo={<ArrowUpRight className="size-5" strokeWidth={2.5} />} />
+      </div>
+      <div className="flex w-full max-w-[420px] items-center justify-between gap-3 px-1 text-[10px] text-muted-foreground">
+        <p role="status">{notice || (playing ? "An easier way back in." : `Demo code: ${CODE} · no email is sent`)}</p>
+        <button data-replay type="button" onClick={() => { form.current?.querySelector("input")?.blur(); stop.current = false; setStopped(false); setEmail(""); setCode(""); setStep("email"); setStatus("idle"); setError(""); setNotice(""); setReplay((count) => count + 1); }} className="flex shrink-0 items-center gap-1 rounded px-1 py-1 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="size-3" aria-hidden="true" />Replay</button>
+      </div>
+    </main>
+  );
+}
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
