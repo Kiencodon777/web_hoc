@@ -6,12 +6,12 @@
  function stop(){cancelAnimationFrame(frame);frame=0;}
  function paint(){
   document.querySelector('#community-band')?.remove();
-  const corner=document.querySelector('.appearance-quick');if(!corner||!latest)return;
+  if(!latest)return;
   let badge=document.querySelector('#community-presence');
   if(!badge){
    badge=document.createElement('aside');badge.id='community-presence';badge.className='community-presence';
-   badge.innerHTML='<span class="community-presence-dot" aria-hidden="true"></span><strong class="community-presence-number" aria-hidden="true">0</strong><span aria-hidden="true">đang online</span><span class="sr-only" role="status" aria-atomic="true"></span>';
-   corner.append(badge);target=null;
+   badge.innerHTML='<strong class="community-presence-number" aria-hidden="true">0</strong><span aria-hidden="true">đang online</span><span class="sr-only" role="status" aria-atomic="true"></span>';
+   document.body.append(badge);target=null;
   }
   badge.title=(latest.preview?'Số liệu của bản thử. ':'')+'Số trình duyệt có tương tác trong 2 phút gần nhất; không phải số người tuyệt đối.';
   const count=latest.online,node=badge.querySelector('strong');badge.dataset.active=String(count>0);
